@@ -1,0 +1,74 @@
+#include "arap.h"
+#include "graphics/meshloader.h"
+
+#include <iostream>
+#include <set>
+#include <map>
+#include <vector>
+
+#include <Eigen/Core>
+#include <Eigen/Sparse>
+#include <Eigen/SVD>
+
+#include "ocean/ocean.h"
+
+using namespace std;
+using namespace Eigen;
+
+ARAP::ARAP() {}
+
+void ARAP::init
+	(
+	Eigen::Vector3f &coeffMin,
+	Eigen::Vector3f &coeffMax
+	)
+{
+	m_num_iterations = 1000;
+	m_mesh_path = "meshes/bunny.obj";
+
+	vector<Vector3f> vertices;
+	vector<Vector3i> triangles;
+
+	// If this doesn't work for you, remember to change your working directory
+//	if (MeshLoader::loadTriMesh(m_mesh_path, vertices, triangles)) {
+//		m_shape.init(vertices, triangles);
+//	}
+
+	ocean o = ocean();
+	vertices = o.get_vertices();
+	triangles = o.get_faces();
+	m_shape.init(vertices, triangles);
+
+	// Students, please don't touch this code: get min and max for viewport stuff
+	MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
+	int i = 0;
+	for (unsigned long i = 0; i < vertices.size(); ++i) {
+		all_vertices.row(i) = vertices[i];
+	}
+	coeffMin = all_vertices.colwise().minCoeff();
+	coeffMax = all_vertices.colwise().maxCoeff();
+}
+
+
+
+// Move an anchored vertex, defined by its index, to targetPosition
+void ARAP::move
+	(
+	int vertex,
+	Vector3f targetPosition
+	)
+{
+	// Here are some helpful controls for the application
+	//
+	// - You start in first-person camera mode
+	//   - WASD to move, left-click and drag to rotate
+	//   - R and F to move vertically up and down
+	//
+	// - C to change to orbit camera mode
+	//
+	// - Right-click (and, optionally, drag) to anchor/unanchor points
+	//   - Left-click an anchored point to move it around
+	//
+	// - Minus and equal keys (click repeatedly) to change the size of the vertices
+}
+

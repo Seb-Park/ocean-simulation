@@ -1,0 +1,9 @@
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/ocean.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/StaticGLEW.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/ocean_other_files.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/ocean_autogen_timestamp_deps.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/ocean_autogen.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/StaticGLEW_autogen_timestamp_deps.dir
+/Users/sotech117/Documents/final/adv/ocean-simulation/cmake-build-debug/CMakeFiles/StaticGLEW_autogen.dir

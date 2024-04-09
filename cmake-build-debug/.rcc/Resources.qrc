@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="resources/shaders/shader.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.frag</file>
+    <file alias="resources/shaders/shader.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.vert</file>
+    <file alias="resources/shaders/anchorPoint.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.vert</file>
+    <file alias="resources/shaders/anchorPoint.geom">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.geom</file>
+    <file alias="resources/shaders/anchorPoint.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.frag</file>
+  </qresource>
+</RCC>
+
