@@ -95,7 +95,8 @@ void GLWidget::initializeGL()
 
     // Note for maintainers: Z-up
     float fovY = 120;
-    float nearPlane = 0.0001f;
+//    float nearPlane = 0.0001f;
+    float nearPlane = 0.01;
     float farPlane  = 3 * extentLength;
 
     // Initialize camera with a reasonable transform
