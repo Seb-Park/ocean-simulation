@@ -23,12 +23,12 @@ public:
 
 private:
 
-    const int length = 32; // length of grid
-    const int width = 32; // width of grid
+    const int length = 256; // length of grid
+    const int width = 256; // width of grid
 	const int N = length * width; // total number of grid points
 
-	const double A = 10; // numeric constant for the Phillips spectrum
-	const double V = 5.0; // wind speed
+    const double A = 30; // numeric constant for the Phillips spectrum
+    const double V = 0.5; // wind speed
 	const std::pair<double, double> omega_wind
 		= std::make_pair(1.0, 0.0); // wind direction
 

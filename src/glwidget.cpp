@@ -112,23 +112,27 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
+    Eigen::Matrix4f inverseView = m_camera.getView().inverse();
+    m_defaultShader->setUniform("inverseView", inverseView);
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    m_pointShader->bind();
-    m_pointShader->setUniform("proj",   m_camera.getProjection());
-    m_pointShader->setUniform("view",   m_camera.getView());
-    m_pointShader->setUniform("vSize",  m_vSize);
-    m_pointShader->setUniform("width",  width());
-    m_pointShader->setUniform("height", height());
-    m_arap.draw(m_pointShader, GL_POINTS);
-    m_pointShader->unbind();
+//    m_pointShader->bind();
+//    m_pointShader->setUniform("proj",   m_camera.getProjection());
+//    m_pointShader->setUniform("view",   m_camera.getView());
+//    m_pointShader->setUniform("vSize",  m_vSize);
+//    m_pointShader->setUniform("width",  width());
+//    m_pointShader->setUniform("height", height());
+//    m_arap.draw(m_pointShader, GL_POINTS);
+//    m_pointShader->unbind();
 }
 
 void GLWidget::resizeGL(int w, int h)

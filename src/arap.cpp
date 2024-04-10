@@ -34,10 +34,10 @@ void ARAP::init
 //		m_shape.init(vertices, triangles);
 //	}
 
-
     vertices = m_ocean.get_vertices();
     triangles = m_ocean.get_faces();
 	m_shape.init(vertices, triangles);
+    m_shape.setColor(0.27f, .803f, .96f);
 
 	// Students, please don't touch this code: get min and max for viewport stuff
 	MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
@@ -67,7 +67,7 @@ void ARAP::update(double seconds)
    m_shape.setVertices(m_ocean.get_vertices());
 
   m_time += m_timestep;
-   std::cout << m_time << std::endl;
+//   std::cout << m_time << std::endl;
 }
 
 // Move an anchored vertex, defined by its index, to targetPosition
