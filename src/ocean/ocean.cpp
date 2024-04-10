@@ -10,18 +10,24 @@
 ocean::ocean()
 {
 	initial_h = std::vector<std::pair<double, double>>();
+    current_h = std::vector<std::pair<double, double>>();
+
 	// initialize the initial height fields
 	for (int i = 0; i < N; i++)
 	{
 		initial_h.push_back(amplitude_0(i));
+        current_h.push_back(initial_h[i]);
 	}
 }
 
+void ocean::updateVertexAmplitudes(double t){
+    for (int i = 0; i < N; i++){
+        current_h[i] = amplitude_t(t, i);
+    }
+}
+
 /* Maps the 1D k-index into it's 2D waveform vector */
-std::pair<double, double> ocean::k_index_to_k_vector
-	(
-		int k_index
-	)
+std::pair<double, double> ocean::k_index_to_k_vector(int k_index)
 {
 	// get the x and z indices
 	int x = k_index % length;
@@ -200,11 +206,12 @@ std::pair<double, double> ocean::amplitude_t
 	// add the real and imaginary part together from both h_0 and h_0_conjugate
 	double real =
 		// h+0 real
-		h_0.first * exp_positive.first
-		- h_0.second * exp_positive.second
+        (h_0.first * exp_positive.first)
+        - (h_0.second * exp_positive.second)
 		// h_0_conjugate real
-		+ h_0_conjugate.first * exp_negative.first
-		- h_0_conjugate.second * exp_negative.second;
+        + (h_0_conjugate.first * exp_negative.first)
+        - (h_0_conjugate.second * exp_negative.second);
+
 	double imag =
 		// h_0 imaginary
 		h_0.first * exp_positive.second
@@ -225,9 +232,14 @@ std::vector<Eigen::Vector3f> ocean::get_vertices()
 		double k_x = k.first;
 		double k_z = k.second;
 
-		double amplitude = initial_h[i].first;
+        //if (i < length)
+        double amplitude = current_h[i].first;
+        if (i < length) amplitude = initial_h[i].first;
 
-		std::cout << "k_x: " << k_x << " k_z: " << k_z << " amplitude: " << amplitude << std::endl;
+
+        //if (i==2) std::cout << amplitude << std::endl;
+
+        //std::cout << "k_x: " << k_x << " k_z: " << k_z << " amplitude: " << amplitude << std::endl;
 
 		vertices.emplace_back(k_x, amplitude, k_z);
 	}
@@ -251,8 +263,8 @@ std::vector<Eigen::Vector3i> ocean::get_faces()
 			int i3 = i + length;
 			int i4 = i + length + 1;
 
-			faces.emplace_back(i1, i2, i3);
-			faces.emplace_back(i2, i3, i4);
+            faces.emplace_back(i2, i1, i3);
+            faces.emplace_back(i2, i3, i4);
 		}
 	}
 	return faces;

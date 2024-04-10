@@ -34,9 +34,9 @@ void ARAP::init
 //		m_shape.init(vertices, triangles);
 //	}
 
-	ocean o = ocean();
-	vertices = o.get_vertices();
-	triangles = o.get_faces();
+
+    vertices = m_ocean.get_vertices();
+    triangles = m_ocean.get_faces();
 	m_shape.init(vertices, triangles);
 
 	// Students, please don't touch this code: get min and max for viewport stuff
@@ -49,7 +49,26 @@ void ARAP::init
 	coeffMax = all_vertices.colwise().maxCoeff();
 }
 
+void ARAP::update(double seconds)
+{
+    // STUDENTS: This method should contain all the time-stepping logic for your simulation.
+    //   Specifically, the code you write here should compute new, updated vertex positions for your
+    //   simulation mesh, and it should then call m_shape.setVertices to update the display with those
+    //   newly-updated vertices.
 
+    // STUDENTS: As currently written, the program will just continually compute simulation timesteps as long
+    //    as the program is running (see View::tick in view.cpp) . You might want to e.g. add a hotkey for pausing
+    //    the simulation, and perhaps start the simulation out in a paused state.
+
+    // Note that the "seconds" parameter represents the amount of time that has passed since
+    // the last update
+
+   m_ocean.updateVertexAmplitudes(m_time);
+   m_shape.setVertices(m_ocean.get_vertices());
+
+  m_time += m_timestep;
+   std::cout << m_time << std::endl;
+}
 
 // Move an anchored vertex, defined by its index, to targetPosition
 void ARAP::move
@@ -58,6 +77,7 @@ void ARAP::move
 	Vector3f targetPosition
 	)
 {
+    std::cout << "moving vertex: " << vertex << std::endl;
 	// Here are some helpful controls for the application
 	//
 	// - You start in first-person camera mode
