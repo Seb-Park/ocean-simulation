@@ -104,6 +104,12 @@ void Shape::setModelMatrix(const Affine3f &model) { m_modelMatrix = model.matrix
 
 // ================== General Graphics Stuff
 
+void Shape::setColor(float r, float g, float b) {
+    m_red = r;
+    m_green = g;
+    m_blue = b;
+}
+
 void Shape::draw(Shader *shader, GLenum mode)
 {
     Eigen::Matrix3f m3 = m_modelMatrix.topLeftCorner(3, 3);

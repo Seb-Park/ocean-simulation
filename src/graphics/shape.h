@@ -31,6 +31,8 @@ public:
 
     void setModelMatrix(const Eigen::Affine3f &model);
 
+    void setColor(float r, float g, float b);
+
     void draw(Shader *shader, GLenum mode);
     SelectMode select(Shader *shader, int vertex);
     bool selectWithSpecifiedMode(Shader *shader, int vertex, SelectMode mode);
