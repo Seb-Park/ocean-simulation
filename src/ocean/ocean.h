@@ -27,7 +27,7 @@ private:
     const int width = 32; // width of grid
 	const int N = length * width; // total number of grid points
 
-	const double A = 100; // numeric constant for the Phillips spectrum
+	const double A = 10; // numeric constant for the Phillips spectrum
 	const double V = 5.0; // wind speed
 	const std::pair<double, double> omega_wind
 		= std::make_pair(1.0, 0.0); // wind direction

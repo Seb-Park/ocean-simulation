@@ -140,8 +140,8 @@ int ocean::k_index_to_negative_k_index
 	int x = k_index % length;
 	int z = k_index / length;
 
-	int x_neg = length - x;
-	int z_neg = width - z;
+	int x_neg = length - x - 1;
+	int z_neg = width - z - 1;
 
 	return z_neg * length + x_neg;
 }
@@ -234,7 +234,7 @@ std::vector<Eigen::Vector3f> ocean::get_vertices()
 
         //if (i < length)
         double amplitude = current_h[i].first;
-        if (i < length) amplitude = initial_h[i].first;
+        // if (i < length) amplitude = initial_h[i].first;
 
 
         //if (i==2) std::cout << amplitude << std::endl;
