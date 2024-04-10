@@ -70,6 +70,8 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+   // glShadeModel(GL_SMOOTH);
+
 
     // Initialize shaders
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
@@ -288,6 +290,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 void GLWidget::tick()
 {
     float deltaSeconds = m_deltaTimeProvider.restart() / 1000.f;
+    m_arap.update(deltaSeconds);
 
     // Move camera
     auto look = m_camera.getLook();

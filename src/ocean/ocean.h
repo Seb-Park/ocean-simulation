@@ -14,9 +14,17 @@ class ocean
 {
 public:
 	ocean();
+    void updateVertexAmplitudes(double t);
+    std::vector<Eigen::Vector3f> get_vertices();
+    std::vector<Eigen::Vector3i> get_faces();
 
-	const int length = 16; // length of grid
-	const int width = 16; // width of grid
+
+
+
+private:
+
+    const int length = 32; // length of grid
+    const int width = 32; // width of grid
 	const int N = length * width; // total number of grid points
 
 	const double A = 100; // numeric constant for the Phillips spectrum
@@ -25,13 +33,11 @@ public:
 		= std::make_pair(1.0, 0.0); // wind direction
 
 	std::vector<std::pair<double, double>> initial_h; // initial height fields for each K
+    std::vector<std::pair<double, double>> current_h; // current height fields for each K
+
 
 	const double D = 1; // Depth below mean water level (for dispersion relation)
 
-	std::vector<Eigen::Vector3f> get_vertices
-	();
-	std::vector<Eigen::Vector3i> get_faces
-	();
 
 	std::pair<double, double> k_index_to_k_vector
 	(

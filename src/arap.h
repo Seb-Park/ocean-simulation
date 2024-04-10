@@ -3,6 +3,7 @@
 #include "graphics/shape.h"
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
+#include "ocean/ocean.h"
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -22,6 +23,8 @@ public:
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
+    void update(double seconds);
+
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
@@ -65,5 +68,9 @@ public:
 
 	int m_num_iterations;
 	const char * m_mesh_path;
+
+    ocean m_ocean;
+    double m_time = 0.00;
+    double m_timestep = 0.001;
 };
 
