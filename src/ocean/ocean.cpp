@@ -196,7 +196,7 @@ std::pair<double, double> ocean::amplitude_t
 	// get dispersion from k
 	std::pair<double, double> k = k_index_to_k_vector(k_index);
 	double k_magnitude = sqrt(k.first * k.first + k.second * k.second);
-	double omega = omega_dispersion(k_magnitude);
+	double omega = omega_dispersion(k_magnitude, true);
 
 	// calculate the complex exponential terms
 	double omega_t = omega * t;
@@ -234,6 +234,7 @@ std::vector<Eigen::Vector3f> ocean::get_vertices()
 
         //if (i < length)
         double amplitude = current_h[i].first;
+		// double amplitude = sqrt(current_h[i].first * current_h[i].first + current_h[i].second * current_h[i].second);
         // if (i < length) amplitude = initial_h[i].first;
 
 

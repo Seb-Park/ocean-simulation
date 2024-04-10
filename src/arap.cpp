@@ -67,7 +67,7 @@ void ARAP::update(double seconds)
    m_shape.setVertices(m_ocean.get_vertices());
 
   m_time += m_timestep;
-   std::cout << m_time << std::endl;
+  // std::cout << m_time << std::endl;
 }
 
 // Move an anchored vertex, defined by its index, to targetPosition
