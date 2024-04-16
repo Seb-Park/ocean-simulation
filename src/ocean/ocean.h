@@ -23,12 +23,16 @@ public:
 
 private:
 
-    const int length = 81; // length of grid
-    const int width = 81; // width of grid
+    const int length = 256; // length of grid
+    const int width = 256; // width of grid
 	const int N = length * width; // total number of grid points
+    const double spacing = 4.0; // spacing between grid points
+    const double lambda = 4.0; // how much displacement matters
 
-	const double A = 10.0; // numeric constant for the Phillips spectrum
-	const double V = .25; // wind speed
+    const double A = 10.0; // numeric constant for the Phillips spectrum
+    const double V = 2.5; // wind speed
+    const double gravity = 9.8;
+    const double L = V*V/gravity;
 	const std::pair<double, double> omega_wind
 		= std::make_pair(1.0, 0.0); // wind direction
 
@@ -36,13 +40,16 @@ private:
     std::vector<std::pair<double, double>> current_h; // current height fields for each K
 
 
-	const double D = 1; // Depth below mean water level (for dispersion relation)
+    const double D = 1.0; // Depth below mean water level (for dispersion relation)
 
 
 	std::pair<double, double> k_index_to_k_vector
 	(
 		int k_index
 	);
+
+    std::pair<double, double> k_index_to_horiz_pos(int k_index);
+
 	std::pair<double, double> sample_complex_gaussian
 		();
 	double phillips_spectrum
@@ -71,6 +78,9 @@ private:
 		double t,
 		int k_index
 	);
+
+    std::pair<double, double> calculate_displacement(int k_index);
+
 };
 
 

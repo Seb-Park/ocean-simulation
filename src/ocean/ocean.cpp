@@ -23,22 +23,61 @@ ocean::ocean()
 void ocean::updateVertexAmplitudes(double t){
     for (int i = 0; i < N; i++){
         current_h[i] = amplitude_t(t, i);
+//        std::pair<double, double> x = k_index_to_horiz_pos(i);
+
+//        std::pair<double, double> sum_amplitude = std::make_pair(0.0, 0.0);
+
+//        for (int j=0; j<N; j++){
+//            std::pair<double, double> k = k_index_to_k_vector(i);
+//            double k_dot_x = k.first*x.first + k.second * x.second;
+
+//            // basically 0 + ai
+//            std::pair<double, double> exp = exp_complex({0, k_dot_x});
+//            std::pair<double, double> h = amplitude_t(t, i);
+
+//            double real_result = exp.first*h.first - exp.second*h.second;
+//            double imag_result = exp.first*h.second + exp.second*h.first;
+
+
+//             sum_amplitude.first += real_result;
+//             sum_amplitude.second += imag_result;
+//        }
+
+//        current_h[i] = sum_amplitude;
     }
+
+
 }
 
 /* Maps the 1D k-index into it's 2D waveform vector */
 std::pair<double, double> ocean::k_index_to_k_vector(int k_index)
 {
-	// get the x and z indices
-	int x = k_index % length;
-	int z = k_index / length;
+    // get the x and z indices
+    int x = k_index % length;
+    int z = k_index / length;
 
-	// calculate the k_x and k_z values, according to the length
-	double k_x = (2 * M_PI * x - N) / (double) length;
-	double k_z = (2 * M_PI * z - N) / (double) width;
+    // calculate the k_x and k_z values, according to the length
+    double k_x = (2.0 * M_PI * x - N) / (double) length;
+    double k_z = (2.0 * M_PI * z - N) / (double) width;
 
-	return std::make_pair(k_x, k_z);
+    return std::make_pair(k_x, k_z);
 }
+
+
+/* Maps the 1D k-index into it's 2D waveform vector */
+std::pair<double, double> ocean::k_index_to_horiz_pos(int k_index)
+{
+    // get the x and z indices
+    int x = k_index % length;
+    int z = k_index / length;
+
+    // calculate the k_x and k_z values, according to the length
+    double k_x = (M_PI * x - N) / (double) length;
+    double k_z = (M_PI * z - N) / (double) width;
+
+    return std::make_pair(k_x, k_z);
+}
+
 
 /*
  * Randomly generates a complex number by
@@ -65,8 +104,8 @@ std::pair<double, double> ocean::sample_complex_gaussian
 	}
 
 	// real and imaginary parts of the complex number
-	double real = sqrt(-2 * log(uniform_1)) * cos(2 * M_PI * uniform_2);
-	double imag = sqrt(-2 * log(uniform_1)) * sin(2 * M_PI * uniform_2);
+    double real = sqrt(-2 * log(uniform_1)) * cos(2 * M_PI * uniform_2);
+    double imag = sqrt(-2 * log(uniform_1)) * sin(2 * M_PI * uniform_2);
 
 	return std::make_pair(real, imag);
 }
@@ -98,7 +137,7 @@ double ocean::phillips_spectrum
 
 	double phillips =
 		A // numeric constant
-		* exp(-1 / KL_squared)
+        * exp(-1.0 / KL_squared)
 		/ (k_fourth)
 		* k_dot_omega_squared;
 
@@ -122,8 +161,9 @@ std::pair<double, double> ocean::amplitude_0
 
 	double sqrt_phillips = sqrt(phillips_spectrum(k_index));
 
-	double real = (1 / sqrt(2)) * xi_real * sqrt_phillips;
-	double imag = (1 / sqrt(2)) * xi_imag * sqrt_phillips;
+    double sqrt2 = 0.707106781187; // this is just 1/sqrt(2)
+    double real = sqrt2 * xi_real * sqrt_phillips;
+    double imag = sqrt2 * xi_imag * sqrt_phillips;
 
 	return std::make_pair(real, imag);
 }
@@ -223,26 +263,46 @@ std::pair<double, double> ocean::amplitude_t
 	return std::make_pair(real, imag);
 }
 
+std::pair<double, double> ocean::calculate_displacement(int k_index){
+
+    std::pair<double, double> k = k_index_to_k_vector(k_index);
+    double k_x = k.first;
+    double k_z = k.second;
+    double k_mag = sqrt(k.first*k.first + k.second*k.second);
+
+
+
+}
+
 std::vector<Eigen::Vector3f> ocean::get_vertices()
 {
 	std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
 	for (int i = 0; i < N; i++)
 	{
-		std::pair<double, double> k = k_index_to_k_vector(i);
+        std::pair<double, double> k = k_index_to_horiz_pos(i);
 		double k_x = k.first;
 		double k_z = k.second;
+        double k_mag = sqrt(k.first*k.first + k.second*k.second);
+
 
         //if (i < length)
-        double amplitude = current_h[i].first;
+        std::pair<double, double> h = current_h[i];
+        double amplitude = h.first;
+
+        // calculate displacement
+        double d_x = lambda*k_x/k_mag * h.second; // real
+        double d_z = lambda*k_z/k_mag * h.second; // real
+
+
 		// double amplitude = sqrt(current_h[i].first * current_h[i].first + current_h[i].second * current_h[i].second);
         // if (i < length) amplitude = initial_h[i].first;
 
 
-        //if (i==2) std::cout << amplitude << std::endl;
+        //if (i==2) std::cout << d_z << std::endl;
 
         //std::cout << "k_x: " << k_x << " k_z: " << k_z << " amplitude: " << amplitude << std::endl;
 
-		vertices.emplace_back(k_x, amplitude, k_z);
+        vertices.emplace_back(k_x*spacing + d_x, amplitude, k_z*spacing + d_z);
 	}
 	return vertices;
 }
