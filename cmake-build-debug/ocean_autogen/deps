@@ -1081,6 +1081,8 @@ ocean_autogen/timestamp: \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/src/mainwindow.h \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean.cpp \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean.h \
+	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean_alt.cpp \
+	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean_alt.h \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/util/tiny_obj_loader.h \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/util/unsupportedeigenthing/OpenGLSupport \
 	/Users/sotech117/Library/Application\ Support/JetBrains/Toolbox/apps/CLion/ch-0/232.9921.42/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCInformation.cmake \

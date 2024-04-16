@@ -48,35 +48,42 @@ void ocean_alt::init_wave_index_constants(){
 // fast fourier transform at time t
 void ocean_alt::fft_prime(double t){
 
-    // find height at each grid index
+	std::vector<Eigen::Vector2d> h_tildas = std::vector<Eigen::Vector2d>();
+
+    // find each h_tilda at each index
     for (int i=0; i<N; i++){
         Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
         Eigen::Vector2d h_t_sum = Eigen::Vector2d(0.0, 0.0);
 
-        // for each position in grid, sum up amplitudes dependng on that position
+		Eigen::Vector2d h_t_prime = h_prime_t(i, t); // vector(real, imag)
 
-        for (int j=0; j<N; j++){
-            Eigen::Vector2d k_vector = m_waveIndexConstants[j].k_vector;
-
-
-            // add x vector and k vector as imaginary numbers
-            double imag_xk_sum = x_vector[0]*k_vector[0] + x_vector[1]*k_vector[1];
-            Eigen::Vector2d exp = complex_exp(imag_xk_sum); // vector(real, imag)
-            Eigen::Vector2d h_t_prime = h_prime_t(j, t); // vector(real, imag)
-
-            double real_comp = h_t_prime[0]*exp[0] - h_t_prime[1]*exp[1];
-            double imag_comp = h_t_prime[0]*exp[1] + h_t_prime[1]*exp[0];
-
-            h_t_sum += Eigen::Vector2d(real_comp, imag_comp);
-        }
+		h_tildas.emplace_back(h_t_sum);
 
         // now assign the current amplitude at that index
-        m_current_h[i] = h_t_sum;
 
         //m_current_h[i] = h_prime_t(i, t);
-
-
     }
+
+	// for each position in grid, sum up amplitudes dependng on that position
+	for (int i=0; i<N; i++)
+	{
+		m_current_h[i] = Eigen::Vector2d(0, 0);
+		for (int j = 0; j < N; j++)
+		{
+			Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
+			Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
+
+			// add x vector and k vector as imaginary numbers
+			double imag_xk_sum = x_vector[0]*k_vector[0] + x_vector[1]*k_vector[1];
+			Eigen::Vector2d exp = complex_exp(imag_xk_sum); // vector(real, imag)
+			Eigen::Vector2d h_t_prime = h_prime_t(i, t); // vector(real, imag)
+
+			double real_comp = h_t_prime[0]*exp[0] - h_t_prime[1]*exp[1];
+			double imag_comp = h_t_prime[0]*exp[1] + h_t_prime[1]*exp[0];
+
+			m_current_h[i] += Eigen::Vector2d(real_comp, imag_comp);;
+		}
+	}
 
 }
 
