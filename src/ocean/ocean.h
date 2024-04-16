@@ -25,12 +25,13 @@ private:
 
     const bool M_IS_SHALLOW = false;
 
-    const int length = 256; // length of grid
-    const int width = 256; // width of grid
+    const int length = 512; // length of grid
+    const int width = 512; // width of grid
 	const int N = length * width; // total number of grid points
+    const double dist_between = 10.0; // distance between grid points
 
-	const double A = 10.0; // numeric constant for the Phillips spectrum
-    const double V = 3; // wind speed
+    const double A = 30.0; // numeric constant for the Phillips spectrum
+    const double V = 100; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
 	const std::pair<double, double> omega_wind
@@ -40,7 +41,7 @@ private:
     std::vector<std::pair<double, double>> current_h; // current height fields for each K
 
 
-	const double D = 1; // Depth below mean water level (for dispersion relation)
+    const double D = 6.0; // Depth below mean water level (for dispersion relation)
 
 
     std::pair<double, double> index_to_k_vector
@@ -63,10 +64,8 @@ private:
 		double k_magnitude,
 		bool is_shallow=false
 	);
-	std::pair<double, double> exp_complex
-	(
-		std::pair<double, double> z
-	);
+    std::pair<double, double> exp_complex(double ix);
+
     std::pair<double, double> amplitude_t(double t, int index, std::pair<double, double> k);
 
 };

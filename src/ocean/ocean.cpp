@@ -115,13 +115,14 @@ double ocean::phillips_spectrum(std::pair<double, double> k)
 	double KL_squared = (k_magnitude * L) * (k_magnitude * L);
 	double k_fourth = k_magnitude * k_magnitude * k_magnitude * k_magnitude;
 
+    double l = .1;
 	double phillips =
 		A // numeric constant
         * exp(-1.0 / KL_squared)
 		/ (k_fourth)
-		* k_dot_omega_squared;
+        * k_dot_omega_squared
+        * exp(-(k_magnitude*k_magnitude*l*l)); 	// consider the small length check as described in the paper
 
-	// TODO: consider the small length check as described in the paper
 	return phillips;
 }
 
@@ -142,7 +143,7 @@ std::pair<double, double> ocean::amplitude_0(std::pair<double, double> k)
     double real = inverse_sqrt_2 * xi_real * sqrt_phillips;
     double imag = inverse_sqrt_2 * xi_imag * sqrt_phillips;
 
-	return std::make_pair(real, imag);
+    return std::make_pair(real, imag);
 }
 
 /*
@@ -184,13 +185,11 @@ double ocean::omega_dispersion
 	}
 }
 
-std::pair<double, double> ocean::exp_complex
-	(
-		std::pair<double, double> z
-	)
-{
-	double real = exp(z.first) * cos(z.second);
-	double imag = exp(z.first) * sin(z.second);
+// where ix is a number made imaginary
+std::pair<double, double> ocean::exp_complex(double ix){
+
+    double real = cos(ix);
+    double imag = sin(ix);
 
 	return std::make_pair(real, imag);
 }
@@ -204,10 +203,8 @@ std::pair<double, double> ocean::amplitude_t(double t, int index, std::pair<doub
 
 	// get the initial height (and it's conjugate)
     std::pair<double, double> h_0 = initial_h[index];
-    Eigen::Vector2f h0_vector = Eigen::Vector2f(h_0.first, h_0.second);
-    Eigen::Vector2f conj = h0_vector.conjugate();
-
-    std::pair<double, double> h_0_conjugate = std::make_pair(conj[0], conj[1]);;
+    std::pair<double, double> neg_h_0 = amplitude_0(std::make_pair(-k.first, -k.second));
+    std::pair<double, double> h_0_conjugate = std::make_pair(h_0.first, h_0.second);;
 
 	// get dispersion from k
 	double k_magnitude = sqrt(k.first * k.first + k.second * k.second);
@@ -215,17 +212,17 @@ std::pair<double, double> ocean::amplitude_t(double t, int index, std::pair<doub
 
 	// calculate the complex exponential terms
 	double omega_t = omega * t;
-	std::pair<double, double> exp_positive = exp_complex(std::make_pair(0, omega_t));
-    std::pair<double, double> exp_negative = exp_complex(std::make_pair(0, -omega_t));
+    std::pair<double, double> exp_positive = exp_complex(omega_t);
+    std::pair<double, double> exp_negative = exp_complex(-omega_t);
 
 	// add the real and imaginary part together from both h_0 and h_0_conjugate
 	double real =
 		// h+0 real
         (h_0.first * exp_positive.first)
-        - (h_0.second * exp_positive.second)
+        + (h_0.second * exp_positive.second)
 		// h_0_conjugate real
         + (h_0_conjugate.first * exp_negative.first)
-        - (h_0_conjugate.second * exp_negative.second);
+        + (h_0_conjugate.second * exp_negative.second);
 
 	double imag =
 		// h_0 imaginary
@@ -257,7 +254,7 @@ std::vector<Eigen::Vector3f> ocean::get_vertices()
 
         //std::cout << "k_x: " << k_x << " k_z: " << k_z << " amplitude: " << amplitude << std::endl;
 
-        vertices.emplace_back(k_x, amplitude, k_z);
+        vertices.emplace_back(k_x*dist_between, amplitude, k_z*dist_between);
 	}
 	return vertices;
 }
