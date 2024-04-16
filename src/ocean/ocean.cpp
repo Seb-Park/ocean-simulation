@@ -15,29 +15,54 @@ ocean::ocean()
 	// initialize the initial height fields
 	for (int i = 0; i < N; i++)
 	{
-		initial_h.push_back(amplitude_0(i));
+        std::pair<double, double> k = index_to_k_vector(i);
+        initial_h.push_back(amplitude_0(k));
         current_h.push_back(initial_h[i]);
 	}
 }
 
 void ocean::updateVertexAmplitudes(double t){
     for (int i = 0; i < N; i++){
-        current_h[i] = amplitude_t(t, i);
+        std::pair<double, double> k = index_to_k_vector(i);
+
+        current_h[i] = amplitude_t(t, i, k);
     }
 }
 
 /* Maps the 1D k-index into it's 2D waveform vector */
-std::pair<double, double> ocean::k_index_to_k_vector(int k_index)
+std::pair<double, double> ocean::index_to_k_vector(int index)
 {
-	// get the x and z indices
-	int x = k_index % length;
-	int z = k_index / length;
+    // get n' and m' from k_index
+    // since k_index goes from 0 <= k_index <= length*width
+    int n_prime = index % length;
+    int m_prime = index / length;
 
-	// calculate the k_x and k_z values, according to the length
-	double k_x = (2 * M_PI * x - N) / (double) length;
-	double k_z = (2 * M_PI * z - N) / (double) width;
+    double n = (double)n_prime - (double).50*length;
+    double m = (double)m_prime - (double).50*width;
 
-	return std::make_pair(k_x, k_z);
+    // calculate the k_x and k_z values, according to n and m
+    double k_x = (2 * M_PI * n) / L;
+    double k_z = (2 * M_PI * m) / L;
+
+    return std::make_pair(k_x, k_z);
+}
+
+/* Maps the 1D k-index into it's horizontal x,z position (for passing into shape loader) */
+std::pair<double, double> ocean::index_to_horizontal_pos(int index)
+{
+    // get n' and m' from k_index
+    // since k_index goes from 0 <= k_index <= length*width
+    int n_prime = index % length;
+    int m_prime = index / length;
+
+    double n = (double)n_prime - (double).50*length;
+    double m = (double)m_prime - (double).50*width;
+
+    // calculate horizontal pos
+    double pos_x = (n * L) / (double) length;
+    double pos_z = (m * L) / (double) width;
+
+    return std::make_pair(pos_x, pos_z);
 }
 
 /*
@@ -75,19 +100,13 @@ std::pair<double, double> ocean::sample_complex_gaussian
  * Generates the Phillips spectrum for a given k-index.
  * See section 4.3 of the paper.
  */
-double ocean::phillips_spectrum
-	(
-	int k_index
-	)
+double ocean::phillips_spectrum(std::pair<double, double> k)
 {
 	// get the k_x, k_z values & amplitude of k
-	std::pair<double, double> k = k_index_to_k_vector(k_index);
 	double k_x = k.first;
 	double k_z = k.second;
 	double k_magnitude = sqrt(k_x * k_x + k_z * k_z);
 
-	// calculate L, the max wave size from wind speed V
-	double L = (V * V) / 9.81;
 	// get the strength of k onto the wind direction
 	double k_dot_omega = k_x * omega_wind.first + k_z * omega_wind.second;
 
@@ -98,7 +117,7 @@ double ocean::phillips_spectrum
 
 	double phillips =
 		A // numeric constant
-		* exp(-1 / KL_squared)
+        * exp(-1.0 / KL_squared)
 		/ (k_fourth)
 		* k_dot_omega_squared;
 
@@ -110,20 +129,18 @@ double ocean::phillips_spectrum
  * Generates the initial (i.e. t = 0) fourier amplitude.
  * See section 4.4 of the paper.
  */
-std::pair<double, double> ocean::amplitude_0
-	(
-		int k_index
-	)
+std::pair<double, double> ocean::amplitude_0(std::pair<double, double> k)
 {
 	std::pair<double, double> xi = sample_complex_gaussian();
 
 	double xi_real = xi.first;
 	double xi_imag = xi.second;
 
-	double sqrt_phillips = sqrt(phillips_spectrum(k_index));
+    double sqrt_phillips = sqrt(phillips_spectrum(k));
 
-	double real = (1 / sqrt(2)) * xi_real * sqrt_phillips;
-	double imag = (1 / sqrt(2)) * xi_imag * sqrt_phillips;
+    double inverse_sqrt_2 = 0.707106781187; // this is 1/sqrt(2)
+    double real = inverse_sqrt_2 * xi_real * sqrt_phillips;
+    double imag = inverse_sqrt_2 * xi_imag * sqrt_phillips;
 
 	return std::make_pair(real, imag);
 }
@@ -159,11 +176,11 @@ double ocean::omega_dispersion
 	if (is_shallow)
 	{
 		double tanh_kD = tanh(D * k_magnitude);
-		return sqrt(9.81 * k_magnitude * tanh_kD);
+        return sqrt(gravity * k_magnitude * tanh_kD);
 	}
 	else
 	{
-		return sqrt(9.81 * k_magnitude);
+        return sqrt(gravity * k_magnitude);
 	}
 }
 
@@ -182,26 +199,24 @@ std::pair<double, double> ocean::exp_complex
  * Generates the fourier amplitude at time t.
  * See section 4.4 of the paper.
  */
-std::pair<double, double> ocean::amplitude_t
-	(
-		double t,
-		int k_index
-	)
+std::pair<double, double> ocean::amplitude_t(double t, int index, std::pair<double, double> k)
 {
+
 	// get the initial height (and it's conjugate)
-	std::pair<double, double> h_0 = initial_h[k_index];
-	std::pair<double, double> h_0_conjugate = initial_h[k_index_to_negative_k_index(k_index)];
-	h_0_conjugate = std::make_pair(h_0_conjugate.first, -h_0_conjugate.second);
+    std::pair<double, double> h_0 = initial_h[index];
+    Eigen::Vector2f h0_vector = Eigen::Vector2f(h_0.first, h_0.second);
+    Eigen::Vector2f conj = h0_vector.conjugate();
+
+    std::pair<double, double> h_0_conjugate = std::make_pair(conj[0], conj[1]);;
 
 	// get dispersion from k
-	std::pair<double, double> k = k_index_to_k_vector(k_index);
 	double k_magnitude = sqrt(k.first * k.first + k.second * k.second);
-	double omega = omega_dispersion(k_magnitude, true);
+    double omega = omega_dispersion(k_magnitude, M_IS_SHALLOW);
 
 	// calculate the complex exponential terms
 	double omega_t = omega * t;
 	std::pair<double, double> exp_positive = exp_complex(std::make_pair(0, omega_t));
-	std::pair<double, double> exp_negative = exp_complex(std::make_pair(0, -omega_t));
+    std::pair<double, double> exp_negative = exp_complex(std::make_pair(0, -omega_t));
 
 	// add the real and imaginary part together from both h_0 and h_0_conjugate
 	double real =
@@ -215,10 +230,10 @@ std::pair<double, double> ocean::amplitude_t
 	double imag =
 		// h_0 imaginary
 		h_0.first * exp_positive.second
-		+ h_0.second * exp_positive.first
+        + h_0.second * exp_positive.first
 		// h_0_conjugate imaginary
 		+ h_0_conjugate.first * exp_negative.second
-		+ h_0_conjugate.second * exp_negative.first;
+        + h_0_conjugate.second * exp_negative.first;
 
 	return std::make_pair(real, imag);
 }
@@ -228,9 +243,9 @@ std::vector<Eigen::Vector3f> ocean::get_vertices()
 	std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
 	for (int i = 0; i < N; i++)
 	{
-		std::pair<double, double> k = k_index_to_k_vector(i);
+        std::pair<double, double> k = index_to_horizontal_pos(i);
 		double k_x = k.first;
-		double k_z = k.second;
+        double k_z = k.second;
 
         //if (i < length)
         double amplitude = current_h[i].first;
@@ -238,11 +253,11 @@ std::vector<Eigen::Vector3f> ocean::get_vertices()
         // if (i < length) amplitude = initial_h[i].first;
 
 
-        //if (i==2) std::cout << amplitude << std::endl;
+        //std::cout << amplitude << std::endl;
 
         //std::cout << "k_x: " << k_x << " k_z: " << k_z << " amplitude: " << amplitude << std::endl;
 
-		vertices.emplace_back(k_x, amplitude, k_z);
+        vertices.emplace_back(k_x, amplitude, k_z);
 	}
 	return vertices;
 }

@@ -23,12 +23,16 @@ public:
 
 private:
 
-    const int length = 81; // length of grid
-    const int width = 81; // width of grid
+    const bool M_IS_SHALLOW = false;
+
+    const int length = 256; // length of grid
+    const int width = 256; // width of grid
 	const int N = length * width; // total number of grid points
 
 	const double A = 10.0; // numeric constant for the Phillips spectrum
-	const double V = .25; // wind speed
+    const double V = 3; // wind speed
+    const double gravity = 9.81;
+    const double L = V*V/gravity;
 	const std::pair<double, double> omega_wind
 		= std::make_pair(1.0, 0.0); // wind direction
 
@@ -39,20 +43,17 @@ private:
 	const double D = 1; // Depth below mean water level (for dispersion relation)
 
 
-	std::pair<double, double> k_index_to_k_vector
+    std::pair<double, double> index_to_k_vector
 	(
 		int k_index
 	);
+
+    std::pair<double, double> index_to_horizontal_pos(int k_index);
+
 	std::pair<double, double> sample_complex_gaussian
 		();
-	double phillips_spectrum
-	(
-		int k_index
-	);
-	std::pair<double, double> amplitude_0
-	(
-		int k_index
-	);
+    double phillips_spectrum(std::pair<double, double> k);
+    std::pair<double, double> amplitude_0(std::pair<double, double> k);
 	int k_index_to_negative_k_index
 	(
 		int k_index
@@ -66,11 +67,8 @@ private:
 	(
 		std::pair<double, double> z
 	);
-	std::pair<double, double> amplitude_t
-	(
-		double t,
-		int k_index
-	);
+    std::pair<double, double> amplitude_t(double t, int index, std::pair<double, double> k);
+
 };
 
 
