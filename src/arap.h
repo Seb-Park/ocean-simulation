@@ -74,6 +74,6 @@ public:
 
     ocean_alt m_ocean;
     double m_time = 0.00;
-    double m_timestep = 0.001;
+    double m_timestep = 0.03;
 };
 

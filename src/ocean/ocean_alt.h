@@ -46,6 +46,8 @@ private:
     Eigen::Vector2d h_prime_t(int i, double t);
     Eigen::Vector2d get_horiz_pos(int i);
     std::pair<double, double> sample_complex_gaussian();
+    std::vector<Eigen::Vector2d> fast_fft(std::vector<Eigen::Vector2d> h);
+
 
 
 
@@ -65,15 +67,18 @@ private:
     const int num_cols = 32;
 
     const int N = num_rows*num_cols; // total number of grid points
-    const double lambda = 4.0; // how much displacement matters
+    const double lambda = .40; // how much displacement matters
+    const double spacing = 35.0; // spacing between grid points
 
-    const double A = 30.0; // numeric constant for the Phillips spectrum
-    const double V = 50.0; // wind speed
+    const double A = 1.0; // numeric constant for the Phillips spectrum
+    const double V = 5.5; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation
 
     std::vector<Eigen::Vector2d> m_current_h; // current height fields for each K
+    std::vector<Eigen::Vector2d> m_displacements; // current displacement vector for each K
+
 
 
     const double D = 1.0; // Depth below mean water level (for dispersion relation)

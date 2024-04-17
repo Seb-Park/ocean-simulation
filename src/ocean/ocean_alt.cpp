@@ -42,12 +42,67 @@ void ocean_alt::init_wave_index_constants(){
 
         // initialize m_current_h to be h0 for now
         m_current_h.push_back(h0_prime);
+        m_displacements.push_back(Eigen::Vector2d(0.0, 0.0));
+    }
+}
+
+std::vector<Eigen::Vector2d> ocean_alt::fast_fft(std::vector<Eigen::Vector2d> h)
+{
+    int N = h.size();
+    std::vector<Eigen::Vector2d> H = std::vector<Eigen::Vector2d>(N);
+
+    if (N == 1)
+    {
+        H[0] = h[0];
+        return H;
+    }
+    else
+    {
+        std::vector<Eigen::Vector2d> even = std::vector<Eigen::Vector2d>(N / 2);
+        std::vector<Eigen::Vector2d> odd = std::vector<Eigen::Vector2d>(N / 2);
+
+        for (int i = 0; i < N / 2; i++)
+        {
+            even[i] = h[2 * i];
+            odd[i] = h[2 * i + 1];
+        }
+
+        std::vector<Eigen::Vector2d> even_fft = fast_fft(even);
+        std::vector<Eigen::Vector2d> odd_fft = fast_fft(odd);
+
+        for (int i = 0; i < N / 2; i++)
+        {
+
+            Eigen::Vector2d k = m_waveIndexConstants[i].k_vector;
+            Eigen::Vector2d x = m_waveIndexConstants[i].base_horiz_pos;
+
+
+            double k_dot_xz = k.dot(x);
+
+            Eigen::Vector2d omega = complex_exp(k_dot_xz);
+            Eigen::Vector2d omega_times_odd = Eigen::Vector2d(omega[0] * odd_fft[i][0] - omega[1] * odd_fft[i][1], omega[0] * odd_fft[i][1] + omega[1] * odd_fft[i][0]);
+
+            H[i] = Eigen::Vector2d(even_fft[i][0] + omega_times_odd[0], even_fft[i][1] + omega_times_odd[1]);
+            H[i + N / 2] = Eigen::Vector2d(even_fft[i][0] - omega_times_odd[0], even_fft[i][1] - omega_times_odd[1]);
+        }
+
+        return H;
     }
 }
 
 // fast fourier transform at time t
 void ocean_alt::fft_prime(double t){
 
+//    // NON FFT
+//    for (int i=0; i<N; i++){
+//        Eigen::Vector2d h_t_prime = h_prime_t(i, t); // vector(real, imag)
+
+//        m_current_h[i] = h_t_prime;
+//    }
+
+//    return;
+
+    // FFT
 	std::vector<Eigen::Vector2d> h_tildas = std::vector<Eigen::Vector2d>();
 
     // find each h_tilda at each index, to be used for next for loop
@@ -61,10 +116,12 @@ void ocean_alt::fft_prime(double t){
 	for (int i=0; i<N; i++){
         Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
         m_current_h[i] = Eigen::Vector2d(0.0, 0.0);
+        m_displacements[i] = Eigen::Vector2d(0.0, 0.0);
+
 
 		for (int j = 0; j < N; j++){
             Eigen::Vector2d k_vector = m_waveIndexConstants[j].k_vector;
-            Eigen::Vector2d h_tilda_prime = h_tildas[i]; // vector(real, imag)
+            Eigen::Vector2d h_tilda_prime = h_tildas[j]; // vector(real, imag)
 
 
 			// add x vector and k vector as imaginary numbers
@@ -74,7 +131,12 @@ void ocean_alt::fft_prime(double t){
             double real_comp = h_tilda_prime[0]*exp[0] - h_tilda_prime[1]*exp[1];
             double imag_comp = h_tilda_prime[0]*exp[1] + h_tilda_prime[1]*exp[0];
 
-			m_current_h[i] += Eigen::Vector2d(real_comp, imag_comp);;
+            m_current_h[i] += Eigen::Vector2d(real_comp, imag_comp);
+
+            Eigen::Vector2d k_normalized = k_vector.normalized();
+
+            m_displacements[i] += k_normalized*imag_comp;
+
 		}
 	}
 
@@ -132,9 +194,23 @@ Eigen::Vector2d ocean_alt::h_0_prime(Eigen::Vector2d k){
 
 double ocean_alt::phillips_prime(Eigen::Vector2d k){
     double k_mag = k.norm();
+
+    k.normalize();
     double dot_prod = k.dot(omega_wind);
 
-    double output =  A*exp(-1.0/(k_mag*L*k_mag*L))*dot_prod*dot_prod/(k_mag*k_mag*k_mag*k_mag);
+    double output = 0.0;
+    // l = 1
+    if (k_mag < .0001) return 0.0;
+
+    if (k_mag > 1.0){
+
+       output =  A*exp(-(k_mag*k_mag))*dot_prod*dot_prod/(k_mag*k_mag*k_mag*k_mag);
+    } else {
+       output =  A*exp(-1.0/(k_mag*L*k_mag*L))*dot_prod*dot_prod/(k_mag*k_mag*k_mag*k_mag);
+
+    }
+
+
 
     return output;
 }
@@ -208,20 +284,32 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
 {
     std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
     for (int i = 0; i < N; i++){
-        Eigen::Vector2d horiz_pos = m_waveIndexConstants[i].base_horiz_pos;
+        Eigen::Vector2d horiz_pos = spacing*m_waveIndexConstants[i].base_horiz_pos;
         Eigen::Vector2d amplitude = m_current_h[i];
 
         if (i==6) std::cout << amplitude[0] << std::endl;
 
-//        // calculate displacement
-//        double d_x = lambda*k_x/k_mag * h.second; // real
-//        double d_z = lambda*k_z/k_mag * h.second; // real
+        // calculate displacement
+        Eigen::Vector2d disp = lambda*m_displacements[i];
 
 
         // for final vertex position, use the real number component of amplitude vector
-        vertices.emplace_back(horiz_pos[0], amplitude[0], horiz_pos[1]);
+        vertices.push_back(Eigen::Vector3f(horiz_pos[0] + disp[0], amplitude[0], horiz_pos[1] + disp[1]));
     }
     return vertices;
+
+//    auto res = fast_fft(m_current_h);
+
+//        // call on fast_fft for each vertex
+//        std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
+//        for (int i = 0; i < N; i++)
+//        {
+//            Eigen::Vector2d x = m_waveIndexConstants[i].base_horiz_pos;
+//            double y = res[i][0];
+//            vertices.push_back(Eigen::Vector3f(x[0], y, x[1]));
+//        }
+
+//        return vertices;
 }
 
 std::vector<Eigen::Vector3i> ocean_alt::get_faces()
