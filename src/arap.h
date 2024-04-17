@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/shape.h"
-#include "graphics/oceanshape.h"
+//#include "graphics/oceanshape.h"
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
 #include "ocean/ocean.h"
@@ -18,7 +18,7 @@ class ARAP
 {
 private:
     Shape m_shape;
-    OceanShape m_oceanShape;
+//    OceanShape m_oceanShape;
 
 public:
     ARAP();
