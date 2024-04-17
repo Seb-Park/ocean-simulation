@@ -17,15 +17,19 @@ out vec3 normal_worldSpace;
 out vec3 camera_worldSpace;
 out vec3 pos;
 out vec3 refrPos;
+out float refrProb;
 out vec2 uv;
 
-vec3 getRefrPos() {
-    float depth = -1.f;
+vec4 getRefrPos() {
+    float depth = -1.f; // TODO: Pass as uniform
     vec3 w_o = pos - camera_worldSpace;
     float cos_theta_i = dot(-w_o, normal_worldSpace);
     float n_i = 1;
     float n_t = 1.33f;
     float determinant = 1.f - (pow((n_i / n_t), 2.f) * (1.f - pow(cos_theta_i, 2.f)));
+
+    float r0 = pow((n_i - n_t) / (n_i + n_t), 2.f); // variable required to calculate probability of reflection
+    float prob_to_refl = r0 + ((1 - r0) * pow((1 - cos_theta_i), 5.f));
 
     if (determinant >= 0) {
         float cos_theta_t = sqrt(determinant);
@@ -36,12 +40,12 @@ vec3 getRefrPos() {
         float dist = position.y - depth;
         float depthScale = dist / w_t.y;
         vec3 groundContactPoint = -(w_t * depthScale) + position;
-        return groundContactPoint;
+        return vec4(groundContactPoint, 1.f - prob_to_refl);
     } else {
 //        Eigen::Vector3f w_i = w_o - 2 * w_o.dot(intersectNormal) * incidenceNormal;
 //        Ray reflectedRay(i.hit, w_i);
 //        L += traceRay(reflectedRay, scene, true, current_ior, false) / threshold;
-        return vec3(0, 0, 0);
+        return vec4(0, 0, 0, 0);
     }
 }
 
@@ -62,7 +66,9 @@ void main() {
     groundContactPoint = vec3(model * vec4(position, 1));
     uv = vec2((position.x + 81.f) / (162.f), groundContactPoint.z);
 //    uv = vec2(normal);
-    refrPos = getRefrPos();
+    vec4 refrPos_and_prob = getRefrPos();
+    refrPos = vec3(refrPos_and_prob);
+    refrProb = clamp(refrPos_and_prob.w, 0.f, 1.f);
 
     gl_Position = proj * view * model * vec4(position, 1);
 }

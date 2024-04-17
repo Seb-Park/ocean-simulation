@@ -6,6 +6,7 @@ in vec3 camera_worldSpace;
 in vec3 normal_worldSpace;
 in vec3 pos;
 in vec3 refrPos;
+in float refrProb;
 in vec2 uv;
 
 uniform int   wire  = 0;
@@ -42,8 +43,16 @@ void main() {
 //    fragColor = vec4((pos - vec3(widthBounds[0], 0, lengthBounds[0])) / 5.f, 1.f);
 //    fragColor = vec4(fragColor.x, 0.f, fragColor.z, 1.f);
 //    fragColor = vec4(test, test, test, 1.f);
-    fragColor = vec4(vec3(uvFromWorldPoint(refrPos), 0.f), 1.f);
+    vec2 refrUV = uvFromWorldPoint(refrPos);
+    vec4 transmissive = vec4(vec3(refrUV, 1.f - refrUV.y), 1.f);
 
-//    fragColor = clamp(0.5f * vec4(red * d, green * d, blue * d, 0.5f) + 0.5f * vec4(1, 1, 1, 1) * spec, 0, 1);
-
+    fragColor = 0.25f * vec4(red * d, green * d, blue * d, 1.0f); // Diffuse
+    fragColor += 0.75f * vec4(1, 1, 1, 1) * pow(spec, 10.f); // Specular TODO: Pass multiplications as uniforms.
+    fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
+    fragColor *=  (1 - (refrProb / 1.f));
+    fragColor += (refrProb / 1.5f) * transmissive;
+    fragColor = vec4(vec3(fragColor), 1.5f);
+    // Dividing refrProb by 2 just for heuristic. Want more phong to show through.
+//    fragColor = clamp(fragColor, 0.f, 1.f);
+//    fragColor = vec4(refrProb, 0.f, 0.f, 1.f);
 }
