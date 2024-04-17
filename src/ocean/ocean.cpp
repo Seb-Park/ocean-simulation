@@ -252,11 +252,18 @@ std::vector<std::pair<double, double>> ocean::fast_fft
 
 		for (int i = 0; i < N / 2; i++)
 		{
-			std::pair<double, double> omega = exp_complex(std::make_pair(0, (-2 * M_PI * i) / N));
+			int x = i % length;
+			int z = i / length;
+
+			std::pair<double, double> k = k_index_to_k_vector(i);
+
+			double k_dot_xz = k.first * x + k.second * z;
+
+			std::pair<double, double> omega = exp_complex(std::make_pair(0, k_dot_xz));
 			std::pair<double, double> omega_times_odd = std::make_pair(omega.first * odd_fft[i].first - omega.second * odd_fft[i].second, omega.first * odd_fft[i].second + omega.second * odd_fft[i].first);
 
 			H[i] = std::make_pair(even_fft[i].first + omega_times_odd.first, even_fft[i].second + omega_times_odd.second);
-			H[i + N / 2] = std::make_pair(even_fft[i].first + omega_times_odd.first, even_fft[i].second + omega_times_odd.second);
+			H[i + N / 2] = std::make_pair(even_fft[i].first - omega_times_odd.first, even_fft[i].second - omega_times_odd.second);
 		}
 
 		return H;
