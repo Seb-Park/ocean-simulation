@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/meshloader.cpp
     src/graphics/shader.cpp
     src/graphics/shape.cpp
+    src/graphics/oceanshape.cpp
 
     src/mainwindow.h
     src/arap.h
@@ -46,6 +47,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/meshloader.h
     src/graphics/shader.h
     src/graphics/shape.h
+    src/graphics/oceanshape.h
 
     util/tiny_obj_loader.h
     util/unsupportedeigenthing/OpenGLSupport
@@ -80,6 +82,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     PREFIX
         "/"
     FILES
+        resources/images/uv1.png
+        resources/images/kitten.png
         resources/shaders/shader.frag
         resources/shaders/shader.vert
         resources/shaders/anchorPoint.vert

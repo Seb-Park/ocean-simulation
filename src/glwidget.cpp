@@ -107,6 +107,8 @@ void GLWidget::initializeGL()
 
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
+
+    m_arap.initGroundPlane(":resources/images/kitty.png", 2, m_defaultShader);
 }
 
 void GLWidget::paintGL()
@@ -120,8 +122,13 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("view", m_camera.getView());
     Eigen::Matrix4f inverseView = m_camera.getView().inverse();
     m_defaultShader->setUniform("inverseView", inverseView);
+    m_defaultShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
+    m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+//    m_defaultShader->setUniform("");
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glClear(GL_DEPTH_BUFFER_BIT);
 

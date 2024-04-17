@@ -1,6 +1,7 @@
 #include "shape.h"
 
 #include <iostream>
+//#include <QImage>
 #include "graphics/shader.h"
 
 using namespace Eigen;
@@ -126,8 +127,12 @@ void Shape::draw(Shader *shader, GLenum mode)
         shader->setUniform("blue",  m_blue);
         shader->setUniform("alpha", m_alpha);
         glBindVertexArray(m_surfaceVao);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
+        shader->setUniform("sampler", 1);
         glDrawElements(mode, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
         glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
         break;
     }
     case GL_POINTS:
@@ -274,5 +279,44 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
             }
         }
     }
+}
+
+void Shape::initGroundPlane(std::string texturePath, float depth, Shader* shader) {
+
+    // Prepare filepath
+    QString ocean_floor_filepath = QString(texturePath.c_str());
+
+    // TASK 1: Obtain image from filepath
+    this->ocean_floor_image = QImage(ocean_floor_filepath);
+
+    // TASK 2: Format image to fit OpenGL
+    ocean_floor_image = ocean_floor_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    auto bits = this->ocean_floor_image.bits();
+    auto dat = ocean_floor_image.data_ptr();
+
+    // TASK 3: Generate texture
+    glGenTextures(1, &ocean_floor_texture);
+
+    // TASK 9: Set the active texture slot to texture slot 0
+    glActiveTexture(GL_TEXTURE0);
+
+    // TASK 4: Bind kitten texture
+    glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
+
+    // TASK 5: Load image into kitten texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ocean_floor_image.width(), ocean_floor_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, ocean_floor_image.bits());
+
+    // TASK 6: Set min and mag filters' interpolation mode to linear
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // TASK 7: Unbind kitten texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // TASK 10: set the texture.frag uniform for our texture
+    glUseProgram(shader->id());
+//    glUniform1i(glGetUniformLocation(shader->id(), "sampler"), 0);
+    shader->setUniform("sampler", 0);
+    glUseProgram(0);
 }
 
