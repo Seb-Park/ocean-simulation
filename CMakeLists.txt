@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/meshloader.cpp
     src/graphics/shader.cpp
     src/graphics/shape.cpp
-    src/graphics/oceanshape.cpp
+#    src/graphics/oceanshape.cpp
 
     src/mainwindow.h
     src/arap.h
@@ -47,7 +47,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/meshloader.h
     src/graphics/shader.h
     src/graphics/shape.h
-    src/graphics/oceanshape.h
+#    src/graphics/oceanshape.h
 
     util/tiny_obj_loader.h
     util/unsupportedeigenthing/OpenGLSupport
