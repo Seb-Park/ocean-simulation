@@ -223,27 +223,60 @@ std::pair<double, double> ocean::amplitude_t
 	return std::make_pair(real, imag);
 }
 
+std::vector<std::pair<double, double>> ocean::fast_fft
+	(
+	std::vector<std::pair<double, double>> h
+	)
+{
+	int N = h.size();
+	std::vector<std::pair<double, double>> H = std::vector<std::pair<double, double>>(N);
+
+	if (N == 1)
+	{
+		H[0] = h[0];
+		return H;
+	}
+	else
+	{
+		std::vector<std::pair<double, double>> even = std::vector<std::pair<double, double>>(N / 2);
+		std::vector<std::pair<double, double>> odd = std::vector<std::pair<double, double>>(N / 2);
+
+		for (int i = 0; i < N / 2; i++)
+		{
+			even[i] = h[2 * i];
+			odd[i] = h[2 * i + 1];
+		}
+
+		std::vector<std::pair<double, double>> even_fft = fast_fft(even);
+		std::vector<std::pair<double, double>> odd_fft = fast_fft(odd);
+
+		for (int i = 0; i < N / 2; i++)
+		{
+			std::pair<double, double> omega = exp_complex(std::make_pair(0, (-2 * M_PI * i) / N));
+			std::pair<double, double> omega_times_odd = std::make_pair(omega.first * odd_fft[i].first - omega.second * odd_fft[i].second, omega.first * odd_fft[i].second + omega.second * odd_fft[i].first);
+
+			H[i] = std::make_pair(even_fft[i].first + omega_times_odd.first, even_fft[i].second + omega_times_odd.second);
+			H[i + N / 2] = std::make_pair(even_fft[i].first + omega_times_odd.first, even_fft[i].second + omega_times_odd.second);
+		}
+
+		return H;
+	}
+}
+
 std::vector<Eigen::Vector3f> ocean::get_vertices()
 {
+	auto res = fast_fft(current_h);
+
+	// call on fast_fft for each vertex
 	std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
 	for (int i = 0; i < N; i++)
 	{
-		std::pair<double, double> k = k_index_to_k_vector(i);
-		double k_x = k.first;
-		double k_z = k.second;
-
-        //if (i < length)
-        double amplitude = current_h[i].first;
-		// double amplitude = sqrt(current_h[i].first * current_h[i].first + current_h[i].second * current_h[i].second);
-        // if (i < length) amplitude = initial_h[i].first;
-
-
-        //if (i==2) std::cout << amplitude << std::endl;
-
-        //std::cout << "k_x: " << k_x << " k_z: " << k_z << " amplitude: " << amplitude << std::endl;
-
-		vertices.emplace_back(k_x, amplitude, k_z);
+		double x = i % length;
+		double z = i / length;
+		double y = res[i].first;
+		vertices.push_back(Eigen::Vector3f(x, y, z));
 	}
+
 	return vertices;
 }
 

@@ -289,7 +289,7 @@ build StaticGLEW_autogen/timestamp StaticGLEW_autogen/mocs_compilation.cpp | ${c
 #############################################
 # Phony custom command for CMakeFiles/ocean_autogen_timestamp_deps
 
-build CMakeFiles/ocean_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/ocean_autogen_timestamp_deps: phony libStaticGLEW.a /Users/sotech117/Qt/6.5.2/macos/./libexec/uic /Users/sotech117/Qt/6.5.2/macos/./libexec/moc || StaticGLEW_autogen StaticGLEW_autogen_timestamp_deps libStaticGLEW.a
+build CMakeFiles/ocean_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/ocean_autogen_timestamp_deps: phony libStaticGLEW.a /Users/sotech117/Qt/6.5.2/macos/./libexec/moc /Users/sotech117/Qt/6.5.2/macos/./libexec/uic || StaticGLEW_autogen StaticGLEW_autogen_timestamp_deps libStaticGLEW.a
 
 
 #############################################
@@ -301,7 +301,7 @@ build CMakeFiles/ocean_autogen | ${cmake_ninja_workdir}CMakeFiles/ocean_autogen:
 #############################################
 # Phony custom command for CMakeFiles/StaticGLEW_autogen_timestamp_deps
 
-build CMakeFiles/StaticGLEW_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/StaticGLEW_autogen_timestamp_deps: phony /Users/sotech117/Qt/6.5.2/macos/./libexec/uic /Users/sotech117/Qt/6.5.2/macos/./libexec/moc
+build CMakeFiles/StaticGLEW_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/StaticGLEW_autogen_timestamp_deps: phony /Users/sotech117/Qt/6.5.2/macos/./libexec/moc /Users/sotech117/Qt/6.5.2/macos/./libexec/uic
 
 
 #############################################
