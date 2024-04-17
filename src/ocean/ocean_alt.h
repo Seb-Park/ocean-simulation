@@ -45,6 +45,8 @@ private:
     Eigen::Vector2d complex_exp(double exponent);
     Eigen::Vector2d h_prime_t(int i, double t);
     Eigen::Vector2d get_horiz_pos(int i);
+    std::pair<double, double> sample_complex_gaussian();
+
 
 
 
@@ -56,63 +58,26 @@ private:
 
 
 
+    const double Lx = 100.0;
+    const double Lz = 100.0;
 
-    const int length = 10; // length of grid (L_x)
-    const int width = 10; // width of grid (L_z)
-    const int N = length * width; // total number of grid points
-    const double spacing = 1.0; // spacing between grid points
+    const int num_rows = 32;
+    const int num_cols = 32;
+
+    const int N = num_rows*num_cols; // total number of grid points
     const double lambda = 4.0; // how much displacement matters
 
-    const double A = 1.0; // numeric constant for the Phillips spectrum
-    const double V = 1.0; // wind speed
-    const double gravity = 9.8;
+    const double A = 30.0; // numeric constant for the Phillips spectrum
+    const double V = 50.0; // wind speed
+    const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation
 
-    std::vector<std::pair<double, double>> initial_h; // initial height fields for each K
     std::vector<Eigen::Vector2d> m_current_h; // current height fields for each K
 
 
     const double D = 1.0; // Depth below mean water level (for dispersion relation)
 
-
-    std::pair<double, double> k_index_to_k_vector
-    (
-        int k_index
-    );
-
-    std::pair<double, double> k_index_to_horiz_pos(int k_index);
-
-    std::pair<double, double> sample_complex_gaussian
-        ();
-    double phillips_spectrum
-    (
-        int k_index
-    );
-    std::pair<double, double> amplitude_0
-    (
-        int k_index
-    );
-    int k_index_to_negative_k_index
-    (
-        int k_index
-    );
-    double omega_dispersion
-    (
-        double k_magnitude,
-        bool is_shallow=false
-    );
-    std::pair<double, double> exp_complex
-    (
-        std::pair<double, double> z
-    );
-    std::pair<double, double> amplitude_t
-    (
-        double t,
-        int k_index
-    );
-
-    std::pair<double, double> calculate_displacement(int k_index);
 
 };
 
