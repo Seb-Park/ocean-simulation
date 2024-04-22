@@ -8,6 +8,7 @@ in vec3 pos;
 in vec3 refrPos;
 in float refrProb;
 in vec2 uv;
+in float matIor;
 
 uniform int   wire  = 0;
 uniform float red   = 1.0;
@@ -44,13 +45,19 @@ void main() {
 //    fragColor = vec4(fragColor.x, 0.f, fragColor.z, 1.f);
 //    fragColor = vec4(test, test, test, 1.f);
     vec2 refrUV = uvFromWorldPoint(refrPos);
+    float beerAtt = exp(-length((pos - refrPos)) * 0.5f);
+
+    vec4 diffuse = vec4(red * d, green * d, blue * d, 1.0f);
+    vec4 specular = vec4(1, 1, 1, 1) * pow(spec, 10.f);
     vec4 transmissive = vec4(vec3(refrUV, 1.f - refrUV.y), 1.f);
 
-    fragColor = 0.25f * vec4(red * d, green * d, blue * d, 1.0f); // Diffuse
-    fragColor += 0.75f * vec4(1, 1, 1, 1) * pow(spec, 10.f); // Specular TODO: Pass multiplications as uniforms.
+//    refrProb *= beerAtt;
+
+    fragColor = 0.4f * diffuse; // Diffuse
+    fragColor += 0.6f * specular; // Specular TODO: Pass multiplications as uniforms.
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
-    fragColor *=  (1 - (refrProb / 1.f));
-    fragColor += (refrProb / 1.5f) * transmissive;
+    fragColor *=  (1 - ((beerAtt * refrProb) / 1.f));
+    fragColor += ((beerAtt * refrProb) / 1.5f) * transmissive;
 //    fragColor = transmissive * refrProb;
     fragColor = vec4(vec3(fragColor), 1.5f);
     // Dividing refrProb by 2 just for heuristic. Want more phong to show through.

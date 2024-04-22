@@ -19,6 +19,7 @@ out vec3 pos;
 out vec3 refrPos;
 out float refrProb;
 out vec2 uv;
+out float matIor;
 
 vec4 getRefrPos() {
     float depth = -1.f; // TODO: Pass as uniform
@@ -26,6 +27,7 @@ vec4 getRefrPos() {
     float cos_theta_i = dot(-w_o, normal_worldSpace);
     float n_i = 1;
     float n_t = 1.33f;
+//    matIor = n_t;
     float determinant = 1.f - (pow((n_i / n_t), 2.f) * (1.f - pow(cos_theta_i, 2.f)));
 
     float r0 = pow((n_i - n_t) / (n_i + n_t), 2.f); // variable required to calculate probability of reflection
@@ -54,6 +56,7 @@ void main() {
     float dist = position.y - depth;
     float width = 81.f * 2.f;
     float length = 81.f * 2.f;
+    matIor = 1.33f;
 
     normal_cameraSpace = normalize(inverse(transpose(mat3(view))) * inverseTransposeModel * normal);
     camera_worldSpace = vec3(inverseView * vec4(0.f, 0.f, 0.f, 1.f));
