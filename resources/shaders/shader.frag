@@ -51,6 +51,7 @@ void main() {
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
     fragColor *=  (1 - (refrProb / 1.f));
     fragColor += (refrProb / 1.5f) * transmissive;
+//    fragColor = transmissive * refrProb;
     fragColor = vec4(vec3(fragColor), 1.5f);
     // Dividing refrProb by 2 just for heuristic. Want more phong to show through.
 //    fragColor = clamp(fragColor, 0.f, 1.f);
