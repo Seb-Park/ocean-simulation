@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 #include <vector>
 #include <unordered_set>
+#include <QString>
+#include <QImage>
 
 #define EIGEN_DONT_VECTORIZE
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
@@ -33,6 +35,8 @@ public:
 
     void setColor(float r, float g, float b);
 
+    void initGroundPlane(std::string texturePath, float depth, Shader* shader);
+
     void draw(Shader *shader, GLenum mode);
     SelectMode select(Shader *shader, int vertex);
     bool selectWithSpecifiedMode(Shader *shader, int vertex, SelectMode mode);
@@ -47,6 +51,8 @@ private:
     GLuint m_surfaceVao;
     GLuint m_surfaceVbo;
     GLuint m_surfaceIbo;
+    GLuint ocean_floor_texture;
+    QImage ocean_floor_image;
 
     unsigned int m_numSurfaceVertices;
     unsigned int m_verticesSize;

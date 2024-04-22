@@ -32,6 +32,8 @@ public:
     void setUniform(const std::string &name, float f);
     void setUniform(const std::string &name, int i);
     void setUniform(const std::string &name, bool b);
+    void setUniform(const std::string &name, Eigen::Vector3f v);
+    void setUniform(const std::string &name, float a, float b);
 
     void setUniformArrayByIndex(const std::string &name, float f, size_t index);
     void setUniformArrayByIndex(const std::string &name, const Eigen::Vector2f &vec2, size_t index);

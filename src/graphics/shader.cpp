@@ -83,6 +83,14 @@ void Shader::setUniform(const std::string &name, bool b) {
     glUniform1i(m_uniforms[name], static_cast<GLint>(b));
 }
 
+void Shader::setUniform(const std::string &name, Eigen::Vector3f v) {
+    glUniform3f(m_uniforms[name], static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
+}
+
+void Shader::setUniform(const std::string &name, float a, float b) {
+    glUniform2f(m_uniforms[name], static_cast<GLfloat>(a), static_cast<GLfloat>(b));
+}
+
 void Shader::setUniformArrayByIndex(const std::string &name, float f, size_t index) {
     glUniform1f(m_uniformArrays[std::make_tuple(name, index)], f);
 }

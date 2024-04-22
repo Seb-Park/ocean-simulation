@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/shape.h"
+//#include "graphics/oceanshape.h"
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
 #include "ocean/ocean.h"
@@ -17,6 +18,7 @@ class ARAP
 {
 private:
     Shape m_shape;
+//    OceanShape m_oceanShape;
 
 public:
     ARAP();
@@ -36,6 +38,10 @@ public:
     void draw(Shader *shader, GLenum mode)
     {
         m_shape.draw(shader, mode);
+    }
+
+    void initGroundPlane(std::string texturePath, float depth, Shader* shader) {
+        m_shape.initGroundPlane(texturePath, depth, shader);
     }
 
     SelectMode select(Shader *shader, int vertex)
@@ -72,5 +78,7 @@ public:
     ocean m_ocean;
     double m_time = 0.00;
     double m_timestep = 0.001;
+
+    Eigen::Vector3f minCorner, maxCorner;
 };
 
