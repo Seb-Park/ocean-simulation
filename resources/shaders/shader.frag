@@ -45,7 +45,7 @@ void main() {
 //    fragColor = vec4(fragColor.x, 0.f, fragColor.z, 1.f);
 //    fragColor = vec4(test, test, test, 1.f);
     vec2 refrUV = uvFromWorldPoint(refrPos);
-    float beerAtt = exp(-length((pos - refrPos)) * 0.5f);
+    float beerAtt = exp(-length((pos - refrPos)) * 2.0f); // TODO: Make uniform
 
     vec4 diffuse = vec4(red * d, green * d, blue * d, 1.0f);
     vec4 specular = vec4(1, 1, 1, 1) * pow(spec, 10.f);
@@ -53,7 +53,7 @@ void main() {
 
 //    refrProb *= beerAtt;
 
-    fragColor = 0.4f * diffuse; // Diffuse
+    fragColor = 0.75f * diffuse; // Diffuse
     fragColor += 0.6f * specular; // Specular TODO: Pass multiplications as uniforms.
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
     fragColor *=  (1 - ((beerAtt * refrProb) / 1.f));
@@ -63,4 +63,9 @@ void main() {
     // Dividing refrProb by 2 just for heuristic. Want more phong to show through.
 //    fragColor = clamp(fragColor, 0.f, 1.f);
 //    fragColor = vec4(refrProb, 0.f, 0.f, 1.f);
+
+    // TODO: ACTUAL LIGHTING MODEL SHOULD BE SOMETHING LIKE
+    // VELOCITY * DIFFUSE
+    // (1 - refrProb) * SPECULAR
+    // refrProb * (BEER * TRANSMISSIVE + (1 - beerAtt) * VOLUME (which is somewhat diffuse too?))
 }
