@@ -3,9 +3,6 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <iostream>
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-
 
 #define SPEED 1.5
 #define ROTATE_SPEED 0.0025
@@ -120,9 +117,6 @@ void GLWidget::initializeGL()
     // END INITIALIZE TEXTURE STUFF
 
 
-    // initialize texture
-    m_texture0 = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/hello.png").textureID;
-
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
     Vector3f coeffMin, coeffMax;
     m_arap.init(coeffMin, coeffMax);
@@ -141,8 +135,7 @@ void GLWidget::initializeGL()
 
     // Note for maintainers: Z-up
     float fovY = 120;
-//    float nearPlane = 0.0001f;
-    float nearPlane = 0.01;
+    float nearPlane = 0.0001f;
     float farPlane  = 3 * extentLength;
 
     // Initialize camera with a reasonable transform
@@ -155,18 +148,6 @@ void GLWidget::initializeGL()
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
 
-    //m_arap.initGroundPlane(":resources/images/kitty.png", 2, m_defaultShader);
-
-    //INIT FBO
-    // m_devicePixelRatio = this->devicePixelRatio();
-
-    //  m_defaultFBO = 2;
-    //  m_screen_width = size().width() * m_devicePixelRatio;
-    //  m_screen_height = size().height() * m_devicePixelRatio;
-    //  m_fbo_width = m_screen_width;
-    //  m_fbo_height = m_screen_height;
-
-    //  initFullScreenQuad();
 }
 
 //void GLWidget::paintTexture(GLuint texture, bool filtered){
@@ -215,121 +196,6 @@ void GLWidget::paintGL()
 ////    m_pointShader->setUniform("height", height());
 ////    m_arap.draw(m_pointShader, GL_POINTS);
 ////    m_pointShader->unbind();
-}
-
-void GLWidget::paintTexture(GLuint texture, bool postProcessOn){
-    m_defaultShader->bind();
-
-    // Task 32: Set your bool uniform on whether or not to filter the texture drawn
-    glBindVertexArray(m_fullscreen_vao);
-    // Task 10: Bind "texture" to slot 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindVertexArray(0);
-    m_defaultShader->unbind();
-}
-
-void GLWidget::initFullScreenQuad(){
-    // Generate and bind a VBO and a VAO for a fullscreen quad
-      glGenBuffers(1, &m_fullscreen_vbo);
-      glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
-      glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
-      glGenVertexArrays(1, &m_fullscreen_vao);
-      glBindVertexArray(m_fullscreen_vao);
-
-      // Task 14: modify the code below to add a second attribute to the vertex attribute array
-      glEnableVertexAttribArray(0);
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void *>(0*sizeof(GLfloat)));
-
-      glEnableVertexAttribArray(1);
-      glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void *>(3*sizeof(GLfloat)));
-
-      // Unbind the fullscreen quad's VBO and VAO
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
-      glBindVertexArray(0);
-
-      makeFBO();
-}
-
-void GLWidget::makeFBO(){
-    // Task 19: Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
-    glGenTextures(1, &m_fbo_texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-    // Set min and mag filters' interpolation mode to linear
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
-    glGenRenderbuffers(1, &m_fbo_renderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    // Task 18: Generate and bind an FBO
-    glGenFramebuffers(1, &m_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-    // Task 21: Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
-
-    // Task 22: Unbind the FBO
-    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
-
-}
-
-TextureData GLWidget::loadTextureFromFile(const char *path)
-{
-    std::string filename = std::string(path);
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    stbi_set_flip_vertically_on_load(false);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    TextureData newtex;
-    newtex.textureID = textureID;
-    newtex.height = height;
-    newtex.width = width;
-    return newtex;
 }
 
 void GLWidget::resizeGL(int w, int h)
