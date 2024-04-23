@@ -36,6 +36,7 @@ public:
     void setColor(float r, float g, float b);
 
     void initGroundPlane(std::string texturePath, float depth, Shader* shader);
+    void initSkyPlane(std::string texturePath, float depth, Shader* shader);
 
     void draw(Shader *shader, GLenum mode);
     SelectMode select(Shader *shader, int vertex);
