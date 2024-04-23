@@ -42,13 +42,13 @@ vec2 uvFromWorldPoint(vec3 point) {
 
 void main() {
     // Do lighting in camera space
-    vec3 lightDir = normalize(vec3(0, 0.5, 1));
-    lightDir = normalize(vec3(0.f, 3.f, 0.f) - pos);
+    vec3 lightDir = -normalize(vec3(1, -1, 1));
+//    lightDir = normalize(vec3(0.f, 3.f, 0.f) - pos);
 //    float d = clamp(dot(normal_cameraSpace, lightDir), 0, 1);
     float d = clamp(dot(normal_worldSpace, lightDir), 0, 1);
     vec3 reflectedLight = lightDir - 2 * dot(lightDir, normal_worldSpace) * normal_worldSpace;
     vec3 posToCam = normalize(camera_worldSpace - pos);
-    float spec = pow(dot(posToCam, reflectedLight), 2.f);
+    float spec = pow(clamp(dot(posToCam, reflectedLight), 0, 1), 2.f);
 
 //    fragColor = texture(sampler, vec2(0.5f, 0.5f));
 //    fragColor = vec4(abs(pos.x / 160.f), pos.y, 0.f, 1.f);
@@ -59,7 +59,13 @@ void main() {
 //    fragColor = vec4(fragColor.x, 0.f, fragColor.z, 1.f);
 //    fragColor = vec4(test, test, test, 1.f);
     vec2 refrUV = uvFromWorldPoint(refrPos);
-    float beerAtt = exp(-length((pos - refrPos)) * 0.2f); // TODO: Make uniform
+    float waterMurkiness = 0.002f; // TODO: Make uniform
+    vec3 waterVolumeColor = vec3(red * 0.1f, green * 0.2f, blue * 0.2f);
+    float murkDiffuse = 0.3f;
+    float murkAmbient = 0.8f;
+    float beerAtt = exp(-length((pos - refrPos)) * waterMurkiness);
+    // EXPLANATION: WHEN THE WATER IS NOT PERFECTLY CLEAR, IT WILL HAVE STUFF SCATTERING LIGHT UNDERNEATH THE SURFACE
+    // SOME OF IT WILL BE DIFFUSELY LIT, BUT THERE WILL BE SUBSURFACE SCATTERING, ESTIMATED BY THE AMBIENT TERM
 
     vec4 diffuse = vec4(red * d, green * d, blue * d, 1.0f);
     vec4 specular = vec4(1, 1, 1, 1) * pow(spec, 10.f);
@@ -67,14 +73,20 @@ void main() {
     float waterBlurriness = 0.f;
     vec2 refrUVBlurry = (1 - beerAtt) * vec2(rand(refrUV), rand(vec4(pos, d))) * waterBlurriness + refrUV;
     vec4 transmissive = texture(sampler, vec2(refrUVBlurry));
+    vec4 murk = (vec4(waterVolumeColor * d * murkDiffuse + waterVolumeColor * murkAmbient, 1.0f));
 
 //    refrProb *= beerAtt;
 
     fragColor = 0.75f * diffuse; // Diffuse
-    fragColor += 0.6f * specular; // Specular TODO: Pass multiplications as uniforms.
+    fragColor = vec4(0,0,0,0);
+    fragColor += 1.f * specular; // Specular TODO: Pass multiplications as uniforms.
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
-    fragColor *=  (1 - ((beerAtt * refrProb) / 1.f));
-    fragColor += ((beerAtt * refrProb) / 1.5f) * transmissive;
+    fragColor *=  ((1 - refrProb) / 1.f);
+
+    vec4 volumetric = beerAtt * transmissive;
+    volumetric += (1 - beerAtt) * murk;
+
+    fragColor += refrProb * volumetric;
 //    fragColor = transmissive * refrProb;
     fragColor = vec4(vec3(fragColor), 1.5f);
     // Dividing refrProb by 2 just for heuristic. Want more phong to show through.
@@ -87,4 +99,6 @@ void main() {
     // refrProb * (BEER * TRANSMISSIVE + (1 - beerAtt) * VOLUME (which is somewhat diffuse too?))
     // Transmissive shouldn't just get darker, but blurrier as beer attenuation lowers.
 //    fragColor = texture(sampler, vec2(refrUV));
+//    fragColor = vec4(normal_worldSpace[0], 0, normal_worldSpace[1], 1.f);
+//    fragColor = diffuse;
 }
