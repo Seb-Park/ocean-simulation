@@ -24,7 +24,7 @@ out vec2 uv;
 out float matIor;
 
 vec4 getRefrPos() {
-    float depth = -3.f; // TODO: Pass as uniform
+    float depth = -1000.f; // TODO: Pass as uniform
     vec3 w_o = normalize(pos - camera_worldSpace);
     float cos_theta_i = dot(-w_o, normal_worldSpace);
     float n_i = 1;

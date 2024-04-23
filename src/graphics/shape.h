@@ -30,6 +30,8 @@ public:
 
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
+    void setVertices_and_Normals(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3f> &normals);
+
 
     void setModelMatrix(const Eigen::Affine3f &model);
 
@@ -75,6 +77,12 @@ private:
     Eigen::Vector3f getNormal(const Eigen::Vector3i& face);
     void updateMesh(const std::vector<Eigen::Vector3i> &triangles,
                     const std::vector<Eigen::Vector3f> &vertices,
+                           std::vector<Eigen::Vector3f>& verts,
+                           std::vector<Eigen::Vector3f>& normals,
+                           std::vector<Eigen::Vector3f>& colors);
+    void updateMesh_withNormals(const std::vector<Eigen::Vector3i> &faces,
+                           const std::vector<Eigen::Vector3f> &vertices,
+                           const std::vector<Eigen::Vector3f> &calculated_norms,
                            std::vector<Eigen::Vector3f>& verts,
                            std::vector<Eigen::Vector3f>& normals,
                            std::vector<Eigen::Vector3f>& colors);

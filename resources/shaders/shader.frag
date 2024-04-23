@@ -45,8 +45,8 @@ vec2 uvFromWorldPoint(vec3 point) {
 
 void main() {
     // Do lighting in camera space
-    vec3 lightDir = normalize(vec3(0, 0.5, 1));
-    lightDir = normalize(vec3(0.f, 3.f, 0.f) - pos);
+    vec3 lightDir = normalize(vec3(1, 0.5, 1));
+  //  lightDir = normalize(vec3(0.f, 3.f, 0.f) - pos);
 //    float d = clamp(dot(normal_cameraSpace, lightDir), 0, 1);
     float d = clamp(dot(normal_worldSpace, lightDir), 0, 1);
     vec3 reflectedLight = lightDir - 2 * dot(lightDir, normal_worldSpace) * normal_worldSpace;
@@ -62,7 +62,7 @@ void main() {
 //    fragColor = vec4(fragColor.x, 0.f, fragColor.z, 1.f);
 //    fragColor = vec4(test, test, test, 1.f);
     vec2 refrUV = uvFromWorldPoint(refrPos);
-    float beerAtt = exp(-length((pos - refrPos)) * 0.2f); // TODO: Make uniform
+    float beerAtt = exp(-length((pos - refrPos)) * 0.001f); // TODO: Make uniform
 
     vec4 diffuse = vec4(red * d, green * d, blue * d, 1.0f);
     vec4 specular = vec4(1, 1, 1, 1) * pow(spec, 10.f);
@@ -90,4 +90,6 @@ void main() {
     // refrProb * (BEER * TRANSMISSIVE + (1 - beerAtt) * VOLUME (which is somewhat diffuse too?))
     // Transmissive shouldn't just get darker, but blurrier as beer attenuation lowers.
 //    fragColor = texture(sampler, vec2(refrUV));
+
+    //fragColor = vec4(vec3(normal_worldSpace), 1.f);
 }

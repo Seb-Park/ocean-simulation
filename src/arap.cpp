@@ -103,10 +103,12 @@ void ARAP::update(double seconds)
     // Note that the "seconds" parameter represents the amount of time that has passed since
     // the last update
 
-   m_ocean.updateVertexAmplitudes(m_time);
-   m_shape.setVertices(m_ocean.get_vertices());
+    m_ocean.fft_prime(m_time);
+    m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+   // m_shape.setVertices(m_ocean.get_vertices());
 
-  m_time += m_timestep;
+
+     m_time += m_timestep;
   // std::cout << m_time << std::endl;
 }
 
