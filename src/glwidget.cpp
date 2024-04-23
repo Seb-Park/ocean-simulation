@@ -81,7 +81,7 @@ void GLWidget::initializeGL()
     // INITIALIZE TEXTURE STUFF
 
     // Prepare filepath
-    QString kitten_filepath = QString(":/resources/images/kitten.png");
+    QString kitten_filepath = QString(":/resources/images/anamorphic.jpg");
 
     // TASK 1: Obtain image from filepath
     m_image = QImage(kitten_filepath);

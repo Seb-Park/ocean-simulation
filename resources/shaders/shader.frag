@@ -64,7 +64,7 @@ void main() {
     vec4 diffuse = vec4(red * d, green * d, blue * d, 1.0f);
     vec4 specular = vec4(1, 1, 1, 1) * pow(spec, 10.f);
 //    vec4 transmissive = vec4(vec3(refrUV, 1.f - refrUV.y), 1.f);
-    float waterBlurriness = 0.1f;
+    float waterBlurriness = 0.f;
     vec2 refrUVBlurry = (1 - beerAtt) * vec2(rand(refrUV), rand(vec4(pos, d))) * waterBlurriness + refrUV;
     vec4 transmissive = texture(sampler, vec2(refrUVBlurry));
 
