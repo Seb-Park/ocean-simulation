@@ -92,13 +92,13 @@ void GLWidget::initializeGL()
     auto bits = m_image.bits();
 
     // TASK 3: Generate kitten texture
-    glGenTextures(1, &m_kitten_texture);
+    glGenTextures(1, &m_ground_texture);
 
     // TASK 9: Set the active texture slot to texture slot 0
     glActiveTexture(GL_TEXTURE0);
 
     // TASK 4: Bind kitten texture
-    glBindTexture(GL_TEXTURE_2D, m_kitten_texture);
+    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
 
     // TASK 5: Load image into kitten texture
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
@@ -115,9 +115,9 @@ void GLWidget::initializeGL()
 //    glUniform1i(glGetUniformLocation(m_texture_shader->id(), "sampler"), 0);
 //    glUseProgram(0);
 
-    glUseProgram(m_defaultShader->id());
-    glUniform1i(glGetUniformLocation(m_defaultShader->id(), "sampler"), 0);
-    glUseProgram(0);
+    m_defaultShader->bind();
+    m_defaultShader->setUniform("sampler", 0);
+    m_defaultShader->unbind();
 
 //    // TASK 11: Fix this "fullscreen" quad's vertex data
 //    // TASK 12: Play around with different values!
@@ -206,7 +206,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-//    paintTexture(m_kitten_texture, false);
+//    paintTexture(m_ground_texture, false);
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //    glEnable( GL_BLEND );
@@ -220,7 +220,7 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_kitten_texture);
+    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 

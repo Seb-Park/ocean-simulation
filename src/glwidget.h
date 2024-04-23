@@ -54,7 +54,7 @@ private:
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
     QImage m_image;
-    GLuint m_kitten_texture;
+    GLuint m_ground_texture;
 
     float m_movementScaling;
     float m_vertexSelectionThreshold;
