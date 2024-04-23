@@ -81,15 +81,15 @@ void GLWidget::initializeGL()
     // INITIALIZE TEXTURE STUFF
 
     // Prepare filepath
-    QString kitten_filepath = QString(":/resources/images/anamorphic.jpg");
+    QString ground_texture_filepath = QString(":/resources/images/anamorphic.jpg");
 
     // TASK 1: Obtain image from filepath
-    m_image = QImage(kitten_filepath);
+    m_ground_image = QImage(ground_texture_filepath);
 
     // TASK 2: Format image to fit OpenGL
-    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    m_ground_image = m_ground_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
-    auto bits = m_image.bits();
+    auto bits = m_ground_image.bits();
 
     // TASK 3: Generate kitten texture
     glGenTextures(1, &m_ground_texture);
@@ -101,7 +101,7 @@ void GLWidget::initializeGL()
     glBindTexture(GL_TEXTURE_2D, m_ground_texture);
 
     // TASK 5: Load image into kitten texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_ground_image.width(), m_ground_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_ground_image.bits());
 
     // TASK 6: Set min and mag filters' interpolation mode to linear
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -111,10 +111,6 @@ void GLWidget::initializeGL()
     glBindTexture(GL_TEXTURE_2D, 0);
 
 //    // TASK 10: set the texture.frag uniform for our texture
-//    glUseProgram(m_texture_shader->id());
-//    glUniform1i(glGetUniformLocation(m_texture_shader->id(), "sampler"), 0);
-//    glUseProgram(0);
-
     m_defaultShader->bind();
     m_defaultShader->setUniform("sampler", 0);
     m_defaultShader->unbind();

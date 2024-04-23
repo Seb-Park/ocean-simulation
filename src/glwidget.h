@@ -53,7 +53,7 @@ private:
 
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
-    QImage m_image;
+    QImage m_ground_image;
     GLuint m_ground_texture;
 
     float m_movementScaling;
