@@ -9,6 +9,9 @@ in vec3 refrPos;
 in float refrProb;
 in vec2 uv;
 
+uniform sampler2D texture_img;
+
+
 uniform int   wire  = 0;
 uniform float red   = 1.0;
 uniform float green = 1.0;
@@ -56,4 +59,9 @@ void main() {
     // Dividing refrProb by 2 just for heuristic. Want more phong to show through.
 //    fragColor = clamp(fragColor, 0.f, 1.f);
 //    fragColor = vec4(refrProb, 0.f, 0.f, 1.f);
+
+
+    // assign texture
+    fragColor = texture(texture_img, uv);
+
 }

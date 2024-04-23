@@ -37,6 +37,8 @@ public:
 
     void draw(Shader *shader, GLenum mode)
     {
+
+
         m_shape.draw(shader, mode);
     }
 

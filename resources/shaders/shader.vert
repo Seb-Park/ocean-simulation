@@ -2,6 +2,8 @@
 
 layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in vec3 normal;   // Normal of the vertex
+layout(location = 3) in vec3 texCoords;   // Normal of the vertex
+
 
 uniform mat4 proj;
 uniform mat4 view;
@@ -65,7 +67,7 @@ void main() {
     vec3 groundContactPoint = -(normal * depthScale) + position; // carries down to ground
     groundContactPoint = vec3(model * vec4(position, 1));
     uv = vec2((position.x + 81.f) / (162.f), groundContactPoint.z);
-//    uv = vec2(normal);
+    uv = vec2(texCoords);
     vec4 refrPos_and_prob = getRefrPos();
     refrPos = vec3(refrPos_and_prob);
     refrProb = clamp(refrPos_and_prob.w, 0.f, 1.f);

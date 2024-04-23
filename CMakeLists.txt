@@ -84,6 +84,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     FILES
         resources/images/uv1.png
         resources/images/kitten.png
+        resources/images/hello.png
+
         resources/shaders/shader.frag
         resources/shaders/shader.vert
         resources/shaders/anchorPoint.vert
