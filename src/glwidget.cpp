@@ -81,39 +81,7 @@ void GLWidget::initializeGL()
     // INITIALIZE TEXTURE STUFF
 
     // Prepare filepath
-    QString ground_texture_filepath = QString(":/resources/images/anamorphic.jpg");
 
-    // TASK 1: Obtain image from filepath
-    m_ground_image = QImage(ground_texture_filepath);
-
-    // TASK 2: Format image to fit OpenGL
-    m_ground_image = m_ground_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-
-    auto bits = m_ground_image.bits();
-
-    // TASK 3: Generate kitten texture
-    glGenTextures(1, &m_ground_texture);
-
-    // TASK 9: Set the active texture slot to texture slot 0
-    glActiveTexture(GL_TEXTURE0);
-
-    // TASK 4: Bind kitten texture
-    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
-
-    // TASK 5: Load image into kitten texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_ground_image.width(), m_ground_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_ground_image.bits());
-
-    // TASK 6: Set min and mag filters' interpolation mode to linear
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // TASK 7: Unbind kitten texture
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-//    // TASK 10: set the texture.frag uniform for our texture
-    m_defaultShader->bind();
-    m_defaultShader->setUniform("sampler", 0);
-    m_defaultShader->unbind();
 
 //    // TASK 11: Fix this "fullscreen" quad's vertex data
 //    // TASK 12: Play around with different values!
@@ -127,6 +95,7 @@ void GLWidget::initializeGL()
 //        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
 //         1.0f, -1.0f, 0.0f, 1.0f, 0.0f
 //    };
+    m_arap.initGroundPlane(":/resources/images/anamorphic.jpg", 2, m_defaultShader);
 
 //    // Generate and bind a VBO and a VAO for a fullscreen quad
 //    glGenBuffers(1, &m_fullscreen_vbo);
@@ -179,7 +148,6 @@ void GLWidget::initializeGL()
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
 
-    m_arap.initGroundPlane(":resources/images/kitty.png", 2, m_defaultShader);
 }
 
 //void GLWidget::paintTexture(GLuint texture, bool filtered){
@@ -215,12 +183,8 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
