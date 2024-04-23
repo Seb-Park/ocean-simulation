@@ -127,12 +127,12 @@ void Shape::draw(Shader *shader, GLenum mode)
         shader->setUniform("blue",  m_blue);
         shader->setUniform("alpha", m_alpha);
         glBindVertexArray(m_surfaceVao);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
-        shader->setUniform("sampler", 1);
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
+//        shader->setUniform("sampler", 0);
         glDrawElements(mode, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
         glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+//        glBindTexture(GL_TEXTURE_2D, 0);
         break;
     }
     case GL_POINTS:

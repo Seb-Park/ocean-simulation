@@ -22,7 +22,7 @@ out vec2 uv;
 out float matIor;
 
 vec4 getRefrPos() {
-    float depth = -1.f; // TODO: Pass as uniform
+    float depth = -3.f; // TODO: Pass as uniform
     vec3 w_o = normalize(pos - camera_worldSpace);
     float cos_theta_i = dot(-w_o, normal_worldSpace);
     float n_i = 1;
@@ -52,8 +52,8 @@ vec4 getRefrPos() {
 }
 
 void main() {
-    float depth = -2.f;
-    float dist = position.y - depth;
+//    float depth = -4.f;
+//    float dist = position.y - depth;
     float width = 81.f * 2.f;
     float length = 81.f * 2.f;
     matIor = 1.33f;
@@ -64,10 +64,10 @@ void main() {
     pos = vec3(model * vec4(position, 1.f)); //vec3(model * vec4(objSpacePos, 1.f));
 //    pos = position;
 
-    float depthScale = dist / normal.y;
-    vec3 groundContactPoint = -(normal * depthScale) + position; // carries down to ground
-    groundContactPoint = vec3(model * vec4(position, 1));
-    uv = vec2((position.x + 81.f) / (162.f), groundContactPoint.z);
+//    float depthScale = dist / normal.y;
+//    vec3 groundContactPoint = -(normal * depthScale) + position; // carries down to ground
+//    groundContactPoint = vec3(model * vec4(position, 1));
+//    uv = vec2((position.x + 81.f) / (162.f), groundContactPoint.z);
 //    uv = vec2(normal);
     vec4 refrPos_and_prob = getRefrPos();
     refrPos = vec3(refrPos_and_prob);

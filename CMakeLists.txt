@@ -84,11 +84,16 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     FILES
         resources/images/uv1.png
         resources/images/kitten.png
+        resources/images/hello.png
+        resources/images/sand_text.jpg
+#        resources/images/ground.png
         resources/shaders/shader.frag
         resources/shaders/shader.vert
         resources/shaders/anchorPoint.vert
         resources/shaders/anchorPoint.geom
         resources/shaders/anchorPoint.frag
+        resources/shaders/texture.vert
+        resources/shaders/texture.frag
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

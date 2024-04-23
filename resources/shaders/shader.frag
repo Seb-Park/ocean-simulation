@@ -20,6 +20,20 @@ uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
 //uniform float test = 0;
 
+float rand(vec2 n) {
+    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
+
+float rand(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+float rand(vec4 n) {
+//    vec2 first2 = vec2(n[0], n[1]);
+////    return 1.f;
+    return rand(vec2(n[0] * rand(n[2]), n[1] * rand(n[3])));
+}
+
 vec2 uvFromWorldPoint(vec3 point) {
     float u = (point.x - widthBounds[0]) / (widthBounds[1] - widthBounds[0]);
     float v = (point.z - lengthBounds[0]) / (lengthBounds[1] - lengthBounds[0]);
@@ -45,11 +59,14 @@ void main() {
 //    fragColor = vec4(fragColor.x, 0.f, fragColor.z, 1.f);
 //    fragColor = vec4(test, test, test, 1.f);
     vec2 refrUV = uvFromWorldPoint(refrPos);
-    float beerAtt = exp(-length((pos - refrPos)) * 2.0f); // TODO: Make uniform
+    float beerAtt = exp(-length((pos - refrPos)) * 0.2f); // TODO: Make uniform
 
     vec4 diffuse = vec4(red * d, green * d, blue * d, 1.0f);
     vec4 specular = vec4(1, 1, 1, 1) * pow(spec, 10.f);
-    vec4 transmissive = vec4(vec3(refrUV, 1.f - refrUV.y), 1.f);
+//    vec4 transmissive = vec4(vec3(refrUV, 1.f - refrUV.y), 1.f);
+    float waterBlurriness = 0.1f;
+    vec2 refrUVBlurry = (1 - beerAtt) * vec2(rand(refrUV), rand(vec4(pos, d))) * waterBlurriness + refrUV;
+    vec4 transmissive = texture(sampler, vec2(refrUVBlurry));
 
 //    refrProb *= beerAtt;
 
@@ -68,4 +85,6 @@ void main() {
     // VELOCITY * DIFFUSE
     // (1 - refrProb) * SPECULAR
     // refrProb * (BEER * TRANSMISSIVE + (1 - beerAtt) * VOLUME (which is somewhat diffuse too?))
+    // Transmissive shouldn't just get darker, but blurrier as beer attenuation lowers.
+//    fragColor = texture(sampler, vec2(refrUV));
 }
