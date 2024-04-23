@@ -36,6 +36,7 @@ public:
     void setColor(float r, float g, float b);
 
     void initGroundPlane(std::string texturePath, float depth, Shader* shader);
+    void initSkyPlane(std::string texturePath, float depth, Shader* shader);
 
     void draw(Shader *shader, GLenum mode);
     SelectMode select(Shader *shader, int vertex);
@@ -51,8 +52,8 @@ private:
     GLuint m_surfaceVao;
     GLuint m_surfaceVbo;
     GLuint m_surfaceIbo;
-    GLuint ocean_floor_texture;
-    QImage ocean_floor_image;
+    GLuint m_ground_texture;
+    QImage m_ground_image;
 
     unsigned int m_numSurfaceVertices;
     unsigned int m_verticesSize;

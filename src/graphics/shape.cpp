@@ -113,6 +113,10 @@ void Shape::setColor(float r, float g, float b) {
 
 void Shape::draw(Shader *shader, GLenum mode)
 {
+    // Drawing the ground texture.
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
+
     Eigen::Matrix3f m3 = m_modelMatrix.topLeftCorner(3, 3);
     Eigen::Matrix3f inverseTransposeModel = m3.inverse().transpose();
 
@@ -127,12 +131,12 @@ void Shape::draw(Shader *shader, GLenum mode)
         shader->setUniform("blue",  m_blue);
         shader->setUniform("alpha", m_alpha);
         glBindVertexArray(m_surfaceVao);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
-        shader->setUniform("sampler", 1);
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
+//        shader->setUniform("sampler", 0);
         glDrawElements(mode, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
         glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+//        glBindTexture(GL_TEXTURE_2D, 0);
         break;
     }
     case GL_POINTS:
@@ -145,6 +149,7 @@ void Shape::draw(Shader *shader, GLenum mode)
         break;
     }
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 SelectMode Shape::select(Shader *shader, int closest_vertex)
@@ -283,28 +288,27 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
 
 void Shape::initGroundPlane(std::string texturePath, float depth, Shader* shader) {
 
-    // Prepare filepath
-    QString ocean_floor_filepath = QString(texturePath.c_str());
+    QString ground_texture_filepath = QString(texturePath.c_str());
 
     // TASK 1: Obtain image from filepath
-    this->ocean_floor_image = QImage(ocean_floor_filepath);
+    m_ground_image = QImage(ground_texture_filepath);
 
     // TASK 2: Format image to fit OpenGL
-    ocean_floor_image = ocean_floor_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-    auto bits = this->ocean_floor_image.bits();
-    auto dat = ocean_floor_image.data_ptr();
+    m_ground_image = m_ground_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
-    // TASK 3: Generate texture
-    glGenTextures(1, &ocean_floor_texture);
+    auto bits = m_ground_image.bits();
+
+    // TASK 3: Generate kitten texture
+    glGenTextures(1, &m_ground_texture);
 
     // TASK 9: Set the active texture slot to texture slot 0
     glActiveTexture(GL_TEXTURE0);
 
     // TASK 4: Bind kitten texture
-    glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
+    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
 
     // TASK 5: Load image into kitten texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ocean_floor_image.width(), ocean_floor_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, ocean_floor_image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_ground_image.width(), m_ground_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_ground_image.bits());
 
     // TASK 6: Set min and mag filters' interpolation mode to linear
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -313,10 +317,47 @@ void Shape::initGroundPlane(std::string texturePath, float depth, Shader* shader
     // TASK 7: Unbind kitten texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // TASK 10: set the texture.frag uniform for our texture
-    glUseProgram(shader->id());
-//    glUniform1i(glGetUniformLocation(shader->id(), "sampler"), 0);
+//    // TASK 10: set the texture.frag uniform for our texture
+    shader->bind();
     shader->setUniform("sampler", 0);
-    glUseProgram(0);
+    shader->unbind();
+}
+
+void Shape::initSkyPlane(std::string texturePath, float depth, Shader* shader) {
+    //TODO: Complete
+
+    QString ground_texture_filepath = QString(texturePath.c_str());
+
+    // TASK 1: Obtain image from filepath
+    m_ground_image = QImage(ground_texture_filepath);
+
+    // TASK 2: Format image to fit OpenGL
+    m_ground_image = m_ground_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    auto bits = m_ground_image.bits();
+
+    // TASK 3: Generate kitten texture
+    glGenTextures(1, &m_ground_texture);
+
+    // TASK 9: Set the active texture slot to texture slot 0
+    glActiveTexture(GL_TEXTURE1);
+
+    // TASK 4: Bind kitten texture
+    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
+
+    // TASK 5: Load image into kitten texture
+    glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA, m_ground_image.width(), m_ground_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_ground_image.bits());
+
+    // TASK 6: Set min and mag filters' interpolation mode to linear
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // TASK 7: Unbind kitten texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+//    // TASK 10: set the texture.frag uniform for our texture
+    shader->bind();
+    shader->setUniform("sampler", 1);
+    shader->unbind();
 }
 

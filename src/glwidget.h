@@ -35,6 +35,7 @@ private:
     // Basic OpenGL Overrides
     void initializeGL()         override;
     void paintGL()              override;
+    void paintTexture(GLuint texture, bool filtered);
     void resizeGL(int w, int h) override;
 
     // Event Listeners
@@ -63,6 +64,12 @@ private:
     Camera  m_camera;
     Shader *m_defaultShader;
     Shader *m_pointShader;
+    Shader *m_texture_shader;
+
+    GLuint m_fullscreen_vbo;
+    GLuint m_fullscreen_vao;
+    QImage m_ground_image;
+    GLuint m_ground_texture;
 
     float m_movementScaling;
     float m_vertexSelectionThreshold;

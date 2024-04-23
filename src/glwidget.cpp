@@ -73,12 +73,52 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-   // glShadeModel(GL_SMOOTH);
+//    glShadeModel(GL_SMOOTH);
 
 
     // Initialize shaders
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
     m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
+//    m_texture_shader = new Shader(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
+
+    // INITIALIZE TEXTURE STUFF
+
+    // Prepare filepath
+
+
+//    // TASK 11: Fix this "fullscreen" quad's vertex data
+//    // TASK 12: Play around with different values!
+//    // TASK 13: Add UV coordinates
+//    std::vector<GLfloat> fullscreen_quad_data =
+//    { //     POSITIONS    //    UVs    //
+//        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+//        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+//         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+//         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+//        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+//         1.0f, -1.0f, 0.0f, 1.0f, 0.0f
+//    };
+    m_arap.initGroundPlane(":/resources/images/anamorphic.jpg", 2, m_defaultShader);
+
+//    // Generate and bind a VBO and a VAO for a fullscreen quad
+//    glGenBuffers(1, &m_fullscreen_vbo);
+//    glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
+//    glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
+//    glGenVertexArrays(1, &m_fullscreen_vao);
+//    glBindVertexArray(m_fullscreen_vao);
+
+//    // TASK 14: modify the code below to add a second attribute to the vertex attribute array
+//    glEnableVertexAttribArray(0);
+//    glEnableVertexAttribArray(1);
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
+//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+
+//    // Unbind the fullscreen quad's VBO and VAO
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindVertexArray(0);
+
+    // END INITIALIZE TEXTURE STUFF
+
 
     // initialize texture
     m_texture0 = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/hello.png").textureID;
@@ -118,22 +158,41 @@ void GLWidget::initializeGL()
     //m_arap.initGroundPlane(":resources/images/kitty.png", 2, m_defaultShader);
 
     //INIT FBO
-    m_devicePixelRatio = this->devicePixelRatio();
+    // m_devicePixelRatio = this->devicePixelRatio();
 
-     m_defaultFBO = 2;
-     m_screen_width = size().width() * m_devicePixelRatio;
-     m_screen_height = size().height() * m_devicePixelRatio;
-     m_fbo_width = m_screen_width;
-     m_fbo_height = m_screen_height;
+    //  m_defaultFBO = 2;
+    //  m_screen_width = size().width() * m_devicePixelRatio;
+    //  m_screen_height = size().height() * m_devicePixelRatio;
+    //  m_fbo_width = m_screen_width;
+    //  m_fbo_height = m_screen_height;
 
-     initFullScreenQuad();
+    //  initFullScreenQuad();
 }
+
+//void GLWidget::paintTexture(GLuint texture, bool filtered){
+////    glUseProgram(m_texture_shader->id());
+//    m_texture_shader->bind();
+//    // TASK 32: Set your bool uniform on whether or not to filter the texture drawn
+////    glUniform1i(glGetUniformLocation(m_texture_shader->id(), "filtered"), filtered);
+//    m_texture_shader->setUniform("filtered", filtered);
+//    // TASK 10: Bind "texture" to slot 0
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, texture);
+//    glBindVertexArray(m_fullscreen_vao);
+////    std::cout << texture << std::endl;
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//    glBindVertexArray(0);
+//    glUseProgram(0);
+//    m_texture_shader->unbind();
+//}
 
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable( GL_BLEND );
+//    paintTexture(m_ground_texture, false);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    glEnable( GL_BLEND );
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
@@ -143,39 +202,19 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
 
-    // bind texture
-   m_defaultShader->setUniform("texture_img", 0);
-   glActiveTexture(GL_TEXTURE0);
-   glBindTexture(GL_TEXTURE_2D, m_texture0);
-
-
-//    m_defaultShader->setUniform("");
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
-    //glBindTexture(GL_TEXTURE_2D, 0);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
-//    glClear(GL_DEPTH_BUFFER_BIT);
-
-
-//    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-//        // Task 25: Bind the default framebuffer
-//        glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
-//        glViewport(0, 0, m_screen_width, m_screen_height);
-
-        // Task 26: Clear the color and depth buffers
-
-        // Task 27: Call paintTexture to draw our FBO color attachment texture | Task 31: Set bool parameter to true
-        paintTexture(m_texture0, true);
-
-//    m_pointShader->bind();
-//    m_pointShader->setUniform("proj",   m_camera.getProjection());
-//    m_pointShader->setUniform("view",   m_camera.getView());
-//    m_pointShader->setUniform("vSize",  m_vSize);
-//    m_pointShader->setUniform("width",  width());
-//    m_pointShader->setUniform("height", height());
-//    m_arap.draw(m_pointShader, GL_POINTS);
-//    m_pointShader->unbind();
+////    m_pointShader->bind();
+////    m_pointShader->setUniform("proj",   m_camera.getProjection());
+////    m_pointShader->setUniform("view",   m_camera.getView());
+////    m_pointShader->setUniform("vSize",  m_vSize);
+////    m_pointShader->setUniform("width",  width());
+////    m_pointShader->setUniform("height", height());
+////    m_arap.draw(m_pointShader, GL_POINTS);
+////    m_pointShader->unbind();
 }
 
 void GLWidget::paintTexture(GLuint texture, bool postProcessOn){
