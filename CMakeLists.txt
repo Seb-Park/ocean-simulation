@@ -88,6 +88,7 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/images/sand_text.jpg
         resources/images/caustic_sample.jpg
         resources/images/anamorphic.jpg
+        resources/images/daniel.jpg
 #        resources/images/ground.png
         resources/shaders/shader.frag
         resources/shaders/shader.vert
