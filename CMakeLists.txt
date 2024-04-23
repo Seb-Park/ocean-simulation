@@ -54,6 +54,8 @@ add_executable(${PROJECT_NAME}
 
     src/ocean/ocean.h
     src/ocean/ocean.cpp
+
+    src/ocean/ocean_alt.h src/ocean/ocean_alt.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
@@ -96,6 +98,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/anchorPoint.frag
         resources/shaders/texture.vert
         resources/shaders/texture.frag
+
+
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

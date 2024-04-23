@@ -5,6 +5,7 @@
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
 #include "ocean/ocean.h"
+#include "ocean/ocean_alt.h"
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -77,9 +78,9 @@ public:
 	int m_num_iterations;
 	const char * m_mesh_path;
 
-    ocean m_ocean;
-    double m_time = 0.00;
-    double m_timestep = 0.001;
+    ocean_alt m_ocean;
+        double m_time = 0.00;
+        double m_timestep = 0.03;
 
     Eigen::Vector3f minCorner, maxCorner;
 };
