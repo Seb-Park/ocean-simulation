@@ -399,11 +399,4 @@ void ocean_alt::fast_fft
 			}
 		}
 	}
-
-	for (int i = 0; i < n; i++)
-	{
-		h[i] /= n;
-		ikh[i] /= n;
-		neg_ik_hat_h[i] /= n;
-	}
 }
