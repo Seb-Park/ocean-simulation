@@ -36,6 +36,7 @@ void ocean_alt::init_wave_index_constants(){
         wave_const.h0_prime = h0_prime;
         wave_const.h0_prime_conj = h0_prime_conj;
         wave_const.w_prime = w_prime;
+        wave_const.w_prime = w_prime;
         wave_const.base_horiz_pos = get_horiz_pos(i);
         wave_const.k_vector = k;
 
@@ -50,7 +51,6 @@ void ocean_alt::init_wave_index_constants(){
     }
 }
 
-
 // fast fourier transform at time t
 void ocean_alt::fft_prime(double t){
 
@@ -63,6 +63,26 @@ void ocean_alt::fft_prime(double t){
 
         h_tildas.emplace_back(h_t_prime);
     }
+
+	bool fast = false;
+	if (fast)
+	{
+		std::vector<Eigen::Vector2d> tmp = fast_fft(h_tildas);
+		for (int i = 0; i < N; i++)
+		{
+			m_current_h[i] = tmp[i];
+
+			// update displacements and slopes
+			Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
+			Eigen::Vector2d k_normalized = k_vector.normalized();
+
+			double imag_comp = m_current_h[i][1];
+			m_displacements[i] += k_normalized*imag_comp;
+			m_slopes[i] += k_vector*imag_comp;
+		}
+
+		return;
+	}
 
     // for each position in grid, sum up amplitudes dependng on that position
     for (int i=0; i<N; i++){
@@ -80,7 +100,7 @@ void ocean_alt::fft_prime(double t){
 
             // add x vector and k vector as imaginary numbers
             double imag_xk_sum = x_vector.dot(k_vector);
-            Eigen::Vector2d exp = complex_exp(imag_xk_sum); // vector(real, imag)
+            Eigen::Vector2d exp = complex_exp(-imag_xk_sum); // vector(real, imag)
 
             double real_comp = h_tilda_prime[0]*exp[0] - h_tilda_prime[1]*exp[1];
             double imag_comp = h_tilda_prime[0]*exp[1] + h_tilda_prime[1]*exp[0];
@@ -91,7 +111,6 @@ void ocean_alt::fft_prime(double t){
 
             m_displacements[i] += k_normalized*imag_comp;
             m_slopes[i] += k_vector*imag_comp;
-
         }
     }
 
@@ -303,4 +322,74 @@ std::vector<Eigen::Vector3i> ocean_alt::get_faces()
         }
     }
     return faces;
+}
+
+std::vector<Eigen::Vector2d> ocean_alt::fast_fft
+	(
+		std::vector<Eigen::Vector2d> h
+	)
+{
+	int N = h.size();
+	int exponent = 0;
+	int power_of_2 = 1;
+	while (power_of_2 < N)
+	{
+		power_of_2 *= 2;
+		exponent++;
+	}
+
+	std::vector<Eigen::Vector2d> H = std::vector<Eigen::Vector2d>(N);
+	// pad with zeros
+	for (int i = 0; i < N; i++)
+	{
+		H[i] = h[i];
+	}
+	for (int i = N; i < power_of_2; i++)
+	{
+		H.emplace_back(Eigen::Vector2d(0.0, 0.0));
+	}
+
+	// bit reverse the indices of the input data array
+	std::vector<Eigen::Vector2d> temp = std::vector<Eigen::Vector2d>(power_of_2);
+	for (int i = 0; i < power_of_2; i++)
+	{
+		int j = 0;
+		for (int k = 0; k < exponent; k++)
+		{
+			j = (j << 1) | (i >> k & 1);
+		}
+		temp[j] = H[i];
+	}
+	for (int i = 0; i < power_of_2; i++)
+	{
+		H[i] = temp[i];
+	}
+
+	// outer loop through levels i->p of even-odd decompositions, beginning with the final decompositions
+	// where individual y_m are used through the first decomposition where Y_n^e and Y_n^o are involved
+	for (int i = 1; i <= exponent; i++)
+	{
+
+		// nested middle loop where each level is grouped into terms according to values of k in the factor
+		// W_N^k = e^(-2*pi*i*k/N) appearing in each sum
+		int N_over_2 = 1 << i;
+		int N_over_4 = 1 << (i - 1);
+		double theta = 2 * M_PI / N_over_2;
+		Eigen::Vector2d W_N = Eigen::Vector2d(cos(theta), -sin(theta));
+		Eigen::Vector2d W = Eigen::Vector2d(1.0, 0.0);
+		for (int k = 0; k < N_over_4; k++)
+		{
+			// innermost loop where each group is split into individual sums
+			for (int j = k; j < power_of_2; j += N_over_2)
+			{
+				Eigen::Vector2d U = H[j];
+				Eigen::Vector2d V = H[j + N_over_4];
+				H[j] = U + W[0] * V - W[1] * V;
+				H[j + N_over_4] = U - (W[0] * V - W[1] * V);
+			}
+			W = W[0] * W_N - W[1] * W_N;
+		}
+	}
+
+	return H;
 }

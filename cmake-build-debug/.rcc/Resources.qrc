@@ -1,10 +1,18 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="resources/images/uv1.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/uv1.png</file>
+    <file alias="resources/images/kitten.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/kitten.png</file>
+    <file alias="resources/images/hello.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/hello.png</file>
+    <file alias="resources/images/sand_text.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/sand_text.jpg</file>
+    <file alias="resources/images/caustic_sample.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/caustic_sample.jpg</file>
+    <file alias="resources/images/anamorphic.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/anamorphic.jpg</file>
     <file alias="resources/shaders/shader.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.frag</file>
     <file alias="resources/shaders/shader.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.vert</file>
     <file alias="resources/shaders/anchorPoint.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.vert</file>
     <file alias="resources/shaders/anchorPoint.geom">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.geom</file>
     <file alias="resources/shaders/anchorPoint.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.frag</file>
+    <file alias="resources/shaders/texture.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/texture.vert</file>
+    <file alias="resources/shaders/texture.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/texture.frag</file>
   </qresource>
 </RCC>
 
