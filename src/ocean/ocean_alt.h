@@ -60,17 +60,17 @@ private:
 
 
 
-    const double Lx = 100.0;
-    const double Lz = 100.0;
+    const double Lx = 1000.0;
+    const double Lz = 1000.0;
 
-    const int num_rows = 32;
-    const int num_cols = 32;
+    const int num_rows = 2048;
+    const int num_cols = 2048;
 
     const int N = num_rows*num_cols; // total number of grid points
     const double lambda = .40; // how much displacement matters
     const double spacing = 35.0; // spacing between grid points
 
-    const double A = .25; // numeric constant for the Phillips spectrum
+    const double A = 1000; // numeric constant for the Phillips spectrum
     const double V = 49; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
@@ -90,9 +90,11 @@ private:
     const double D = 1.0; // Depth below mean water level (for dispersion relation)
 
 
-	std::vector<Eigen::Vector2d> fast_fft
+	void fast_fft
 	(
-		std::vector<Eigen::Vector2d> h
+		std::vector<Eigen::Vector2d> & h,
+		std::vector<Eigen::Vector2d> & ikh,
+		std::vector<Eigen::Vector2d> & neg_ik_hat_h
 	);
 };
 
