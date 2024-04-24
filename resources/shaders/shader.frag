@@ -81,7 +81,9 @@ void main() {
 //    refrProb *= beerAtt;
 
     fragColor = 0.75f * diffuse; // Diffuse
-    fragColor = vec4(0,0,0,0);
+//    fragColor = vec4(0, 0, 0, 1.f);
+//    fragColor = vec4(.9f,1.f,1.f,0);
+    fragColor = vec4(red * .2f, green * .2f, blue * .2f,1.f);
     fragColor += 1.f * specular; // Specular TODO: Pass multiplications as uniforms.
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
     fragColor *=  ((1 - refrProb) / 1.f);
@@ -91,7 +93,7 @@ void main() {
 
     fragColor += refrProb * volumetric;
 //    fragColor = transmissive * refrProb;
-    fragColor = vec4(vec3(fragColor), 1.5f);
+    fragColor = vec4(vec3(fragColor), 1.f);
     // Dividing refrProb by 2 just for heuristic. Want more phong to show through.
 //    fragColor = clamp(fragColor, 0.f, 1.f);
 //    fragColor = vec4(refrProb, 0.f, 0.f, 1.f);
