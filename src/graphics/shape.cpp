@@ -133,9 +133,24 @@ void Shape::setColor(float r, float g, float b) {
 
 void Shape::draw(Shader *shader, GLenum mode)
 {
+    // Texture problem
+    // Not that the texture is not being loaded, because if we bind m_sky_texture it works
+    // Not that one texture is overwriting the other, because if we just load sky it doesn't work
+    // Draws whatever is bound to texture0 no matter what.
     // Drawing the ground texture.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_ground_texture);
+//    glBindTexture(GL_TEXTURE_2D, 0);
+    shader->setUniform("groundSampler", 0);
+    glUniform1i(glGetUniformLocation(shader->id(), "groundSampler"), 0);
+
+    // https://stackoverflow.com/questions/67277087/opengl-glsl-multiple-texture-binding-not-working
+    // FIGURED OUT THE PROBLEM. it was that SAMPLERS WERE DEFAULTING TO SLOT 0 AND SETUNIFORM WASN'T WORKING
+    // BECAUSE IT WAS CALLING SETUNIFORM WITH FREAKING FLOATS. WHAT THE FRICK C++.
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_sky_texture);
+    shader->setUniform("skySampler", 1);
+    glUniform1i(glGetUniformLocation(shader->id(), "skySampler"), 1);
 
     Eigen::Matrix3f m3 = m_modelMatrix.topLeftCorner(3, 3);
     Eigen::Matrix3f inverseTransposeModel = m3.inverse().transpose();
@@ -151,9 +166,6 @@ void Shape::draw(Shader *shader, GLenum mode)
         shader->setUniform("blue",  m_blue);
         shader->setUniform("alpha", m_alpha);
         glBindVertexArray(m_surfaceVao);
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
-//        shader->setUniform("sampler", 0);
         glDrawElements(mode, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
         glBindVertexArray(0);
 //        glBindTexture(GL_TEXTURE_2D, 0);
@@ -169,6 +181,10 @@ void Shape::draw(Shader *shader, GLenum mode)
         break;
     }
     }
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -359,49 +375,52 @@ void Shape::initGroundPlane(std::string texturePath, float depth, Shader* shader
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // TASK 7: Unbind kitten texture
-    glBindTexture(GL_TEXTURE_2D, 0);
 
 //    // TASK 10: set the texture.frag uniform for our texture
     shader->bind();
     shader->setUniform("groundSampler", 0);
     shader->unbind();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Shape::initSkyPlane(std::string texturePath, float height, Shader* shader) {
     //TODO: Complete
 
-    QString ground_texture_filepath = QString(texturePath.c_str());
+    QString sky_texture_filepath = QString(texturePath.c_str());
 
     // TASK 1: Obtain image from filepath
-    m_ground_image = QImage(ground_texture_filepath);
+    m_sky_image = QImage(sky_texture_filepath);
 
     // TASK 2: Format image to fit OpenGL
-    m_ground_image = m_ground_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    m_sky_image = m_sky_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
-    auto bits = m_ground_image.bits();
+    auto bits = m_sky_image.bits();
 
     // TASK 3: Generate kitten texture
-    glGenTextures(1, &m_ground_texture);
+    glGenTextures(1, &m_sky_texture);
 
     // TASK 9: Set the active texture slot to texture slot 0
     glActiveTexture(GL_TEXTURE1);
 
     // TASK 4: Bind kitten texture
-    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
+    glBindTexture(GL_TEXTURE_2D, m_sky_texture);
 
     // TASK 5: Load image into kitten texture
-    glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA, m_ground_image.width(), m_ground_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_ground_image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_sky_image.width(), m_sky_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_sky_image.bits());
 
     // TASK 6: Set min and mag filters' interpolation mode to linear
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // TASK 7: Unbind kitten texture
-    glBindTexture(GL_TEXTURE_2D, 0);
+
 
 //    // TASK 10: set the texture.frag uniform for our texture
     shader->bind();
     shader->setUniform("skySampler", 1);
     shader->unbind();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 

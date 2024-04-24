@@ -57,6 +57,9 @@ private:
     GLuint m_ground_texture;
     QImage m_ground_image;
 
+    GLuint m_sky_texture;
+    QImage m_sky_image;
+
     unsigned int m_numSurfaceVertices;
     unsigned int m_verticesSize;
     float m_red;

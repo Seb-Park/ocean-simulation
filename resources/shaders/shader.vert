@@ -18,6 +18,7 @@ out vec3 normal_cameraSpace;
 out vec3 normal_worldSpace;
 out vec3 camera_worldSpace;
 out vec3 pos;
+out vec3 reflPos;
 out vec3 refrPos;
 out float refrProb;
 out vec2 uv;
@@ -53,6 +54,17 @@ vec4 getRefrPos() {
     }
 }
 
+vec3 getReflPos() {
+    float depth = 5000.f; // TODO: Pass as uniform
+    vec3 w_o = normalize(pos - camera_worldSpace);
+    vec3 reflectedRay = 2 * dot(-w_o, normal_worldSpace) * normal_worldSpace + w_o;
+
+    float dist = depth - position.y;
+    float depthScale = dist / reflectedRay.y;
+    vec3 skyContactPoint = (reflectedRay * depthScale) + position;
+    return skyContactPoint;
+}
+
 void main() {
 //    float depth = -4.f;
 //    float dist = position.y - depth;
@@ -74,6 +86,8 @@ void main() {
     vec4 refrPos_and_prob = getRefrPos();
     refrPos = vec3(refrPos_and_prob);
     refrProb = clamp(refrPos_and_prob.w, 0.f, 1.f);
+
+    reflPos = getReflPos();
 
     gl_Position = proj * view * model * vec4(position, 1);
 }

@@ -5,6 +5,7 @@ in vec3 normal_cameraSpace;
 in vec3 camera_worldSpace;
 in vec3 normal_worldSpace;
 in vec3 pos;
+in vec3 reflPos;
 in vec3 refrPos;
 in float refrProb;
 in vec2 uv;
@@ -18,11 +19,15 @@ uniform float red   = 1.0;
 uniform float green = 1.0;
 uniform float blue  = 1.0;
 uniform float alpha = 1.0;
+//layout(binding = 0) uniform sampler2D groundSampler;
+//layout(binding = 1) uniform sampler2D skySampler;
 uniform sampler2D groundSampler;
 uniform sampler2D skySampler;
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
 //uniform float test = 0;
+
+// Random methods from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
 
 float rand(vec2 n) {
     return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
@@ -63,6 +68,8 @@ void main() {
 //    fragColor = vec4(fragColor.x, 0.f, fragColor.z, 1.f);
 //    fragColor = vec4(test, test, test, 1.f);
     vec2 refrUV = uvFromWorldPoint(refrPos);
+    vec2 reflUV = uvFromWorldPoint(reflPos);
+
     float waterMurkiness = 0.002f; // TODO: Make uniform
     vec3 waterVolumeColor = vec3(red * 0.1f, green * 0.2f, blue * 0.2f);
     float murkDiffuse = 0.3f;
@@ -79,6 +86,7 @@ void main() {
     vec4 transmissive = texture(groundSampler, vec2(refrUVBlurry));
     vec4 murk = (vec4(waterVolumeColor * d * murkDiffuse + waterVolumeColor * murkAmbient, 1.0f));
 
+    vec4 skyRefl = texture(skySampler, vec2(reflUV));
 //    refrProb *= beerAtt;
 
     fragColor = 0.75f * diffuse; // Diffuse
@@ -87,6 +95,9 @@ void main() {
     fragColor = vec4(red * .2f, green * .2f, blue * .2f,1.f);
     fragColor += 1.f * specular; // Specular TODO: Pass multiplications as uniforms.
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
+    fragColor += 0.2f * skyRefl * vec4(0.8f, 0.9f, 1.f, 1.f);
+    fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
+
     fragColor *=  ((1 - refrProb) / 1.f);
 
     vec4 volumetric = beerAtt * transmissive;

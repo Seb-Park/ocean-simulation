@@ -95,7 +95,8 @@ void GLWidget::initializeGL()
 //        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
 //         1.0f, -1.0f, 0.0f, 1.0f, 0.0f
 //    };
-    m_arap.initGroundPlane(":/resources/images/anamorphic.jpg", 2, m_defaultShader);
+    m_arap.initSkyPlane(":/resources/images/uv1.png", 2, m_defaultShader);
+    m_arap.initGroundPlane(":/resources/images/daniel.jpg", 2, m_defaultShader);
 
 //    // Generate and bind a VBO and a VAO for a fullscreen quad
 //    glGenBuffers(1, &m_fullscreen_vbo);
