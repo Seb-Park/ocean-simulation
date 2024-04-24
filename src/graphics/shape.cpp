@@ -363,11 +363,11 @@ void Shape::initGroundPlane(std::string texturePath, float depth, Shader* shader
 
 //    // TASK 10: set the texture.frag uniform for our texture
     shader->bind();
-    shader->setUniform("sampler", 0);
+    shader->setUniform("groundSampler", 0);
     shader->unbind();
 }
 
-void Shape::initSkyPlane(std::string texturePath, float depth, Shader* shader) {
+void Shape::initSkyPlane(std::string texturePath, float height, Shader* shader) {
     //TODO: Complete
 
     QString ground_texture_filepath = QString(texturePath.c_str());
@@ -401,7 +401,7 @@ void Shape::initSkyPlane(std::string texturePath, float depth, Shader* shader) {
 
 //    // TASK 10: set the texture.frag uniform for our texture
     shader->bind();
-    shader->setUniform("sampler", 1);
+    shader->setUniform("skySampler", 1);
     shader->unbind();
 }
 

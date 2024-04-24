@@ -18,7 +18,8 @@ uniform float red   = 1.0;
 uniform float green = 1.0;
 uniform float blue  = 1.0;
 uniform float alpha = 1.0;
-uniform sampler2D sampler;
+uniform sampler2D groundSampler;
+uniform sampler2D skySampler;
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
 //uniform float test = 0;
@@ -53,7 +54,7 @@ void main() {
     vec3 posToCam = normalize(camera_worldSpace - pos);
     float spec = pow(clamp(dot(posToCam, reflectedLight), 0, 1), 2.f);
 
-//    fragColor = texture(sampler, vec2(0.5f, 0.5f));
+//    fragColor = texture(groundSampler, vec2(0.5f, 0.5f));
 //    fragColor = vec4(abs(pos.x / 160.f), pos.y, 0.f, 1.f);
 //    fragColor = vec4(uv.y, uv.y, 0.f, 1.f);
 //    fragColor = vec4(camera_worldSpace.x - pos[0], camera_worldSpace.y - pos[1], pos[2], 1.f);
@@ -75,7 +76,7 @@ void main() {
 //    vec4 transmissive = vec4(vec3(refrUV, 1.f - refrUV.y), 1.f);
     float waterBlurriness = 0.f;
     vec2 refrUVBlurry = (1 - beerAtt) * vec2(rand(refrUV), rand(vec4(pos, d))) * waterBlurriness + refrUV;
-    vec4 transmissive = texture(sampler, vec2(refrUVBlurry));
+    vec4 transmissive = texture(groundSampler, vec2(refrUVBlurry));
     vec4 murk = (vec4(waterVolumeColor * d * murkDiffuse + waterVolumeColor * murkAmbient, 1.0f));
 
 //    refrProb *= beerAtt;
@@ -103,7 +104,7 @@ void main() {
     // (1 - refrProb) * SPECULAR
     // refrProb * (BEER * TRANSMISSIVE + (1 - beerAtt) * VOLUME (which is somewhat diffuse too?))
     // Transmissive shouldn't just get darker, but blurrier as beer attenuation lowers.
-//    fragColor = texture(sampler, vec2(refrUV));
+//    fragColor = texture(groundSampler, vec2(refrUV));
 //    fragColor = vec4(normal_worldSpace[0], 0, normal_worldSpace[1], 1.f);
 //    fragColor = diffuse;
 }

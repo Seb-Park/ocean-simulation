@@ -47,6 +47,10 @@ public:
         m_shape.initGroundPlane(texturePath, depth, shader);
     }
 
+    void initSkyPlane(std::string texturePath, float height, Shader* shader) {
+        m_shape.initSkyPlane(texturePath, height, shader);
+    }
+
     SelectMode select(Shader *shader, int vertex)
     {
         return m_shape.select(shader, vertex);
