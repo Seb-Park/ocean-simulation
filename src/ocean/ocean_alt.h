@@ -70,8 +70,8 @@ private:
     const double lambda = .40; // how much displacement matters
     const double spacing = 35.0; // spacing between grid points
 
-    const double A = 1.0; // numeric constant for the Phillips spectrum
-    const double V = 5.5; // wind speed
+    const double A = .25; // numeric constant for the Phillips spectrum
+    const double V = 49; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation
@@ -90,6 +90,10 @@ private:
     const double D = 1.0; // Depth below mean water level (for dispersion relation)
 
 
+	std::vector<Eigen::Vector2d> fast_fft
+	(
+		std::vector<Eigen::Vector2d> h
+	);
 };
 
 #endif // OCEAN_ALT_H
