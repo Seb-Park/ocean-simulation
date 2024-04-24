@@ -84,7 +84,9 @@ void ocean_alt::fft_prime(double t){
 	if (fast)
 	{
 		// call and update arrays
-		fast_fft(h_tildas, ikh, neg_ik_hat_h);
+		fast_fft(h_tildas);
+		fast_fft(ikh);
+		fast_fft(neg_ik_hat_h);
 
 		// copy over data, divide by N since we are going to position
 		for (int i = 0; i < N; i++)
@@ -115,14 +117,18 @@ void ocean_alt::fft_prime(double t){
             Eigen::Vector2d exp = complex_exp(-imag_xk_sum); // vector(real, imag)
 
             double real_comp = h_tilda_prime[0]*exp[0] - h_tilda_prime[1]*exp[1];
-            double imag_comp = h_tilda_prime[0]*exp[1] + h_tilda_prime[1]*exp[0];
+			double imag_comp = h_tilda_prime[0]*exp[1] + h_tilda_prime[1]*exp[0];
 
             m_current_h[i] += Eigen::Vector2d(real_comp, imag_comp);
 
-            Eigen::Vector2d k_normalized = k_vector.normalized();
+            m_slopes[i] += -k_vector*imag_comp;
 
-            m_displacements[i] += k_normalized*imag_comp;
-            m_slopes[i] += k_vector*imag_comp;
+			if (k_vector.norm() < 0.0001)
+			{
+				continue;
+			}
+			Eigen::Vector2d k_normalized = k_vector.normalized();
+			m_displacements[i] += k_normalized*imag_comp;
         }
     }
 
@@ -131,7 +137,7 @@ void ocean_alt::fft_prime(double t){
 // time dependent calculation of h'(n,m,t)
 Eigen::Vector2d ocean_alt::h_prime_t(int i, double t){
     Eigen::Vector2d h0_prime = m_waveIndexConstants[i].h0_prime; // vector(real, imag)
-    Eigen::Vector2d h0_prime_conj = m_waveIndexConstants[i].h0_prime_conj; // vector(real, imag)
+    Eigen::Vector2d h0_prime_conj = m_waveIndexConstants[N - i].h0_prime_conj; // vector(real, imag)
     double w_prime = m_waveIndexConstants[i].w_prime;
 
     Eigen::Vector2d pos_complex_exp = complex_exp(w_prime*t); // vector(real, imag)
@@ -274,16 +280,19 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         Eigen::Vector2d amplitude = m_current_h[i];
         float height = amplitude[0];
 
-        Eigen::Vector2d slope = m_slopes[i] * .3f;
-        Eigen::Vector3f s = Eigen::Vector3f(-slope[0], 0.0, -slope[1]);
-        Eigen::Vector3f y = Eigen::Vector3f(0.0, 1.0, 0.0);
+//        Eigen::Vector2d slope = m_slopes[i] * .3f;
+//        Eigen::Vector3f s = Eigen::Vector3f(-slope[0], 0.0, -slope[1]);
+//        Eigen::Vector3f y = Eigen::Vector3f(0.0, 1.0, 0.0);
+//
+//        float xs = 1.f + s[0]*s[0];
+//        float ys = 1.f + s[1]*s[1];
+//        float zs = 1.f + s[2]*s[2];
+//
+//        Eigen::Vector3f diff = y - s;
+//        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
 
-        float xs = 1.f + s[0]*s[0];
-        float ys = 1.f + s[1]*s[1];
-        float zs = 1.f + s[2]*s[2];
-
-        Eigen::Vector3f diff = y - s;
-        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
+		Eigen::Vector2d slopes = m_slopes[i];
+        Eigen::Vector3f norm(-slopes[0], 1.0, -slopes[1]);
 
 
 
@@ -349,61 +358,91 @@ int reverse_bits(int x, int n)
 
 void ocean_alt::fast_fft
 	(
-		std::vector<Eigen::Vector2d> & h,
-		std::vector<Eigen::Vector2d> & ikh,
-		std::vector<Eigen::Vector2d> & neg_ik_hat_h
+		std::vector<Eigen::Vector2d> & data
 	)
 {
-	int n = h.size();
-	for (int i = 1, j = 0; i < n; i++) {
-		int bit = n >> 1;
-		for (; j & bit; bit >>= 1)
-			j ^= bit;
-		j ^= bit;
+	// compute the total number of complex values
+	int idim, ndim, isign;
+	unsigned long i1,i2,i3,i2rev,i3rev,ip1,ip2,ip3,ifp1,ifp2;
+	unsigned long ibit,k1,k2,n,nprev,nrem,ntot;
+	float tempi,tempr;
+	double theta,wi,wpi,wpr,wr,wtemp;
 
-		if (i < j)
+	isign = 1;
+
+	// compute the number of complex values
+	ntot = 1, idim = 1, ndim = 2;
+	std::vector<int> nn = {int(Lx), int(Lz)};
+	ntot = Lx * Lz;
+
+	nprev = 1;
+
+	// iterate over the number of dimensions
+	for (idim=ndim; idim >=1; idim--)
+	{
+		n = nn[idim];
+		nrem = ntot / (n * nprev);
+		ip1 = nprev << 1;
+		ip2 = ip1 * n;
+		ip3 = ip2 * nrem;
+		i2rev = 1;
+
+		// bit reversal
+		for (i2 = 1; i2 <= ip2; i2 += ip1)
 		{
-			std::swap(h[i], h[j]);
-			std::swap(ikh[i], ikh[j]);
-			std::swap(neg_ik_hat_h[i], neg_ik_hat_h[j]);
-		}
-	}
-
-	for (int len = 2; len <= n; len <<= 1)
-	{
-		double ang = 2 * 3.14159 / len;
-		Eigen::Vector2d wlen = -complex_exp(ang);
-		for (int i = 0; i < n; i += len) {
-			Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
-			Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
-			Eigen::Vector2d ex = complex_exp(x_vector.dot(k_vector));
-
-			Eigen::Vector2d w(1.0, 0.0);
-			for (int j = 0; j < len / 2; j++) {
-				Eigen::Vector2d u = h[i + j];
-				Eigen::Vector2d v = complex_mult(w, h[i + j + len / 2]);
-				h[i + j] = u + v;
-				h[i + j + len / 2] = u - v;
-
-				u = ikh[i + j];
-				v = complex_mult(w, ikh[i + j + len / 2]);
-				ikh[i + j] = u + v;
-				ikh[i + j + len / 2] = u - v;
-
-				u = neg_ik_hat_h[i + j];
-				v = complex_mult(w, neg_ik_hat_h[i + j + len / 2]);
-				neg_ik_hat_h[i + j] = u + v;
-				neg_ik_hat_h[i + j + len / 2] = u - v;
-
-				w = complex_mult(w, wlen);
+			if (i2 < i2rev)
+			{
+				for (i1 = i2; i1 <= i2 + ip1; i1++)
+				{
+					for (i3 = i1; i3 <= ip3; i3 += ip2)
+					{
+						i3rev = i2rev + i3 - i2;
+						std::swap(data[i3], data[i3rev]);
+					}
+				}
 			}
+			ibit = ip2 >> 1;
+			while (ibit >= ip1 && i2rev > ibit)
+			{
+				i2rev -= ibit;
+				ibit >>= 1;
+			}
+			i2rev += ibit;
 		}
-	}
 
-	for (int i = 0; i < n; i++)
-	{
-		h[i] /= n;
-		ikh[i] /= n;
-		neg_ik_hat_h[i] /= n;
+		// danielson-lanczon routine
+		ifp1 = ip1;
+		while (ifp1 < ip2)
+		{
+			ifp2=ifp1 << 1;
+			theta = isign*6.28318530717959 / (ifp2 / ip1);
+			wtemp = sin(0.5*theta);
+			wpr = -2.0*wtemp*wtemp;
+			wpi = sin(theta);
+			wr = 1.0;
+			wi = 0.0;
+			for (i3 = 1; i3 <= ifp1; i3 += ip1)
+			{
+				for (i1 = i3; i1 <= i3 + ip1; i1++)
+				{
+					for (i2 = i1; i2 <= ip3; i2 += ifp2)
+					{
+						k1 = i2;
+						k2 = k1 + ifp1;
+
+						tempr = wr*data[k2].x() - wi*data[k2].y();
+						tempi = wr*data[k2].y() + wi*data[k2].x();
+						data[k2] = Eigen::Vector2d(
+							data[k1].x() - tempr, data[k1].y() - tempi);
+						data[k1] += Eigen::Vector2d(tempr, tempi);
+					}
+				}
+				// trigonometric recurrence
+				wr = (wtemp = wr)*wpr - wi*wpi + wr;
+				wi = wi*wpr + wtemp*wpi + wi;
+			}
+			ifp1 = ifp2;
+		}
+		nprev *= n;
 	}
 }
