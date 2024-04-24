@@ -1081,6 +1081,8 @@ ocean_autogen/timestamp: \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/src/mainwindow.h \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean.cpp \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean.h \
+	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean_alt.cpp \
+	/Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean_alt.h \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/util/tiny_obj_loader.h \
 	/Users/sotech117/Documents/final/adv/ocean-simulation/util/unsupportedeigenthing/OpenGLSupport \
 	/Users/sotech117/Library/Application\ Support/JetBrains/Toolbox/apps/CLion/ch-0/232.9921.42/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCInformation.cmake \
@@ -1397,6 +1399,7 @@ ocean_autogen/timestamp: \
 	/Users/sotech117/Qt/6.5.2/macos/lib/QtCore.framework/Versions/A/Headers/qxmlstream.h \
 	/Users/sotech117/Qt/6.5.2/macos/lib/QtCore.framework/Versions/A/Headers/qxpfunctional.h \
 	/Users/sotech117/Qt/6.5.2/macos/lib/QtCore.framework/Versions/A/Headers/qxptype_traits.h \
+	/Users/sotech117/Qt/6.5.2/macos/lib/QtGui.framework/Versions/A/Headers/QImage \
 	/Users/sotech117/Qt/6.5.2/macos/lib/QtGui.framework/Versions/A/Headers/QSurfaceFormat \
 	/Users/sotech117/Qt/6.5.2/macos/lib/QtGui.framework/Versions/A/Headers/qaction.h \
 	/Users/sotech117/Qt/6.5.2/macos/lib/QtGui.framework/Versions/A/Headers/qbitmap.h \

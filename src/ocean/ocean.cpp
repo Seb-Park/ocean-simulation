@@ -270,3 +270,62 @@ std::vector<Eigen::Vector3i> ocean::get_faces()
 	}
 	return faces;
 }
+
+//
+//std::vector<Eigen::Vector2d> ocean_alt::fast_fft
+//	(
+//		std::vector<Eigen::Vector2d> h
+//	)
+//{
+//	int N = h.size();
+//	std::vector<Eigen::Vector2d> H = std::vector<Eigen::Vector2d>(N);
+//
+//	if (N == 1)
+//	{
+//		H[0] = h[0];
+//		return H;
+//	}
+//	else
+//	{
+//		std::vector<Eigen::Vector2d> even = std::vector<Eigen::Vector2d>(N / 2);
+//		std::vector<Eigen::Vector2d> odd = std::vector<Eigen::Vector2d>(N / 2);
+//
+//		for (int i = 0; i < N / 2; i++)
+//		{
+//			even[i] = h[2 * i];
+//			odd[i] = h[2 * i + 1];
+//		}
+//
+//		std::vector<Eigen::Vector2d> even_fft = fast_fft(even);
+//		std::vector<Eigen::Vector2d> odd_fft = fast_fft(odd);
+//
+//		for (int i = 0; i < N / 2; i++)
+//		{
+//			Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
+//			Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
+//
+//			Eigen::Vector2d h_tilda_prime = h[i]; // vector(real, imag)
+//
+//			double k_dot_x = x_vector.dot(k_vector);
+//			Eigen::Vector2d omega = complex_exp(-k_dot_x); // vector(real, imag)
+//			Eigen::Vector2d omega_times_odd =
+//				{
+//					omega[0] * odd_fft[i][0] - omega[1] * odd_fft[i][1],
+//					omega[0] * odd_fft[i][1] + omega[1] * odd_fft[i][0]
+//				};
+//
+//			H[i] = Eigen::Vector2d
+//				(
+//					even_fft[i][0] + omega_times_odd[0],
+//					even_fft[i][1] + omega_times_odd[1]
+//				);
+//			H[i + N / 2] = Eigen::Vector2d
+//				(
+//					even_fft[i][0] - omega_times_odd[0],
+//					even_fft[i][1] - omega_times_odd[1]
+//				);
+//		}
+//
+//		return H;
+//	}
+//}
