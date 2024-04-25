@@ -64,7 +64,7 @@ void GLWidget::initializeGL()
     fprintf(stdout, "Successfully initialized GLEW %s\n", glewGetString(GLEW_VERSION));
 
     // Set clear color to white
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0, 0, 0, 1);
 
     // Enable depth-testing and backface culling
     glEnable(GL_DEPTH_TEST);

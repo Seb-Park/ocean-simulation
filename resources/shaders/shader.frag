@@ -95,7 +95,7 @@ void main() {
     fragColor = vec4(red * .2f, green * .2f, blue * .2f,1.f);
     fragColor += 1.f * specular; // Specular TODO: Pass multiplications as uniforms.
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
-    fragColor += 0.2f * skyRefl * vec4(0.8f, 0.9f, 1.f, 1.f);
+    fragColor += 0.3f * skyRefl;
     fragColor = clamp(fragColor, 0.f, 1.f); // Clamp
 
     fragColor *=  ((1 - refrProb) / 1.f);

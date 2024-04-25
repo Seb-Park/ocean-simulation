@@ -55,9 +55,9 @@ vec4 getRefrPos() {
 }
 
 vec3 getReflPos() {
-    float depth = 5000.f; // TODO: Pass as uniform
+    float depth = 500.f; // TODO: Pass as uniform
     vec3 w_o = normalize(pos - camera_worldSpace);
-    vec3 reflectedRay = 2 * dot(-w_o, normal_worldSpace) * normal_worldSpace + w_o;
+    vec3 reflectedRay = w_o - 2 * dot(w_o, normal_worldSpace) * normal_worldSpace;
 
     float dist = depth - position.y;
     float depthScale = dist / reflectedRay.y;

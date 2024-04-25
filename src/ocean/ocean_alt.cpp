@@ -110,7 +110,7 @@ void ocean_alt::fft_prime(double t){
             Eigen::Vector2d k_normalized = k_vector.normalized();
 
             m_displacements[i] += k_normalized*imag_comp;
-            m_slopes[i] += k_vector*imag_comp;
+            m_slopes[i] += -k_vector*imag_comp;
         }
     }
 
@@ -271,7 +271,12 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         float zs = 1.f + s[2]*s[2];
 
         Eigen::Vector3f diff = y - s;
-        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
+        // Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
+
+        // NEW
+        Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
+        norm.normalize();
+        // NEW
 
 
 
