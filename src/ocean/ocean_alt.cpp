@@ -80,7 +80,7 @@ void ocean_alt::fft_prime(double t){
 		neg_ik_hat_h.emplace_back(neg_ik_hat_h_val);
     }
 
-	bool fast = true;
+	bool fast = false;
 	if (fast)
 	{
 		// call and update arrays
@@ -302,7 +302,7 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
 
         // calculate displacement
         Eigen::Vector2d disp = lambda*m_displacements[i];
-
+		// disp = Eigen::Vector2d(0.0, 0.0);
         //
 
 

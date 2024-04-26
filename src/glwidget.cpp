@@ -136,7 +136,7 @@ void GLWidget::initializeGL()
     // Note for maintainers: Z-up
     float fovY = 120;
     float nearPlane = 0.1f;
-    float farPlane  = 3 * extentLength;
+    float farPlane  = 1000000.0f;
 
     // Initialize camera with a reasonable transform
     Eigen::Vector3f eye    = center - Eigen::Vector3f::UnitZ() * extentLength;
