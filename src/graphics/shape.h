@@ -36,6 +36,8 @@ public:
     void setColor(float r, float g, float b);
 
     void initGroundPlane(std::string texturePath, float depth, Shader* shader);
+    unsigned int loadCubemap(std::vector<std::string> faces);
+    void initEnvironment(Shader *shader, const Eigen::Matrix4f viewMat, const Eigen::Matrix4f projMat);
 
     void draw(Shader *shader, GLenum mode);
     SelectMode select(Shader *shader, int vertex);
@@ -53,6 +55,10 @@ private:
     GLuint m_surfaceIbo;
     GLuint m_ground_texture;
     QImage m_ground_image;
+
+    unsigned int m_cubemapTexture;
+    Shader *m_skyboxShader;
+    unsigned int m_skyboxVAO, m_skyboxVBO;
 
     unsigned int m_numSurfaceVertices;
     unsigned int m_verticesSize;

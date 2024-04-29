@@ -115,14 +115,24 @@ void Shape::draw(Shader *shader, GLenum mode)
 {
     // Drawing the ground texture.
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
 
     Eigen::Matrix3f m3 = m_modelMatrix.topLeftCorner(3, 3);
     Eigen::Matrix3f inverseTransposeModel = m3.inverse().transpose();
 
+    m_skyboxShader->bind();
+    glDepthFunc(GL_LEQUAL);
+    glBindVertexArray(m_skyboxVAO);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    m_skyboxShader->unbind();
+
     switch(mode) {
     case GL_TRIANGLES:
     {
+        glBindTexture(GL_TEXTURE_2D, m_ground_texture);
         shader->setUniform("wire", 0);
         shader->setUniform("model", m_modelMatrix);
         shader->setUniform("inverseTransposeModel", inverseTransposeModel);
@@ -136,7 +146,8 @@ void Shape::draw(Shader *shader, GLenum mode)
 //        shader->setUniform("sampler", 0);
         glDrawElements(mode, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
         glBindVertexArray(0);
-//        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
         break;
     }
     case GL_POINTS:
@@ -149,7 +160,9 @@ void Shape::draw(Shader *shader, GLenum mode)
         break;
     }
     }
+
     glBindTexture(GL_TEXTURE_2D, 0);
+
 }
 
 SelectMode Shape::select(Shader *shader, int closest_vertex)
@@ -321,5 +334,115 @@ void Shape::initGroundPlane(std::string texturePath, float depth, Shader* shader
     shader->bind();
     shader->setUniform("sampler", 0);
     shader->unbind();
+}
+
+unsigned int Shape::loadCubemap(vector<std::string> faces)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    for (int i = 0; i < faces.size(); i++) {
+        auto face_i_path = QString(faces[i].c_str());
+        auto face_i = QImage(face_i_path);
+        face_i = face_i.convertToFormat(QImage::Format_RGBA8888);
+
+        auto bits = face_i.bits();
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                     0, GL_RGB, face_i.width(), face_i.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, bits
+        );
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    return textureID;
+}
+
+void Shape::initEnvironment(Shader *shader, const Eigen::Matrix4f viewMat, const Eigen::Matrix4f projMat) {
+    vector<std::string> faces
+    {
+        ":resources/images/skybox/right.jpg",
+        ":resources/images/skybox/left.jpg",
+        ":resources/images/skybox/top.jpg",
+        ":resources/images/skybox/bottom.jpg",
+        ":resources/images/skybox/front.jpg",
+        ":resources/images/skybox/back.jpg"
+    };
+    m_cubemapTexture = loadCubemap(faces);
+    m_skyboxShader = shader;
+
+    shader->bind();
+//    glDepthMask(GL_FALSE);
+
+    shader->setUniform("projection", projMat);
+    shader->setUniform("view", viewMat);
+
+//    glBindVertexArray(m_surfaceVao);
+//    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+//    glDrawArrays(GL_TRIANGLES, 0, 36);
+//    glDepthMask(GL_TRUE);
+//    glBindVertexArray(0);
+
+    float skyboxVertices[] = {
+            // positions
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            -1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+             1.0f, -1.0f,  1.0f
+        };
+
+
+    glGenVertexArrays(1, &m_skyboxVAO);
+    glGenBuffers(1, &m_skyboxVBO);
+    glBindVertexArray(m_skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    shader->unbind();
+
 }
 

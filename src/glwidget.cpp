@@ -74,6 +74,7 @@ void GLWidget::initializeGL()
 
 
     // Initialize shaders
+    m_skyboxShader = new Shader(":resources/shaders/environment.vert",  ":resources/shaders/environment.frag");
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
     m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
 //    m_texture_shader = new Shader(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
@@ -96,6 +97,7 @@ void GLWidget::initializeGL()
 //         1.0f, -1.0f, 0.0f, 1.0f, 0.0f
 //    };
     m_arap.initGroundPlane(":/resources/images/anamorphic.jpg", 2, m_defaultShader);
+    m_arap.initEnvironment(m_skyboxShader, m_camera.getView(), m_camera.getProjection());
 
 //    // Generate and bind a VBO and a VAO for a fullscreen quad
 //    glGenBuffers(1, &m_fullscreen_vbo);

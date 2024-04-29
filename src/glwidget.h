@@ -50,6 +50,7 @@ private:
     Shader *m_defaultShader;
     Shader *m_pointShader;
     Shader *m_texture_shader;
+    Shader *m_skyboxShader;
 
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;

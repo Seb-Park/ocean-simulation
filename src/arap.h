@@ -44,6 +44,10 @@ public:
         m_shape.initGroundPlane(texturePath, depth, shader);
     }
 
+    void initEnvironment(Shader* shader, const Eigen::Matrix4f viewMat, const Eigen::Matrix4f projMat) {
+        m_shape.initEnvironment(shader, viewMat, projMat);
+    }
+
     SelectMode select(Shader *shader, int vertex)
     {
         return m_shape.select(shader, vertex);
