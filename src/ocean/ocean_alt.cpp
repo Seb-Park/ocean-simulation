@@ -80,52 +80,84 @@ void ocean_alt::fft_prime(double t){
 		neg_ik_hat_h.emplace_back(neg_ik_hat_h_val);
     }
 
+	// get the starting time so we can caulcate the time it takes to do the fft
+	auto start = std::chrono::system_clock::now();
+
 	bool fast = true;
 	if (fast)
 	{
-		// call and update arrays
-		fast_fft(h_tildas, ikh, neg_ik_hat_h);
 
-		// copy over data, divide by N since we are going to position
+		// call and update arrays
+		// convert h_tildas to 2d array
+		std::vector<std::vector<Eigen::Vector2d>> h_tildas_2d = std::vector<std::vector<Eigen::Vector2d>>();
+		std::vector<std::vector<Eigen::Vector2d>> ikh_2d = std::vector<std::vector<Eigen::Vector2d>>();
+		std::vector<std::vector<Eigen::Vector2d>> neg_ik_hat_h_2d = std::vector<std::vector<Eigen::Vector2d>>();
+		for (int i = 0; i < num_rows; i++)
+		{
+			std::vector<Eigen::Vector2d> row1 = std::vector<Eigen::Vector2d>();
+			std::vector<Eigen::Vector2d> row2 = std::vector<Eigen::Vector2d>();
+			std::vector<Eigen::Vector2d> row3 = std::vector<Eigen::Vector2d>();
+
+			for (int j = 0; j < num_cols; j++)
+			{
+				row1.push_back(h_tildas[i * num_rows + j]);
+				row2.push_back(ikh[i * num_rows + j]);
+				row3.push_back(neg_ik_hat_h[i * num_rows + j]);
+			}
+			h_tildas_2d.push_back(row1);
+			ikh_2d.push_back(row2);
+			neg_ik_hat_h_2d.push_back(row3);
+		}
+
+		m_current_h = m_fastfft.do_fft(h_tildas_2d);
+		// m_current_h = h_tildas;
+		 m_slopes = m_fastfft.do_fft(ikh_2d);
+		 m_displacements = m_fastfft.do_fft(neg_ik_hat_h_2d);
+	}
+	else
+	{
+
+		// for each position in grid, sum up amplitudes dependng on that position
 		for (int i = 0; i < N; i++)
 		{
-			m_current_h[i] = h_tildas[i];
-			m_slopes[i] = ikh[i];
-			m_displacements[i] = neg_ik_hat_h[i];
+			Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
+			m_current_h[i] = Eigen::Vector2d(0.0, 0.0);
+			m_displacements[i] = Eigen::Vector2d(0.0, 0.0);
+			m_slopes[i] = Eigen::Vector2d(0.0, 0.0);
+
+
+			for (int j = 0; j < N; j++)
+			{
+				Eigen::Vector2d k_vector = m_waveIndexConstants[j].k_vector;
+				Eigen::Vector2d h_tilda_prime = h_tildas[j]; // vector(real, imag)
+
+
+				// add x vector and k vector as imaginary numbers
+				double imag_xk_sum = x_vector.dot(k_vector);
+				Eigen::Vector2d exp = complex_exp(imag_xk_sum); // vector(real, imag)
+
+				double real_comp = h_tilda_prime[0] * exp[0] - h_tilda_prime[1] * exp[1];
+				double imag_comp = h_tilda_prime[0] * exp[1] + h_tilda_prime[1] * exp[0];
+
+				m_current_h[i] += Eigen::Vector2d(real_comp, imag_comp);
+
+				Eigen::Vector2d k_normalized = k_vector.normalized();
+
+				m_displacements[i] += k_normalized * imag_comp;
+				m_slopes[i] += k_vector * imag_comp;
+			}
 		}
-		return;
 	}
 
-    // for each position in grid, sum up amplitudes dependng on that position
-    for (int i=0; i<N; i++){
-        Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
-        m_current_h[i] = Eigen::Vector2d(0.0, 0.0);
-        m_displacements[i] = Eigen::Vector2d(0.0, 0.0);
-        m_slopes[i] = Eigen::Vector2d(0.0, 0.0);
+	// m_current_h = h_tildas;
 
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
-
-        for (int j = 0; j < N; j++){
-            Eigen::Vector2d k_vector = m_waveIndexConstants[j].k_vector;
-            Eigen::Vector2d h_tilda_prime = h_tildas[j]; // vector(real, imag)
-
-
-            // add x vector and k vector as imaginary numbers
-            double imag_xk_sum = x_vector.dot(k_vector);
-            Eigen::Vector2d exp = complex_exp(-imag_xk_sum); // vector(real, imag)
-
-            double real_comp = h_tilda_prime[0]*exp[0] - h_tilda_prime[1]*exp[1];
-            double imag_comp = h_tilda_prime[0]*exp[1] + h_tilda_prime[1]*exp[0];
-
-            m_current_h[i] += Eigen::Vector2d(real_comp, imag_comp);
-
-            Eigen::Vector2d k_normalized = k_vector.normalized();
-
-            m_displacements[i] += k_normalized*imag_comp;
-            m_slopes[i] += k_vector*imag_comp;
-        }
-    }
-
+//	std::cout << "finished computation at " << std::ctime(&end_time)
+//			  << "elapsed time: " << elapsed_seconds.count() << "s"
+//			  << std::endl;
 }
 
 // time dependent calculation of h'(n,m,t)
@@ -286,9 +318,6 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
 
 
-
-
-
         //if (i==6) std::cout << amplitude[0] << std::endl;
 
         // calculate displacement
@@ -334,69 +363,4 @@ std::vector<Eigen::Vector3i> ocean_alt::get_faces()
         }
     }
     return faces;
-}
-
-int reverse_bits(int x, int n)
-{
-	int result = 0;
-	for (int i = 0; i < n; i++)
-	{
-		result = (result << 1) | (x & 1);
-		x >>= 1;
-	}
-	return result;
-}
-
-void ocean_alt::fast_fft
-	(
-		std::vector<Eigen::Vector2d> & h,
-		std::vector<Eigen::Vector2d> & ikh,
-		std::vector<Eigen::Vector2d> & neg_ik_hat_h
-	)
-{
-	int n = h.size();
-	for (int i = 1, j = 0; i < n; i++) {
-		int bit = n >> 1;
-		for (; j & bit; bit >>= 1)
-			j ^= bit;
-		j ^= bit;
-
-		if (i < j)
-		{
-			std::swap(h[i], h[j]);
-			std::swap(ikh[i], ikh[j]);
-			std::swap(neg_ik_hat_h[i], neg_ik_hat_h[j]);
-		}
-	}
-
-	for (int len = 2; len <= n; len <<= 1)
-	{
-		double ang = 2 * 3.14159 / len;
-		Eigen::Vector2d wlen = -complex_exp(ang);
-		for (int i = 0; i < n; i += len) {
-			Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
-			Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
-			Eigen::Vector2d ex = complex_exp(x_vector.dot(k_vector));
-
-			Eigen::Vector2d w(1.0, 0.0);
-			for (int j = 0; j < len / 2; j++) {
-				Eigen::Vector2d u = h[i + j];
-				Eigen::Vector2d v = complex_mult(w, h[i + j + len / 2]);
-				h[i + j] = u + v;
-				h[i + j + len / 2] = u - v;
-
-				u = ikh[i + j];
-				v = complex_mult(w, ikh[i + j + len / 2]);
-				ikh[i + j] = u + v;
-				ikh[i + j + len / 2] = u - v;
-
-				u = neg_ik_hat_h[i + j];
-				v = complex_mult(w, neg_ik_hat_h[i + j + len / 2]);
-				neg_ik_hat_h[i + j] = u + v;
-				neg_ik_hat_h[i + j + len / 2] = u - v;
-
-				w = complex_mult(w, wlen);
-			}
-		}
-	}
 }

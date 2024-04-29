@@ -56,6 +56,7 @@ add_executable(${PROJECT_NAME}
     src/ocean/ocean.cpp
 
     src/ocean/ocean_alt.h src/ocean/ocean_alt.cpp
+        src/accelerate/fastfft.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

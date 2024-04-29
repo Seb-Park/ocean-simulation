@@ -585,6 +585,11 @@
 	"SOURCES" : 
 	[
 		[
+			"/Users/sotech117/Documents/final/adv/ocean-simulation/src/accelerate/fastfft.cpp",
+			"MU",
+			null
+		],
+		[
 			"/Users/sotech117/Documents/final/adv/ocean-simulation/src/arap.cpp",
 			"MU",
 			null

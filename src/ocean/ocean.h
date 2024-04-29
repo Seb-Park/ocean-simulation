@@ -17,23 +17,16 @@ public:
     void updateVertexAmplitudes(double t);
     std::vector<Eigen::Vector3f> get_vertices();
     std::vector<Eigen::Vector3i> get_faces();
-    int getLength() {
-        return this->length;
-    }
-    int getWidth() {
-        return this->width;
-    }
-
 
 
 private:
 
-    const int length = 81; // length of grid
-    const int width = 81; // width of grid
+    const int length = 16; // length of grid
+    const int width = 16; // width of grid
 	const int N = length * width; // total number of grid points
 
-    const double A = 50.0; // numeric constant for the Phillips spectrum
-	const double V = .25; // wind speed
+	const double A = 100.0; // numeric constant for the Phillips spectrum
+	const double V = 100000.0; // wind speed
 	const std::pair<double, double> omega_wind
 		= std::make_pair(1.0, 0.0); // wind direction
 
@@ -75,6 +68,10 @@ private:
 	(
 		double t,
 		int k_index
+	);
+	std::vector<std::pair<double, double>> fast_fft
+	(
+		std::vector<std::pair<double, double>> h
 	);
 };
 

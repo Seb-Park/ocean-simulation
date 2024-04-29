@@ -2,8 +2,6 @@
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/arap.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.cpp
-/Users/sotech117/Documents/final/adv/ocean-simulation/util/tiny_obj_loader.h
-/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/glwidget.h
  mmc:Q_OBJECT
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/glwidget.h
@@ -1066,6 +1064,7 @@
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/Eigen/src/plugins/MatrixCwiseUnaryOps.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/Eigen/src/plugins/ReshapedMethods.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/glew/include/GL/glew.h
+ mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/accelerate/fastfft.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/arap.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/shader.h
@@ -1389,6 +1388,8 @@
  mdp:/Users/sotech117/Qt/6.5.2/macos/lib/QtWidgets.framework/Versions/A/Headers/qtwidgetsglobal.h
  mdp:/Users/sotech117/Qt/6.5.2/macos/lib/QtWidgets.framework/Versions/A/Headers/qwidget.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/shape.cpp
+/Users/sotech117/Documents/final/adv/ocean-simulation/util/tiny_obj_loader.h
+/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/arap.cpp
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/meshloader.cpp
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/shader.h
@@ -2456,6 +2457,7 @@
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/Eigen/src/plugins/MatrixCwiseUnaryOps.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/Eigen/src/plugins/ReshapedMethods.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/glew/include/GL/glew.h
+ mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/accelerate/fastfft.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/arap.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/glwidget.h
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.h
@@ -2791,3 +2793,4 @@
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/mainwindow.cpp
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean_alt.cpp
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean_alt.h
+/Users/sotech117/Documents/final/adv/ocean-simulation/src/accelerate/fastfft.cpp
