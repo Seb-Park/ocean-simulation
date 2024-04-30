@@ -109,10 +109,25 @@ void ocean_alt::fft_prime(double t){
 			neg_ik_hat_h_2d.push_back(row3);
 		}
 
+		// call the fast fft
 		m_current_h = m_fastfft.do_fft(h_tildas_2d);
-		// m_current_h = h_tildas;
-		 m_slopes = m_fastfft.do_fft(ikh_2d);
-		 m_displacements = m_fastfft.do_fft(neg_ik_hat_h_2d);
+		m_displacements = m_fastfft.do_fft(ikh_2d);
+		m_slopes = m_fastfft.do_fft(neg_ik_hat_h_2d);
+
+		// do 2D fft for horizontal
+//		int S = (int) sqrt(N);
+//		for (int i = 0; i < S; i++) {
+//			m_current_h = m_fastfft.fft2(h_tildas, 1, i*S);
+//			m_displacements = m_fastfft.fft2(ikh, 1, i*S);
+//			m_slopes = m_fastfft.fft2(neg_ik_hat_h, 1, i*S);
+//		}
+//
+//		// do 2D fft for vertical
+//		for (int i = 0; i < S; i++) {
+//			m_current_h = m_fastfft.fft2(h_tildas, S, i);
+//			m_displacements = m_fastfft.fft2(ikh, S, i);
+//			m_slopes = m_fastfft.fft2(neg_ik_hat_h, S, i);
+//		}
 	}
 	else
 	{
@@ -356,10 +371,8 @@ std::vector<Eigen::Vector3i> ocean_alt::get_faces()
             int i3 = i + num_rows;
             int i4 = i + num_rows + 1;
 
-            faces.emplace_back(i2, i1, i3);
-            faces.emplace_back(i2, i3, i4);
-                        faces.emplace_back(i1, i2, i3);
-                        faces.emplace_back(i3, i2, i4);
+			faces.emplace_back(i1, i2, i3);
+			faces.emplace_back(i3, i2, i4);
         }
     }
     return faces;

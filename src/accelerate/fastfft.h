@@ -21,8 +21,14 @@ public:
 
 	// INSTANCE VARIABLES
 	// Ocean grid params
-	int N; // total number of grid points in one D! must be power of 2 and square root must be an integer
-	int log2_N; // log base 2 of N
+	// unsigned int N; // total number of grid points in one D! must be power of 2 and square root must be an integer
+	// int log2_N; // log base 2 of N
+
+	unsigned int N, which, log_2_N;
+	float pi2;
+	unsigned int *reversed;
+	std::vector<std::vector<complex>> c;
+
 
 	// Final results from the computation
 	std::vector<std::vector<complex>> results;
@@ -63,10 +69,16 @@ public:
 		}
 	}
 
+	std::vector<Eigen::Vector2d> fft2(std::vector<Eigen::Vector2d> input, int stride, int offset);
+
 	// COMPLEX OPERATIONS
 	static inline complex complex_add(complex a, complex b)
 	{
 		return {a.real + b.real, a.imag + b.imag};
+	}
+	static inline complex complex_sub(complex a, complex b)
+	{
+		return {a.real - b.real, a.imag - b.imag};
 	}
 	static inline complex complex_mul(complex a, complex b)
 	{
@@ -84,6 +96,7 @@ public:
 private:
 	// butterfly map for fast fft
 	std::vector<std::vector<Eigen::Vector4d>> m_butterfly_map;
+	std::vector<std::vector<complex>> m_butterfly;
 	std::vector<int> reversed_bit_indices;
 	void precompute_butterfly_map(
 		int log2_N,

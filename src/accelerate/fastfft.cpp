@@ -13,29 +13,50 @@ fastfft::fastfft(int N)
 
 	// set variables assisvaited to N
 	this->N = N;
-	this->log2_N = (int) log2(N);
+	this->log_2_N = (unsigned int) log2(N);
 
 	// initialize reverse bit indices
 	reversed_bit_indices = std::vector<int>(N);
 	for (int i = 0; i < N; i++)
 	{
-		int reversed = 0;
-		for (int j = 0; j < log2_N; j++)
-		{
-			reversed = reversed << 1;
-			reversed = reversed | ((i >> j) & 1);
+		int tmp = i;
+		int res = 0;
+		for (int j = 0; j < log_2_N; j++) {
+			res = (res << 1) + (tmp & 1);
+			tmp >>= 1;
 		}
-		reversed_bit_indices[i] = reversed;
+		reversed_bit_indices[i] = res;
 	}
+
 	// fill in the butterfly map
-	m_butterfly_map = std::vector<std::vector<Eigen::Vector4d>>(log2_N, std::vector<Eigen::Vector4d>(N));
-	for (int stage = 0; stage < log2_N; stage++)
+	for (int stage = 0; stage < log_2_N; stage++)
 	{
-		for (int x = 0; x < N; x++)
+		m_butterfly_map.push_back(std::vector<Eigen::Vector4d>(N));
+		for (int n = 0; n < N; n++)
 		{
-			precompute_butterfly_map(stage, x);
+			precompute_butterfly_map(stage, n);
 		}
 	}
+
+
+	int pow2 = 1;
+	m_butterfly = std::vector<std::vector<complex>>(log_2_N);
+	for (int stage = 0; stage < log_2_N; stage++)
+	{
+		m_butterfly[stage] = std::vector<complex>(pow2);
+		for (int n = 0; n < pow2; n++)
+		{
+			m_butterfly[stage][n] =
+				{
+				cos(M_PI * n / pow2), sin(M_PI * n / pow2)
+				};
+		};
+		pow2 *= 2;
+	}
+	c = std::vector<std::vector<complex>>(2);
+	c[0] = std::vector<complex>(N);
+	c[1] = std::vector<complex>(N);
+	which = 0;
 
 	// inialize variables for the computation
 	m_pingpong = 0;
@@ -53,37 +74,37 @@ void fastfft::precompute_butterfly_map
 )
 {
 	// calculate the twiddle from k
-	int k = (int) (float(N) / pow(2, stage + 1) * n) % N;
+	double k = ((int) (((double) N) / pow(2, stage + 1)) * n) % N;
 	double t = 2 * M_PI * k / (double) N;
 	complex twiddle = complex_exp(t);
 
 	// see if we are dealing with top of bottom of the wing
-	bool is_wingtop = n < N / 2;
-//	int next_pow = pow(2, stage + 1);
-//	int cur_pow = pow(2, stage);
-//	bool is_wingtop = true;
-//	if (n != 0)
-//	{
-//		is_wingtop = next_pow % n < cur_pow;
-//	}
+	// bool is_wingtop = n < N / 2;
+	int next_pow = pow(2, stage + 1);
+	int cur_pow = pow(2, stage);
+	int is_wingtop = 0;
+	if (next_pow % n < cur_pow)
+	{
+		is_wingtop = 1;
+	}
 
 	// first stage handled separately
 	if (stage == 0)
 	{
 		// first stage, need to bit reverse indices
 		int reversed_n = reversed_bit_indices[n];
-		if (is_wingtop)
+		if (is_wingtop == 1)
 		{
-			if (n + 1 == N)
-			{
-				m_butterfly_map[stage][n] =
-					{
-					twiddle.real, twiddle.imag, // twiddle
-					reversed_n, reversed_n // save indices
-					};
-				return;
-			}
-			else
+//			if (n + 1 == N)
+//			{
+//				m_butterfly_map[stage][n] =
+//					{
+//					twiddle.real, twiddle.imag, // twiddle
+//					reversed_n, reversed_n // save indices
+//					};
+//				return;
+//			}
+//			else
 			{
 				int reverse_n_plus1 = reversed_bit_indices[n + 1];
 				m_butterfly_map[stage][n] =
@@ -95,15 +116,15 @@ void fastfft::precompute_butterfly_map
 		}
 		else
 		{
-			if (n == 0)
-			{
-				m_butterfly_map[stage][n] =
-					{
-					twiddle.real, twiddle.imag, // twiddle
-					reversed_n, reversed_n // save indices
-					};
-			}
-			else
+//			if (n == 0)
+//			{
+//				m_butterfly_map[stage][n] =
+//					{
+//					twiddle.real, twiddle.imag, // twiddle
+//					reversed_n, reversed_n // save indices
+//					};
+//			}
+//			else
 			{
 				int reverse_n_minus1 = reversed_bit_indices[n - 1];
 				m_butterfly_map[stage][n] =
@@ -120,7 +141,7 @@ void fastfft::precompute_butterfly_map
 	{
 		int butterfly_span = pow(2, stage);
 
-		if (is_wingtop)
+		if (is_wingtop == 1)
 		{
 			std::cout << "TOP index: " << n + butterfly_span << ", stage: " <<  stage << ", n: " << n << std::endl;
 			m_butterfly_map[stage][n] =
@@ -159,7 +180,7 @@ void fastfft::horizontal_pass
 		complex q = {b[0], b[1]};
 
 		complex twiddle = {butterfly[0], butterfly[1]};
-		complex m = complex_mul(q, twiddle);
+		complex m = complex_mul(twiddle, q);
 		complex H = complex_add(p, m);
 
 		m_pingpong1[x][y] = {H.real, H.imag};
@@ -175,7 +196,7 @@ void fastfft::horizontal_pass
 		complex q = {b[0], b[1]};
 
 		complex twiddle = {butterfly[0], butterfly[1]};
-		complex m = complex_mul(q, twiddle);
+		complex m = complex_mul(twiddle, q);
 		complex H = complex_add(p, m);
 
 		m_pingpong0[x][y] = {H.real, H.imag};
@@ -198,8 +219,8 @@ void fastfft::vertical_pass
 		complex p = {a[0], a[1]};
 		Eigen::Vector2d b = m_pingpong0[index2][x];
 		complex q = {b[0], b[1]};
-		complex twiddle = {butterfly[0], butterfly[1]};
 
+		complex twiddle = {butterfly[0], butterfly[1]};
 		complex m = complex_mul(q, twiddle);
 		complex H = complex_add(p, m);
 
@@ -266,7 +287,7 @@ std::vector<Eigen::Vector2d> fastfft::do_fft
 	m_pingpong = 0;
 
 	// do 1D fft for vetical
-	for (int stage = 0; stage < log2_N; stage++)
+	for (int stage = 0; stage < log_2_N; stage++)
 	{
 		m_stage = stage;
 		for (int x = 0; x < N; x++)
@@ -280,7 +301,7 @@ std::vector<Eigen::Vector2d> fastfft::do_fft
 	}
 
 	// do 1D fft for horizontal
-	for (int stage = 0; stage < log2_N; stage++)
+	for (int stage = 0; stage < log_2_N; stage++)
 	{
 		m_stage = stage;
 		for (int x = 0; x < N; x++)
@@ -313,5 +334,46 @@ std::vector<Eigen::Vector2d> fastfft::do_fft
 	}
 
 	return results_1d;
+}
+
+std::vector<Eigen::Vector2d> fastfft::fft2(std::vector<Eigen::Vector2d> input, int stride, int offset)
+{
+	for (int i = 0; i < N; i++)
+	{
+		int index = reversed_bit_indices[i] * stride + offset;
+		c[which][i] = {input[index][0], input[index][1]};
+	}
+
+	int loops       = N>>1;
+	int size        = 1<<1;
+	int size_over_2 = 1;
+	int w_          = 0;
+	for (int i = 1; i <= log_2_N; i++) {
+		which ^= 1;
+		for (int j = 0; j < loops; j++) {
+			for (int k = 0; k < size_over_2; k++) {
+				c[which][size * j + k] =
+					complex_add(c[which][size * j + k],
+					complex_mul(c[which^1][size * j + size_over_2 + k], m_butterfly[w_][k]));
+			}
+
+			for (int k = size_over_2; k < size; k++) {
+				c[which][size * j + k] =
+					complex_sub(c[which^1][size * j - size_over_2 + k],
+					complex_mul(c[which^1][size * j + k], m_butterfly[w_][k - size_over_2]));
+			}
+		}
+		loops       >>= 1;
+		size        <<= 1;
+		size_over_2 <<= 1;
+		w_++;
+	}
+
+	std::vector<Eigen::Vector2d> output = input;
+	for (int i = 0; i < N; i++)
+	{
+		output[i * stride + offset] = { c[which][i].real, c[which][i].imag };
+	}
+	return output;
 }
 

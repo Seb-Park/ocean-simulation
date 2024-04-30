@@ -61,11 +61,11 @@ private:
 
 
 
-    const double Lx = 100.0;
-    const double Lz = 100.0;
+    const double Lx = 1000.0;
+    const double Lz = 1000.0;
 
-    const int num_rows = 64;
-    const int num_cols = 64;
+    const int num_rows = 128;
+    const int num_cols = 128;
 
     const int N = num_rows*num_cols; // total number of grid points
 	fastfft m_fastfft = fastfft((int) sqrt(N));
@@ -73,7 +73,7 @@ private:
     const double lambda = 0; // how much displacement matters
     const double spacing = 35.0; // spacing between grid points
 
-    const double A = 100; // numeric constant for the Phillips spectrum
+    const double A = 10; // numeric constant for the Phillips spectrum
     const double V = 49; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
