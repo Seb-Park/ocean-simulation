@@ -79,14 +79,14 @@ void fastfft::precompute_butterfly_map
 	complex twiddle = complex_exp(t);
 
 	// see if we are dealing with top of bottom of the wing
-	// bool is_wingtop = n < N / 2;
-	int next_pow = pow(2, stage + 1);
-	int cur_pow = pow(2, stage);
-	int is_wingtop = 0;
-	if (next_pow % n < cur_pow)
-	{
-		is_wingtop = 1;
-	}
+	bool is_wingtop = n < N / 2;
+//	int next_pow = pow(2, stage + 1);
+//	int cur_pow = pow(2, stage);
+//	int is_wingtop = 0;
+//	if (next_pow % n < cur_pow)
+//	{
+//		is_wingtop = 1;
+//	}
 
 	// first stage handled separately
 	if (stage == 0)
