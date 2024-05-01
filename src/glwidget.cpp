@@ -77,7 +77,7 @@ void GLWidget::initializeGL()
     // Initialize shaders
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
     m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
-    m_cubeShader = new Shader(":resources/shaders/caustics.vert", ":resources/shaders/caustics.frag");
+    m_cubeShader = new Shader(":resources/shaders/skybox.vert", ":resources/shaders/skybox.frag");
     //    m_texture_shader = new Shader(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
 
     // INITIALIZE TEXTURE STUFF
