@@ -92,6 +92,12 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/images/anamorphic.jpg
         resources/images/daniel.jpg
         resources/images/sky_clouds.png
+        resources/images/back.jpg
+        resources/images/front.jpg
+        resources/images/right.jpg
+        resources/images/left.jpg
+        resources/images/top.jpg
+        resources/images/bottom.jpg
 #        resources/images/ground.png
         resources/shaders/shader.frag
         resources/shaders/shader.vert
@@ -100,6 +106,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/anchorPoint.frag
         resources/shaders/texture.vert
         resources/shaders/texture.frag
+        resources/shaders/skybox.vert
+        resources/shaders/skybox.frag
 
 
 )
