@@ -7,6 +7,51 @@
 using namespace Eigen;
 using namespace std;
 
+float skyboxVertices[] = {
+        // positions
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
 // ================== Constructor
 
 Shape::Shape() :
@@ -78,6 +123,15 @@ void Shape::init(const vector<Vector3f> &vertices, const vector<Vector3i> &trian
     m_blue  = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
     m_green = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
     m_alpha = 1.0f;
+
+
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 }
 
 void Shape::setVertices(const vector<Vector3f> &vertices)
@@ -187,6 +241,38 @@ void Shape::draw(Shader *shader, GLenum mode)
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    shader->unbind();
+    m_skybox_Shader->bind();
+    renderSkyBox();
+    m_skybox_Shader->unbind();
+    shader->bind();
+}
+
+void Shape::renderSkyBox() {
+    GLint oldCull;
+    glGetIntegerv(GL_CULL_FACE_MODE, &oldCull);
+
+    GLint oldDepth;
+    glGetIntegerv(GL_DEPTH_FUNC, &oldDepth);
+
+    glCullFace(GL_FRONT);
+    glDepthFunc(GL_LEQUAL);
+
+    // DRAW BOX
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox_texture);
+    m_skybox_Shader->setUniform("skybox",2);
+    glUniform1i(glGetUniformLocation(m_skybox_Shader->id(), "skybox"), 2);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    glCullFace(oldCull);
+    glDepthFunc(oldDepth);
 }
 
 SelectMode Shape::select(Shader *shader, int closest_vertex)
@@ -423,5 +509,45 @@ void Shape::initSkyPlane(std::string texturePath, float height, Shader* shader) 
     shader->unbind();
 
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Shape::initSkyBox(Shader* shader) {
+
+    vector<std::string> faces
+    {
+        ":resources/images/right.jpg",
+        ":resources/images/left.jpg",
+        ":resources/images/top.jpg",
+        ":resources/images/bottom.jpg",
+        ":resources/images/front.jpg",
+        ":resources/images/back.jpg"
+    };
+
+    glGenTextures(1, &m_skybox_texture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox_texture);
+
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        QString sky_texture_filepath = QString(faces[i].c_str());
+        QImage sky_part = QImage(sky_texture_filepath);
+        sky_part = sky_part.convertToFormat(QImage::Format_RGBA8888).mirrored();
+        auto bits = sky_part.bits();
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, sky_part.width(), sky_part.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bits);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
+
+    shader->bind();
+    shader->setUniform("skybox", 2);
+    shader->unbind();
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    m_skybox_Shader = shader;
+
 }
 

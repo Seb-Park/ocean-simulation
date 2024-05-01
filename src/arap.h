@@ -38,8 +38,6 @@ public:
 
     void draw(Shader *shader, GLenum mode)
     {
-
-
         m_shape.draw(shader, mode);
     }
 
@@ -49,6 +47,10 @@ public:
 
     void initSkyPlane(std::string texturePath, float height, Shader* shader) {
         m_shape.initSkyPlane(texturePath, height, shader);
+    }
+
+    void initSkyBox(Shader* shader) {
+        m_shape.initSkyBox(shader);
     }
 
     SelectMode select(Shader *shader, int vertex)

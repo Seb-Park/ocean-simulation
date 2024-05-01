@@ -50,6 +50,8 @@ private:
     Shader *m_defaultShader;
     Shader *m_pointShader;
     Shader *m_texture_shader;
+    Shader *m_causticShader;
+    Shader *m_cubeShader;
 
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;

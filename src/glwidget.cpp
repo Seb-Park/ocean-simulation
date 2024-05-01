@@ -51,6 +51,7 @@ GLWidget::~GLWidget()
 {
     if (m_defaultShader != nullptr) delete m_defaultShader;
     if (m_pointShader   != nullptr) delete m_pointShader;
+    if (m_causticShader != nullptr) delete m_causticShader;
 }
 
 // ================== Basic OpenGL Overrides
@@ -76,7 +77,8 @@ void GLWidget::initializeGL()
     // Initialize shaders
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
     m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
-//    m_texture_shader = new Shader(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
+    m_cubeShader = new Shader(":resources/shaders/caustics.vert", ":resources/shaders/caustics.frag");
+    //    m_texture_shader = new Shader(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
 
     // INITIALIZE TEXTURE STUFF
 
@@ -97,6 +99,7 @@ void GLWidget::initializeGL()
 //    };
     m_arap.initSkyPlane(":/resources/images/sky_clouds.png", 2, m_defaultShader);
     m_arap.initGroundPlane(":/resources/images/daniel.jpg", 2, m_defaultShader);
+    m_arap.initSkyBox(m_cubeShader);
 
 //    // Generate and bind a VBO and a VAO for a fullscreen quad
 //    glGenBuffers(1, &m_fullscreen_vbo);
@@ -183,6 +186,10 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("inverseView", inverseView);
     m_defaultShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+
+    m_cubeShader->setUniform("projection", m_camera.getProjection());
+    m_cubeShader->setUniform("view", m_camera.getView());
+
 
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();

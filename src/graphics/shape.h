@@ -39,8 +39,10 @@ public:
 
     void initGroundPlane(std::string texturePath, float depth, Shader* shader);
     void initSkyPlane(std::string texturePath, float height, Shader* shader);
+    void initSkyBox(Shader* shader);
 
     void draw(Shader *shader, GLenum mode);
+    void renderSkyBox();
     SelectMode select(Shader *shader, int vertex);
     bool selectWithSpecifiedMode(Shader *shader, int vertex, SelectMode mode);
     int  getClosestVertex(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold);
@@ -57,8 +59,14 @@ private:
     GLuint m_ground_texture;
     QImage m_ground_image;
 
+    unsigned int skyboxVAO, skyboxVBO;
+
+
     GLuint m_sky_texture;
     QImage m_sky_image;
+
+    GLuint m_skybox_texture;
+    Shader *m_skybox_Shader;
 
     unsigned int m_numSurfaceVertices;
     unsigned int m_verticesSize;
