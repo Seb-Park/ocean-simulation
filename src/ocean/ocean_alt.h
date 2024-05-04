@@ -63,8 +63,8 @@ private:
 	const double Lx = 32.0;
 	const double Lz = 32.0;
 
-	const int num_rows = 32;
-	const int num_cols = 32;
+	const int num_rows = 256;
+	const int num_cols = 256w;
 
 	const int N = num_rows*num_cols; // total number of grid points
 	const double lambda = 0.4; // how much displacement matters

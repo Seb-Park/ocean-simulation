@@ -189,14 +189,14 @@ void GLWidget::paintGL()
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-//    m_pointShader->bind();
-//    m_pointShader->setUniform("proj",   m_camera.getProjection());
-//    m_pointShader->setUniform("view",   m_camera.getView());
-//    m_pointShader->setUniform("vSize",  m_vSize);
-//    m_pointShader->setUniform("width",  width());
-//    m_pointShader->setUniform("height", height());
-//    m_arap.draw(m_pointShader, GL_POINTS);
-//    m_pointShader->unbind();
+    m_pointShader->bind();
+    m_pointShader->setUniform("proj",   m_camera.getProjection());
+    m_pointShader->setUniform("view",   m_camera.getView());
+    m_pointShader->setUniform("vSize",  m_vSize);
+    m_pointShader->setUniform("width",  width());
+    m_pointShader->setUniform("height", height());
+    m_arap.draw(m_pointShader, GL_POINTS);
+    m_pointShader->unbind();
 }
 
 void GLWidget::resizeGL(int w, int h)
