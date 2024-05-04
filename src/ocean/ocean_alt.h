@@ -60,18 +60,18 @@ private:
 
 
 
-	const double Lx = 32.0;
-	const double Lz = 32.0;
+	const double Lx = 512.0;
+	const double Lz = 512.0;
 
 	const int num_rows = 256;
 	const int num_cols = 256;
 
 	const int N = num_rows*num_cols; // total number of grid points
-	const double lambda = 0.4; // how much displacement matters
+	const double lambda = 0; // how much displacement matters
 	const double spacing = 35.0; // spacing between grid points
 
-	const double A = .25; // numeric constant for the Phillips spectrum
-	const double V = 49; // wind speed
+	const double A = 100; // numeric constant for the Phillips spectrum
+	const double V = 50; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation

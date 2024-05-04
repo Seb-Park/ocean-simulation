@@ -132,20 +132,13 @@ Eigen::Vector2d ocean_alt::h_prime_t(int i, double t){
     Eigen::Vector2d neg_complex_exp = complex_exp(-w_prime*t); // vector(real, imag)
 
     // now multiply our four vector(real, imag) out
-
     double real_comp =
-            h0_prime[0]*pos_complex_exp[0]
-            - h0_prime[1]*pos_complex_exp[1]
-            + h0_prime_conj[0]*neg_complex_exp[0]
-            + h0_prime_conj[1]*neg_complex_exp[1];
+		(h0_prime[0]*pos_complex_exp[0] - h0_prime[1]*pos_complex_exp[1]) +
+		(h0_prime_conj[0]*neg_complex_exp[0] - h0_prime_conj[1]*neg_complex_exp[1]);
 
     double imag_comp =
-            h0_prime[0]*pos_complex_exp[1]
-            + h0_prime[1]*pos_complex_exp[0]
-            + h0_prime_conj[0]*neg_complex_exp[1]
-            - h0_prime_conj[1]*neg_complex_exp[0];
-
-
+		(h0_prime[0]*pos_complex_exp[1] + h0_prime[1]*pos_complex_exp[0]) +
+		(h0_prime_conj[0]*neg_complex_exp[1] + h0_prime_conj[1]*neg_complex_exp[0]);
 
     return Eigen::Vector2d(real_comp, imag_comp);
 }
@@ -201,8 +194,8 @@ Eigen::Vector2d ocean_alt::get_k_vector(int n_prime, int m_prime){
     double N_ = (double)num_rows;
     double M_ = (double)num_cols;
 
-    double k_x = (2.0*M_PI*n_ - M_PI*N_)/Lx;
-    double k_z = (2.0*M_PI*m_ - M_PI*M_)/Lz;
+    double k_x = (2*M_PI*n_ - M_PI*N_)/Lx;
+	double k_z = (2*M_PI*m_ - M_PI*M_)/Lz;
 
     return Eigen::Vector2d(k_x, k_z);
 }
@@ -247,8 +240,8 @@ std::pair<double,double> ocean_alt::sample_complex_gaussian(){
     }
 
     // real and imaginary parts of the complex number
-    double real = sqrt(-2 * log(uniform_1)) * cos(2 * M_PI * uniform_2);
-    double imag = sqrt(-2 * log(uniform_1)) * sin(2 * M_PI * uniform_2);
+	double real = sqrt(-2*log(uniform_1)) * cos(2*M_PI*uniform_2);
+	double imag = sqrt(-2*log(uniform_1)) * sin(2*M_PI*uniform_2);
 
     return std::make_pair(real, imag);
 }
@@ -280,8 +273,8 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
 
         // NEW
-//        Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
-//        norm.normalize();
+        // Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
+        // norm.normalize();
         // NEW
 
 
@@ -452,7 +445,7 @@ std::vector<Eigen::Vector2d> ocean_alt::fast_fft
 	for (int i = 0; i < N; i++)
 	{
 		// h[i] /= N;
-		// h[i] /= sqrt(N);
+		h[i] /= sqrt(N);
 		h[i] *= sign[(i / num_rows + i % num_cols) % 2];
 	}
 
