@@ -104,8 +104,8 @@ void ARAP::update(double seconds)
     // the last update
 
     m_ocean.fft_prime(m_time);
-    m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
-   // m_shape.setVertices(m_ocean.get_vertices());
+	m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+    // m_shape.setVertices(m_ocean.get_vertices());
 
 
      m_time += m_timestep;

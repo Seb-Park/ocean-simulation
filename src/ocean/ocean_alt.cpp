@@ -55,30 +55,36 @@ void ocean_alt::init_wave_index_constants(){
 void ocean_alt::fft_prime(double t){
 
     // FFT
-    std::vector<Eigen::Vector2d> h_tildas = std::vector<Eigen::Vector2d>();
+	std::vector<Eigen::Vector2d> h_tildas = std::vector<Eigen::Vector2d>();
+	std::vector<Eigen::Vector2d> ikh = std::vector<Eigen::Vector2d>();
+	std::vector<Eigen::Vector2d> neg_ik_hat_h = std::vector<Eigen::Vector2d>();
 
     // find each h_tilda at each index, to be used for next for loop
-    for (int i=0; i<N; i++){
-        Eigen::Vector2d h_t_prime = h_prime_t(i, t); // vector(real, imag)
+	for (int i=0; i<N; i++){
+		Eigen::Vector2d h_t_prime = h_prime_t(i, t); // vector(real, imag)
 
-        h_tildas.emplace_back(h_t_prime);
-    }
+		h_tildas.emplace_back(h_t_prime);
 
-	bool fast = false;
+		Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
+		ikh.emplace_back(-h_t_prime[1] * k_vector[0], -h_t_prime[1] * k_vector[1]);
+
+		Eigen::Vector2d k_normalized = k_vector.normalized();
+		Eigen::Vector2d neg_ik_hat_h_val =
+			Eigen::Vector2d(k_normalized[1] * h_t_prime[1], k_normalized[0] * h_t_prime[1]);
+		neg_ik_hat_h.emplace_back(neg_ik_hat_h_val);
+	}
+
+	bool fast = true;
 	if (fast)
 	{
 		std::vector<Eigen::Vector2d> tmp = fast_fft(h_tildas);
+		std::vector<Eigen::Vector2d> tmp2 = fast_fft(ikh);
+		std::vector<Eigen::Vector2d> tmp3 = fast_fft(neg_ik_hat_h);
 		for (int i = 0; i < N; i++)
 		{
 			m_current_h[i] = tmp[i];
-
-			// update displacements and slopes
-			Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
-			Eigen::Vector2d k_normalized = k_vector.normalized();
-
-			double imag_comp = m_current_h[i][1];
-			m_displacements[i] += k_normalized*imag_comp;
-			m_slopes[i] += k_vector*imag_comp;
+			m_slopes[i] = tmp2[i];
+			m_displacements[i] = tmp3[i];
 		}
 
 		return;
@@ -271,11 +277,11 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         float zs = 1.f + s[2]*s[2];
 
         Eigen::Vector3f diff = y - s;
-        // Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
+        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
 
         // NEW
-        Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
-        norm.normalize();
+//        Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
+//        norm.normalize();
         // NEW
 
 
@@ -293,8 +299,7 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         // for final vertex position, use the real number component of amplitude vector
         vertices.push_back(Eigen::Vector3f(horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]));
         m_normals[i] = norm.normalized();//Eigen::Vector3f(-slope[0], 1.0, -slope[1]).normalized();
-        //std::cout << "normal: " << m_normals[i] << std::endl;
-
+        //std::cout << "normal: " << m_normals[i] << std::endl
     }
     return vertices;
 }
@@ -329,72 +334,127 @@ std::vector<Eigen::Vector3i> ocean_alt::get_faces()
     return faces;
 }
 
+Eigen::Vector2d muliply_complex(Eigen::Vector2d a, Eigen::Vector2d b)
+{
+	double real = a[0] * b[0] - a[1] * b[1];
+	double imag = a[0] * b[1] + a[1] * b[0];
+	return Eigen::Vector2d(real, imag);
+}
+
+std::vector<Eigen::Vector2d> ifft_1d
+	(
+		std::vector<Eigen::Vector2d> frequencies,
+		bool is_vertical
+	)
+{
+	// one D case, assuming is a square
+	int N = frequencies.size();
+	// make two buffers for intermediate butterfly values
+	std::vector<Eigen::Vector2d> buffer1 = std::vector<Eigen::Vector2d>(N);
+	std::vector<Eigen::Vector2d> buffer2 = std::vector<Eigen::Vector2d>(N);
+
+	// fill buffer one with the frequencies in bit reverse order
+	int log2_N = log2(N);
+	for (int i = 0; i < N; i++)
+	{
+		int reversed = 0;
+		for (int j = 0; j < log2_N; j++)
+		{
+			reversed |= ((i >> j) & 1) << (log2_N - 1 - j);
+		}
+		// std::cout << "reversed, i: " << reversed << ", " << i << std::endl;
+		buffer1[i] = frequencies[reversed];
+	}
+	bool reading_buffer1 = true;
+
+	// go over the stages
+	for (int stage = 1; stage <= log2_N; stage++)
+	{
+		// go over the groups
+		for (int group = 0; group < N / pow(2, stage); group++)
+		{
+			// go over the butterflies
+			for (int butterfly = 0; butterfly < pow(2, stage - 1); butterfly++)
+			{
+				// calculate the indices
+				int index1 = group * pow(2, stage) + butterfly;
+				int index2 = group * pow(2, stage) + pow(2, stage - 1) + butterfly;
+
+				// calculate the twiddle factor
+				int index = group * pow(2, stage) + butterfly;
+				float w = index * 2 * M_PI / pow(2, stage);
+				Eigen::Vector2d twiddle_factor = {cos(w), sin(w)};
+
+				if (reading_buffer1)
+				{
+					buffer2[index1] = buffer1[index1] + muliply_complex(twiddle_factor, buffer1[index2]);
+					buffer2[index2] = buffer1[index1] - muliply_complex(twiddle_factor, buffer1[index2]);
+				}
+				else
+				{
+					buffer1[index1] = buffer2[index1] + muliply_complex(twiddle_factor, buffer2[index2]);
+					buffer1[index2] = buffer2[index1] - muliply_complex(twiddle_factor, buffer2[index2]);
+				}
+			}
+		}
+		reading_buffer1 = !reading_buffer1;
+	}
+
+	// return the buffer that was read last
+	if (reading_buffer1)
+	{
+		return buffer1;
+	}
+	else
+	{
+		return buffer2;
+	}
+}
+
+
 std::vector<Eigen::Vector2d> ocean_alt::fast_fft
 	(
 		std::vector<Eigen::Vector2d> h
 	)
 {
-	int N = h.size();
-	int exponent = 0;
-	int power_of_2 = 1;
-	while (power_of_2 < N)
+	// do a vertical fft on each column
+	for (int i = 0; i < num_rows; i++)
 	{
-		power_of_2 *= 2;
-		exponent++;
+		std::vector<Eigen::Vector2d> col = std::vector<Eigen::Vector2d>();
+		for (int j = 0; j < num_cols; j++)
+		{
+			col.push_back(h[i + j * num_rows]);
+		}
+		std::vector<Eigen::Vector2d> col_fft = ifft_1d(col, true);
+		for (int j = 0; j < num_cols; j++)
+		{
+			h[i + j * num_rows] = col_fft[j];
+		}
 	}
 
-	std::vector<Eigen::Vector2d> H = std::vector<Eigen::Vector2d>(N);
-	// pad with zeros
+	// do a horizontal fft on each row
+	for (int i = 0; i < num_cols; i++)
+	{
+		std::vector<Eigen::Vector2d> row = std::vector<Eigen::Vector2d>();
+		for (int j = 0; j < num_rows; j++)
+		{
+			row.push_back(h[i * num_rows + j]);
+		}
+		std::vector<Eigen::Vector2d> row_fft = ifft_1d(row, false);
+		for (int j = 0; j < num_rows; j++)
+		{
+			h[i * num_rows + j] = row_fft[j];
+		}
+	}
+
+	// divide by N*N and add the signs based on the indices
+	double sign[] = {1, -1};
 	for (int i = 0; i < N; i++)
 	{
-		H[i] = h[i];
-	}
-	for (int i = N; i < power_of_2; i++)
-	{
-		H.emplace_back(Eigen::Vector2d(0.0, 0.0));
+		// h[i] /= N;
+		// h[i] /= sqrt(N);
+		h[i] *= sign[(i / num_rows + i % num_cols) % 2];
 	}
 
-	// bit reverse the indices of the input data array
-	std::vector<Eigen::Vector2d> temp = std::vector<Eigen::Vector2d>(power_of_2);
-	for (int i = 0; i < power_of_2; i++)
-	{
-		int j = 0;
-		for (int k = 0; k < exponent; k++)
-		{
-			j = (j << 1) | (i >> k & 1);
-		}
-		temp[j] = H[i];
-	}
-	for (int i = 0; i < power_of_2; i++)
-	{
-		H[i] = temp[i];
-	}
-
-	// outer loop through levels i->p of even-odd decompositions, beginning with the final decompositions
-	// where individual y_m are used through the first decomposition where Y_n^e and Y_n^o are involved
-	for (int i = 1; i <= exponent; i++)
-	{
-
-		// nested middle loop where each level is grouped into terms according to values of k in the factor
-		// W_N^k = e^(-2*pi*i*k/N) appearing in each sum
-		int N_over_2 = 1 << i;
-		int N_over_4 = 1 << (i - 1);
-		double theta = 2 * M_PI / N_over_2;
-		Eigen::Vector2d W_N = Eigen::Vector2d(cos(theta), -sin(theta));
-		Eigen::Vector2d W = Eigen::Vector2d(1.0, 0.0);
-		for (int k = 0; k < N_over_4; k++)
-		{
-			// innermost loop where each group is split into individual sums
-			for (int j = k; j < power_of_2; j += N_over_2)
-			{
-				Eigen::Vector2d U = H[j];
-				Eigen::Vector2d V = H[j + N_over_4];
-				H[j] = U + W[0] * V - W[1] * V;
-				H[j + N_over_4] = U - (W[0] * V - W[1] * V);
-			}
-			W = W[0] * W_N - W[1] * W_N;
-		}
-	}
-
-	return H;
+	return h;
 }

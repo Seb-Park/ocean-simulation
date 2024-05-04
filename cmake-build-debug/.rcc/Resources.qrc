@@ -6,6 +6,8 @@
     <file alias="resources/images/sand_text.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/sand_text.jpg</file>
     <file alias="resources/images/caustic_sample.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/caustic_sample.jpg</file>
     <file alias="resources/images/anamorphic.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/anamorphic.jpg</file>
+    <file alias="resources/images/daniel.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/daniel.jpg</file>
+    <file alias="resources/images/sky_clouds.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/sky_clouds.png</file>
     <file alias="resources/shaders/shader.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.frag</file>
     <file alias="resources/shaders/shader.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.vert</file>
     <file alias="resources/shaders/anchorPoint.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.vert</file>
