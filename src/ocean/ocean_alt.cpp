@@ -269,13 +269,13 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         float ys = 1.f + s[1]*s[1];
         float zs = 1.f + s[2]*s[2];
 
-        Eigen::Vector3f diff = y - s;
-        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
+//        Eigen::Vector3f diff = y - s;
+//        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
 
-        // NEW
-        // Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
-        // norm.normalize();
-        // NEW
+         // NEW
+         Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
+         norm.normalize();
+         //NEW
 
 
 
@@ -318,8 +318,8 @@ std::vector<Eigen::Vector3i> ocean_alt::get_faces()
             int i3 = i + num_rows;
             int i4 = i + num_rows + 1;
 
-            faces.emplace_back(i2, i1, i3);
-            faces.emplace_back(i2, i3, i4);
+//            faces.emplace_back(i2, i1, i3);
+//            faces.emplace_back(i2, i3, i4);
                         faces.emplace_back(i1, i2, i3);
                         faces.emplace_back(i3, i2, i4);
         }
