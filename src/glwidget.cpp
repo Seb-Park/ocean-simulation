@@ -77,7 +77,10 @@ void GLWidget::initializeGL()
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
     m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
 //    m_texture_shader = new Shader(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
+    m_colorShader   = new Shader(":resources/shaders/color.vert",      ":resources/shaders/color.frag");
 
+
+    initCaustics();
     // INITIALIZE TEXTURE STUFF
 
     // Prepare filepath
@@ -95,6 +98,19 @@ void GLWidget::initializeGL()
 //        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
 //         1.0f, -1.0f, 0.0f, 1.0f, 0.0f
 //    };
+
+    // START FBO STUFF
+
+    m_devicePixelRatio = this->devicePixelRatio();
+
+    m_defaultFBO = 2;
+    m_fbo_width = size().width() * m_devicePixelRatio;
+    m_fbo_height = size().height() * m_devicePixelRatio;
+
+    makeFBO();
+
+    // FBO STUFF END
+
     m_arap.initSkyPlane(":/resources/images/sky_clouds.png", 2, m_defaultShader);
     m_arap.initGroundPlane(":/resources/images/daniel.jpg", 2, m_defaultShader);
 
@@ -151,6 +167,89 @@ void GLWidget::initializeGL()
 
 }
 
+void GLWidget::paintCaustics() {
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+    // Task 15: Clear the screen here
+
+    // TA SOLUTION
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Bind the shader
+    m_colorShader->bind();
+
+    // Task 16: Bind your VAO here
+
+    // TA SOLUTION
+    glBindVertexArray(m_floor_vao);
+
+    // Task 17: Draw your VAO here
+
+    // TA SOLUTION
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    // Task 18: Unbind your VAO here
+
+    // TA SOLUTION
+    glBindVertexArray(0);
+
+    // Unbind the shader
+    glUseProgram(0);
+}
+
+void GLWidget::initCaustics() {
+    glGenBuffers(1, &m_floor_vbo);
+
+    // Task 6: Bind the VBO you created here
+
+    // TA SOLUTION
+    glBindBuffer(GL_ARRAY_BUFFER, m_floor_vbo);
+
+    // Task 8: Construct your std::vector of triangle data here | Task 10: Add colors to your triangle here
+
+    // TA SOLUTION
+    std::vector<GLfloat> triangle =
+    {   //    POSITIONS    //    COLORS    //
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    // Task 9: Pass the triangle vector into your VBO here
+
+    // TA SOLUTION
+    glBufferData(GL_ARRAY_BUFFER, triangle.size() * sizeof(GLfloat), triangle.data(), GL_STATIC_DRAW);
+
+    // ================== Vertex Array Objects
+
+    // Task 11: Generate a VAO here and store it in m_vao
+
+    // TA SOLUTION
+    glGenVertexArrays(1, &m_floor_vao);
+
+    // Task 12: Bind the VAO you created here
+
+    // TA SOLUTION
+    glBindVertexArray(m_floor_vao);
+
+    // Task 13: Add position and color attributes to your VAO here
+
+    // TA SOLUTION
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    GLsizei stride = 6 * sizeof(GLfloat);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+
+    // ================== Returning to Default State
+
+    // Task 14: Unbind your VBO and VAO here
+
+    // TA SOLUTION
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
 //void GLWidget::paintTexture(GLuint texture, bool filtered){
 ////    glUseProgram(m_texture_shader->id());
 //    m_texture_shader->bind();
@@ -169,8 +268,43 @@ void GLWidget::initializeGL()
 //    m_texture_shader->unbind();
 //}
 
+void GLWidget::makeFBO() {
+    // Task 19
+    glActiveTexture(GL_TEXTURE2);
+    glGenTextures(1, &m_fbo_texture);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_fbo_width, m_fbo_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Task 20
+    glGenRenderbuffers(1, &m_fbo_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER,
+                          GL_DEPTH24_STENCIL8,
+                          m_fbo_width,
+                          m_fbo_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Task 18
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+    // Task 21
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
+
+    // Task 22
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+}
+
 void GLWidget::paintGL()
 {
+    paintCaustics();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+//    return;
 //    paintTexture(m_ground_texture, false);
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -183,6 +317,10 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("inverseView", inverseView);
     m_defaultShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+    glUniform1i(glGetUniformLocation(m_defaultShader->id(), "groundSampler"), 2);
 
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();

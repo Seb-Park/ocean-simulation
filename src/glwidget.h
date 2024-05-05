@@ -40,6 +40,11 @@ private:
     void keyPressEvent    (QKeyEvent   *event) override;
     void keyReleaseEvent  (QKeyEvent   *event) override;
 
+    void makeFBO();
+
+    void initCaustics();
+    void paintCaustics();
+
 private slots:
     // Physics Tick
     void tick();
@@ -51,10 +56,24 @@ private:
     Shader *m_pointShader;
     Shader *m_texture_shader;
 
+    Shader *m_colorShader;
+
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
     QImage m_ground_image;
     GLuint m_ground_texture;
+
+    int m_fbo_width;
+    int m_fbo_height;
+    float m_devicePixelRatio;
+
+    GLuint m_fbo;
+    GLuint m_fbo_texture;
+    GLuint m_fbo_renderbuffer;
+    GLuint m_defaultFBO;
+
+    GLuint m_floor_vbo;
+    GLuint m_floor_vao;
 
     float m_movementScaling;
     float m_vertexSelectionThreshold;

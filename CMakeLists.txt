@@ -100,6 +100,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/anchorPoint.frag
         resources/shaders/texture.vert
         resources/shaders/texture.frag
+        resources/shaders/color.vert
+        resources/shaders/color.frag
 
 
 )
