@@ -23,17 +23,17 @@ void ocean_alt::init_wave_index_constants(){
         Eigen::Vector2d k_conj = get_k_vector(-n_prime, m_prime);
 
 
-        Eigen::Vector3f v = Eigen::Vector3f(0,0,1);
-        Eigen::Vector3f norm = Eigen::Vector3f(0,1,0);
-        if (abs(norm[1]) < 1.f){
-            v = (Eigen::Vector3f(0,1,0) - norm[1]*norm).normalized();
-        }
-        Eigen::Vector3f u = norm.cross(v).normalized();
+//        Eigen::Vector3f v = Eigen::Vector3f(0,0,1);
+//        Eigen::Vector3f norm = Eigen::Vector3f(0,1,0);
+//        if (abs(norm[1]) < 1.f){
+//            v = (Eigen::Vector3f(0,1,0) - norm[1]*norm).normalized();
+//        }
+//        Eigen::Vector3f u = norm.cross(v).normalized();
 
-        float u_coord = u.dot(Eigen::Vector3f(n_prime, 0, m_prime)) / 64.f;
-        float v_coord = v.dot(Eigen::Vector3f(n_prime, 0, m_prime)) / 64.f;
+//        float u_coord = u.dot(Eigen::Vector3f(n_prime, 0, m_prime)) / 64.f;
+//        float v_coord = v.dot(Eigen::Vector3f(n_prime, 0, m_prime)) / 64.f;
 
-        std::cout << u_coord << ", " << v_coord << std::endl;
+//        //std::cout << u_coord << ", " << v_coord << std::endl;
 
 
         // texture coord:
@@ -69,7 +69,7 @@ void ocean_alt::init_wave_index_constants(){
         m_foam_constants.k_vectors.push_back(Eigen::Vector2f(k[0], k[1]));
         m_foam_constants.positions.push_back(Eigen::Vector3f(0,0,0));
         m_foam_constants.wavelengths.push_back(0);
-        m_foam_constants.texCoords.push_back(texCoord);
+       // m_foam_constants.texCoords.push_back(texCoord);
 
 
     }

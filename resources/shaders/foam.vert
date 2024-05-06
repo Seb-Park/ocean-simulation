@@ -38,7 +38,7 @@ vec2 calculateTexCoord(vec3 pos){
 
 
      float offset = .5f;
-    return 6*vec2(u_coord + offset, v_coord + offset);
+    return 2*vec2(u_coord + offset, v_coord + offset);
 
 }
 
