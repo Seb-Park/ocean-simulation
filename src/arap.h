@@ -96,7 +96,7 @@ public:
 
     ocean_alt m_ocean;
         double m_time = 0.00;
-        double m_timestep = 0.03;
+        double m_timestep = 0.3;
 
     Eigen::Vector3f minCorner, maxCorner;
 };
