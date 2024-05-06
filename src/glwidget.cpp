@@ -321,6 +321,7 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
 
+    // Set the ocean floor to the painted caustics
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
     glUniform1i(glGetUniformLocation(m_defaultShader->id(), "groundSampler"), 2);
