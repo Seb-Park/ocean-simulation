@@ -75,8 +75,8 @@ private:
 
 
 
-    const double Lx = 1024.0;
-    const double Lz = 1024.0;
+    const double Lx = 512.0;
+    const double Lz = 512.0;
 
     const int num_rows = 256;
     const int num_cols = 256;
@@ -101,6 +101,9 @@ private:
     FoamConstants m_foam_constants;
 
 
+    float max = 0;
+    float min = 0;
+    int iterations = 0;
 
 
 

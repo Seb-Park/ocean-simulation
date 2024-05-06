@@ -2,9 +2,9 @@
 
 layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in float wavelength; // wavelenth adjusted for ocean depth
-layout(location = 2) in vec2 direction; // wave slope
-layout(location = 3) in vec2 texCoords; // texture coords
-layout(location = 3) in vec3 norm; // texture coords
+//layout(location = 2) in vec2 direction; // wave slope
+//layout(location = 3) in vec2 texCoords; // texture coords
+//layout(location = 3) in vec3 norm; // texture coords
 
 
 out vec2 constants;
@@ -43,7 +43,7 @@ vec2 calculateTexCoord(vec3 pos){
 }
 
 void main() {
-    dir = direction;
+    dir = vec2(0,0);
     constants = vec2(wavelength, phaseC);
 
     gl_Position = proj * view * model * vec4(position, 1);

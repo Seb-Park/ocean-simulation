@@ -41,6 +41,16 @@ public:
                            std::vector<Eigen::Vector2f>& tex,
                            std::vector<Eigen::Vector3f>& colors);
 
+    void updateMeshFoam(const std::vector<Eigen::Vector3i> &faces,
+                           const std::vector<Eigen::Vector3f> &vertices,
+                           const std::vector<Eigen::Vector2f> &k_vectors,
+                           const std::vector<float> &wavelengths,
+
+                               std::vector<Eigen::Vector3f> &verts,
+                               std::vector<Eigen::Vector2f> &ks,
+                               std::vector<float> &waves);
+
+
 
     void setModelMatrix(const Eigen::Affine3f &model);
 

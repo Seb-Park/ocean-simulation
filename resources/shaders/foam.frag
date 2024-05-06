@@ -21,7 +21,7 @@ float getSaturation(vec2 k, vec2 xzPos, float adjWaveLength, float phaseC){
     //k = normalize(k);
     float result = dot(k, xzPos) * 3.14f / adjWaveLength;
     result = result + phaseC*time*.5f;
-    result = -tan(result) + 1.57f;
+    result = -tan(result + 1.57f);
     result = exp(result) / 20.f;
 
     return result;
@@ -32,7 +32,7 @@ float getSaturation(vec2 k, vec2 xzPos, float adjWaveLength, float phaseC){
 
 void main() {
     float height = pos.y;
-   float saturation = getSaturation(dir, vec2(pos.x,pos.z), 100.f, 1.f);
+   float saturation = constants[0];//getSaturation(dir, vec2(pos.x, pos.z), 512.f, constants[0]);
    vec4 m_uv = texture(halftone_texture, tex);
    float m_threshold = m_uv.r * m_uv.g * m_uv.b;
 
@@ -49,5 +49,5 @@ void main() {
    if (saturation > m_threshold) j = vec4(vec3(g*foam), 1);
 
 
-  // fragColor = vec4(vec3(saturation), 1);
+   fragColor = vec4(vec3(saturation), 1);
 }
