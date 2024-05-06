@@ -110,7 +110,7 @@ void ARAP::update(double seconds)
     m_shape.setVertices(m_ocean.get_vertices());
 
     FoamConstants foam = m_ocean.getFoamConstants();
-    m_foam_shape.setFoamInputs(m_shape.getVertices(), foam.wavelengths, foam.k_vectors, foam.texCoords);
+    m_foam_shape.setFoamInputs(m_shape.getVertices(), foam);
 
 
      m_time += m_timestep;

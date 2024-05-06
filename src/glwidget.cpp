@@ -86,7 +86,7 @@ void GLWidget::initializeGL()
     m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
 
     m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
-    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam.png").textureID;
+    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
 
 
 

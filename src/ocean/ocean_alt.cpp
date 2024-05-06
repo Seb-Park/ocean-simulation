@@ -69,6 +69,8 @@ void ocean_alt::init_wave_index_constants(){
         m_foam_constants.k_vectors.push_back(Eigen::Vector2f(k[0], k[1]));
         m_foam_constants.positions.push_back(Eigen::Vector3f(0,0,0));
         m_foam_constants.wavelengths.push_back(0);
+        m_foam_constants.phaseCs.push_back(0);
+
         m_foam_constants.texCoords.push_back(texCoord);
 
 
@@ -280,10 +282,25 @@ Eigen::Vector2d ocean_alt::complex_exp(double exponent){
 std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
 {
     std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
+
+
+    if (iterations < 4){
+        for (int i=0; i<N; i++){
+            Eigen::Vector2d amplitude = m_current_h[i];
+            float height = amplitude[0];
+
+            if (height < min) min = height;
+            if (height > max) max = height;
+
+        }
+        iterations ++;
+    }
+
     for (int i = 0; i < N; i++){
         Eigen::Vector2d horiz_pos = spacing*m_waveIndexConstants[i].base_horiz_pos;
         Eigen::Vector2d amplitude = m_current_h[i];
         float height = amplitude[0];
+
 
         Eigen::Vector2d slope = m_slopes[i] * .3f;
         Eigen::Vector3f s = Eigen::Vector3f(-slope[0], 0.0, -slope[1]);
@@ -318,11 +335,15 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         m_normals[i] = norm.normalized();//Eigen::Vector3f(-slope[0], 1.0, -slope[1]).normalized();
         //std::cout << "normal: " << m_normals[i] << std::endl
         m_foam_constants.wavelengths[i] = 2.f *M_PI * m_slopes[i].dot(m_slopes[i]) / Lx;
-        //std::cout << m_foam_constants.wavelengths[i] << std::endl;
+        // w = (2πv)/λ
+       // m_foam_constants.phaseCs[i] = 2.f*M_PI*m_slopes[i].dot(m_slopes[i]) / m_waveIndexConstants[i].w_prime;
+       // std::cout << m_foam_constants.phaseCs[i] << std::endl;
+        //m_foam_constants.wavelengths[i] = (height - min) / (max - min);
 
 
 
     }
+
 
     // populate foam constants
     m_foam_constants.positions = vertices;

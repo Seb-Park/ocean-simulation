@@ -3,6 +3,7 @@
 #include <iostream>
 //#include <QImage>
 #include "graphics/shader.h"
+#include "ocean/ocean_alt.h"
 
 using namespace Eigen;
 using namespace std;
@@ -122,9 +123,12 @@ void Shape::setVertices_and_Normals(const vector<Vector3f> &vertices, const vect
 //// FOR FOAMM!!!!
 ///
 
-void Shape::setFoamInputs(const vector<Vector3f> &vertices, const vector<float> &wavelengths,
-                          const vector<Vector2f> &waveDirs, const vector<Vector2f> &textures){
+void Shape::setFoamInputs(const vector<Vector3f> &vertices, const FoamConstants &foamConstants){
+    std::vector<Eigen::Vector2f> waveDirs = foamConstants.k_vectors;
+    std::vector<float> wavelengths = foamConstants.wavelengths;
+    std::vector<float> phaseCs = foamConstants.phaseCs;
 
+    std::vector<Eigen::Vector2f> texCoords = foamConstants.texCoords;
 
     vector<Vector3f> verts;
     vector<Vector3f> norms;
@@ -138,12 +142,13 @@ void Shape::setFoamInputs(const vector<Vector3f> &vertices, const vector<float> 
 
 
     glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1) + (waveDirs.size() * 2) + (tex.size() * 2) + (norms.size() * 3)), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1) + (waveDirs.size() * 2) + (tex.size() * 2) + (norms.size() * 3) + phaseCs.size() * 1), nullptr, GL_DYNAMIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * verts.size() * 3, static_cast<const void *>(verts.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * wavelengths.size() * 1, static_cast<const void *>(wavelengths.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1)), sizeof(float) * waveDirs.size() * 2, static_cast<const void *>(waveDirs.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1) + (waveDirs.size() * 2)), sizeof(float) * tex.size() * 2, static_cast<const void *>(tex.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1) + (waveDirs.size() * 2) + (tex.size() * 2)), sizeof(float) * (norms.size() * 3), static_cast<const void *>(norms.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1) + (waveDirs.size() * 2) + (tex.size() * 2) + (norms.size() * 3)), sizeof(float) * (phaseCs.size() * 1), static_cast<const void *>(phaseCs.data()));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

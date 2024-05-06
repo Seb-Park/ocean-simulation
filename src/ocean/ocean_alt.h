@@ -24,6 +24,8 @@ struct FoamConstants{
     std::vector<Eigen::Vector3f> positions;
     std::vector<Eigen::Vector2f> k_vectors;
     std::vector<float> wavelengths;
+    std::vector<float> phaseCs;
+
     std::vector<Eigen::Vector2f> texCoords;
 };
 
@@ -81,7 +83,7 @@ private:
     const int num_rows = 64;
     const int num_cols = 64;
 	const int N = num_rows*num_cols; // total number of grid points
-    const double lambda = 0.4; // how much displacement matters
+    const double lambda = 0.7; // how much displacement matters
 	const double spacing = 35.0; // spacing between grid points
 
 	const double A = 100; // numeric constant for the Phillips spectrum
@@ -99,6 +101,10 @@ private:
 
     // FOR FOAM:
     FoamConstants m_foam_constants;
+
+    float max = 0;
+    float min = 0;
+    int iterations = 0;
 
 
 

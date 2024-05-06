@@ -2,9 +2,12 @@
 
 layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in float wavelength; // wavelenth adjusted for ocean depth
+
 layout(location = 2) in vec2 direction; // wave slope
 layout(location = 3) in vec2 texCoords; // texture coords
-layout(location = 3) in vec3 norm; // texture coords
+layout(location = 4) in vec3 norm; // texture coords
+layout(location = 5) in float phaseC; // wavelenth adjusted for ocean depth
+
 
 
 out vec2 constants;
@@ -15,7 +18,6 @@ out vec3 pos;
 
 
 uniform float time;
-uniform float phaseC; // phase constant
 uniform mat4 proj;
 uniform mat4 view;
 uniform mat4 model;
@@ -38,7 +40,7 @@ vec2 calculateTexCoord(vec3 pos){
 
 
      float offset = .5f;
-    return 6*vec2(u_coord + offset, v_coord + offset);
+    return 2*vec2(u_coord + offset, v_coord + offset);
 
 }
 

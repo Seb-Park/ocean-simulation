@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ocean/ocean_alt.h"
 #include <GL/glew.h>
 #include <vector>
 #include <unordered_set>
@@ -31,8 +32,8 @@ public:
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices_and_Normals(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3f> &normals);
-    void setFoamInputs(const std::vector<Eigen::Vector3f> &verts, const std::vector<float> &wavelengths,
-                       const std::vector<Eigen::Vector2f> &waveDirs, const std::vector<Eigen::Vector2f> &textureCoords);
+    void setFoamInputs(const std::vector<Eigen::Vector3f> &vertices, const FoamConstants &foamConstants);
+
     void updateFoam(const std::vector<Eigen::Vector3i> &faces,
                            const std::vector<Eigen::Vector3f> &vertices,
                            const std::vector<Eigen::Vector2f> &texCoords,
