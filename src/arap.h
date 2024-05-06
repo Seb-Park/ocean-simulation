@@ -19,7 +19,8 @@ class ARAP
 {
 private:
     Shape m_shape;
-//    OceanShape m_oceanShape;
+    Shape m_foam_shape;
+
 
 public:
     ARAP();
@@ -41,6 +42,17 @@ public:
 
 
         m_shape.draw(shader, mode);
+    }
+
+    void drawFoam(Shader *shader, GLenum mode)
+    {
+
+
+        m_foam_shape.draw(shader, mode);
+    }
+
+    double getTime() {
+        return m_time;
     }
 
     void initGroundPlane(std::string texturePath, float depth, Shader* shader) {

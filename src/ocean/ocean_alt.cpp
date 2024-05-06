@@ -12,6 +12,7 @@ ocean_alt::ocean_alt()
 
 // initializes static constants (aka they are not time dependent)
 void ocean_alt::init_wave_index_constants(){
+    float tex_step = 1.f/num_rows;
 
     for (int i=0; i<N; i++){
         Eigen::Vector2i m_n = index_1d_to_2d(i);
@@ -20,6 +21,23 @@ void ocean_alt::init_wave_index_constants(){
 
         Eigen::Vector2d k = get_k_vector(n_prime, m_prime);
         Eigen::Vector2d k_conj = get_k_vector(-n_prime, m_prime);
+
+
+        Eigen::Vector3f v = Eigen::Vector3f(0,0,1);
+        Eigen::Vector3f norm = Eigen::Vector3f(0,1,0);
+        if (abs(norm[1]) < 1.f){
+            v = (Eigen::Vector3f(0,1,0) - norm[1]*norm).normalized();
+        }
+        Eigen::Vector3f u = norm.cross(v).normalized();
+
+        float u_coord = u.dot(Eigen::Vector3f(n_prime, 0, m_prime)) / 64.f;
+        float v_coord = v.dot(Eigen::Vector3f(n_prime, 0, m_prime)) / 64.f;
+
+        std::cout << u_coord << ", " << v_coord << std::endl;
+
+
+        // texture coord:
+        Eigen::Vector2f texCoord = Eigen::Vector2f(1, 1);
 
 
         // store h0'(n,m) and w'(n,m) for every index, to be used for later
@@ -36,7 +54,6 @@ void ocean_alt::init_wave_index_constants(){
         wave_const.h0_prime = h0_prime;
         wave_const.h0_prime_conj = h0_prime_conj;
         wave_const.w_prime = w_prime;
-        wave_const.w_prime = w_prime;
         wave_const.base_horiz_pos = get_horiz_pos(i);
         wave_const.k_vector = k;
 
@@ -47,6 +64,13 @@ void ocean_alt::init_wave_index_constants(){
         m_displacements.push_back(Eigen::Vector2d(0.0, 0.0));
         m_slopes.push_back(Eigen::Vector2d(0.0, 0.0));
         m_normals.push_back(Eigen::Vector3f(0.0, 1.0, 0.0));
+
+        // initialize foam constant vectors
+        m_foam_constants.k_vectors.push_back(Eigen::Vector2f(k[0], k[1]));
+        m_foam_constants.positions.push_back(Eigen::Vector3f(0,0,0));
+        m_foam_constants.wavelengths.push_back(0);
+        m_foam_constants.texCoords.push_back(texCoord);
+
 
     }
 }
@@ -293,7 +317,14 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         vertices.push_back(Eigen::Vector3f(horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]));
         m_normals[i] = norm.normalized();//Eigen::Vector3f(-slope[0], 1.0, -slope[1]).normalized();
         //std::cout << "normal: " << m_normals[i] << std::endl
+
+
+
     }
+
+    // populate foam constants
+    m_foam_constants.positions = vertices;
+
     return vertices;
 }
 

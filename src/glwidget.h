@@ -13,6 +13,12 @@
 #include <QTimer>
 #include <memory>
 
+struct TextureData{
+    GLuint textureID;
+    int width;
+    int height;
+};
+
 class GLWidget : public QOpenGLWidget
 {
     Q_OBJECT
@@ -45,6 +51,8 @@ private:
     void initCaustics();
     void paintCaustics();
 
+    TextureData loadTextureFromFile(const char *path);
+
 private slots:
     // Physics Tick
     void tick();
@@ -57,6 +65,8 @@ private:
     Shader *m_texture_shader;
 
     Shader *m_colorShader;
+    Shader *m_foamShader;
+
 
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
@@ -78,6 +88,9 @@ private:
     float m_movementScaling;
     float m_vertexSelectionThreshold;
     float m_vSize;
+
+    // FOAM
+    GLuint m_halftone_tex;
 
     // Timing
     QElapsedTimer m_deltaTimeProvider; // For measuring elapsed time

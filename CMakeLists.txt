@@ -56,6 +56,7 @@ add_executable(${PROJECT_NAME}
     src/ocean/ocean.cpp
 
     src/ocean/ocean_alt.h src/ocean/ocean_alt.cpp
+    src/ocean/halftone.h src/ocean/halftone.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
@@ -92,6 +93,11 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/images/anamorphic.jpg
         resources/images/daniel.jpg
         resources/images/sky_clouds.png
+        resources/images/halftone.png
+
+
+
+
 #        resources/images/ground.png
         resources/shaders/shader.frag
         resources/shaders/shader.vert
@@ -102,6 +108,13 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/texture.frag
         resources/shaders/color.vert
         resources/shaders/color.frag
+
+        resources/shaders/foam.frag
+        resources/shaders/foam.vert
+
+
+
+
 
 
 )
