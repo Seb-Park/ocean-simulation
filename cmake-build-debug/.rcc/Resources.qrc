@@ -8,6 +8,7 @@
     <file alias="resources/images/anamorphic.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/anamorphic.jpg</file>
     <file alias="resources/images/daniel.jpg">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/daniel.jpg</file>
     <file alias="resources/images/sky_clouds.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/sky_clouds.png</file>
+    <file alias="resources/images/halftone.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/halftone.png</file>
     <file alias="resources/shaders/shader.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.frag</file>
     <file alias="resources/shaders/shader.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/shader.vert</file>
     <file alias="resources/shaders/anchorPoint.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.vert</file>
@@ -15,6 +16,10 @@
     <file alias="resources/shaders/anchorPoint.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.frag</file>
     <file alias="resources/shaders/texture.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/texture.vert</file>
     <file alias="resources/shaders/texture.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/texture.frag</file>
+    <file alias="resources/shaders/color.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/color.vert</file>
+    <file alias="resources/shaders/color.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/color.frag</file>
+    <file alias="resources/shaders/foam.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/foam.frag</file>
+    <file alias="resources/shaders/foam.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/foam.vert</file>
   </qresource>
 </RCC>
 
