@@ -91,6 +91,8 @@ private:
 
     // FOAM
     GLuint m_halftone_tex;
+    GLuint m_foam_tex;
+
 
     // Timing
     QElapsedTimer m_deltaTimeProvider; // For measuring elapsed time

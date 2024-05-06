@@ -317,6 +317,8 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         vertices.push_back(Eigen::Vector3f(horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]));
         m_normals[i] = norm.normalized();//Eigen::Vector3f(-slope[0], 1.0, -slope[1]).normalized();
         //std::cout << "normal: " << m_normals[i] << std::endl
+        m_foam_constants.wavelengths[i] = 2.f *M_PI * m_slopes[i].dot(m_slopes[i]) / Lx;
+        //std::cout << m_foam_constants.wavelengths[i] << std::endl;
 
 
 

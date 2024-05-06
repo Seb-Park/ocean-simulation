@@ -85,8 +85,8 @@ void GLWidget::initializeGL()
     m_colorShader   = new Shader(":resources/shaders/color.vert",      ":resources/shaders/color.frag");
     m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
 
-    m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/sky_clouds.png").textureID;
-
+    m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
+    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam.png").textureID;
 
 
 
@@ -361,6 +361,10 @@ void GLWidget::paintGL()
         glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
         glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
 
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
+        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
+
 
 
 
@@ -395,8 +399,8 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

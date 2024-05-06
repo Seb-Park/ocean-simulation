@@ -78,11 +78,10 @@ private:
 	const double Lx = 512.0;
 	const double Lz = 512.0;
 
-    const int num_rows = 32;
-    const int num_cols = 32;
-
+    const int num_rows = 64;
+    const int num_cols = 64;
 	const int N = num_rows*num_cols; // total number of grid points
-    const double lambda = 0.3; // how much displacement matters
+    const double lambda = 0.4; // how much displacement matters
 	const double spacing = 35.0; // spacing between grid points
 
 	const double A = 100; // numeric constant for the Phillips spectrum

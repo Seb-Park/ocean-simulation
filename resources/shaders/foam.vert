@@ -7,7 +7,7 @@ layout(location = 3) in vec2 texCoords; // texture coords
 layout(location = 3) in vec3 norm; // texture coords
 
 
-out vec4 saturation_const;
+out vec2 constants;
 out vec2 dir;
 out vec2 tex;
 out vec3 pos;
@@ -38,13 +38,13 @@ vec2 calculateTexCoord(vec3 pos){
 
 
      float offset = .5f;
-    return vec2(u_coord + offset, v_coord + offset);
+    return 6*vec2(u_coord + offset, v_coord + offset);
 
 }
 
 void main() {
     dir = direction;
-    saturation_const = vec4(wavelength, phaseC, position.x, position.z);
+    constants = vec2(wavelength, phaseC);
 
     gl_Position = proj * view * model * vec4(position, 1);
     pos = vec3(gl_Position);
