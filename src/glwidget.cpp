@@ -69,7 +69,7 @@ void GLWidget::initializeGL()
     fprintf(stdout, "Successfully initialized GLEW %s\n", glewGetString(GLEW_VERSION));
 
     // Set clear color to white
-    glClearColor(0, 0, 0, 1);
+    glClearColor(1, 0.98f, 0.85f, 1);
 
     // Enable depth-testing and backface culling
     glEnable(GL_DEPTH_TEST);
@@ -178,6 +178,8 @@ void GLWidget::initializeGL()
 }
 
 void GLWidget::paintCaustics() {
+    glClearColor(0.68f, 0.58f, 0.38f, 1);
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
     // Task 15: Clear the screen here
@@ -313,6 +315,7 @@ void GLWidget::makeFBO() {
 void GLWidget::paintGL()
 {
     paintCaustics();
+    glClearColor(0.56f, 0.69f, 0.74f, 1);
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 //    return;
 //    paintTexture(m_ground_texture, false);
