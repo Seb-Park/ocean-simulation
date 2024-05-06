@@ -108,6 +108,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/texture.frag
         resources/shaders/skybox.vert
         resources/shaders/skybox.frag
+        resources/shaders/caustics.frag
+        resources/shaders/caustics.vert
 
 
 )

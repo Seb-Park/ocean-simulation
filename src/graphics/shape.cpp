@@ -109,11 +109,14 @@ void Shape::init(const vector<Vector3f> &vertices, const vector<Vector3i> &trian
     // Skybox stuff
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
+
     glBindVertexArray(skyboxVAO);
     glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -245,7 +248,6 @@ void Shape::renderSkyBox() {
 
     // DRAW BOX
     glBindVertexArray(skyboxVAO);
-    std::cout << "glBindVertexArray(skyboxVAO); " << glGetError() << std::endl;
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox_texture);
     m_skybox_Shader->setUniform("skybox",2);
@@ -253,7 +255,7 @@ void Shape::renderSkyBox() {
     glDrawArrays(GL_QUADS, 0, 24);
     glBindVertexArray(0);
 
-    glActiveTexture(GL_TEXTURE2);
+//    glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     glCullFace(oldCull);
