@@ -280,7 +280,7 @@ Eigen::Vector2d ocean_alt::complex_exp(double exponent){
 std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
 {
     std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
-    if (iterations < 4){
+    if (iterations < 10){
         for (int i = 0; i < N; i++){
             Eigen::Vector2d amplitude = m_current_h[i];
             float height = amplitude[0];
@@ -331,8 +331,13 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         Eigen::Vector2i m_n = index_1d_to_2d(i);
 
 
-        m_foam_constants.wavelengths[i] = 1.f;//(height - 0) / (max -0);//M_PI * m_slopes[i].dot(m_slopes[i]) / ((float) m_n[0] / Lx);
-        //std::cout << m_foam_constants.wavelengths[i] << std::endl;
+       // m_foam_constants.wavelengths[i] = 2.f* M_PI * m_slopes[i].dot(m_slopes[i]) /  Lx;
+        m_foam_constants.wavelengths[i] = ((height -200 ) / (1000.f -200 ));
+
+//        if (i < 5){
+//            //std::cout << min << ", " << max << std::endl;
+//            std::cout << m_foam_constants.wavelengths[i] << std::endl;
+//        }
 
 
 

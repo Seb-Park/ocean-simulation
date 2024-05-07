@@ -125,33 +125,20 @@ void Shape::setVertices_and_Normals(const vector<Vector3f> &vertices, const vect
 void Shape::setFoamInputs(const vector<Vector3f> &vertices, const vector<float> &wavelengths,
                           const vector<Vector2f> &waveDirs, const vector<Vector2f> &textures){
 
-
-//    vector<Vector3f> verts;
-//    vector<Vector3f> norms;
-
-//    vector<Vector2f> tex;
-//    vector<Vector3f> colors;
     m_vertices.clear();
     copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
 
-    std::vector<Eigen::Vector3f> verts;
-    std::vector<Eigen::Vector2f> ks;
-    std::vector<float> waves;
+    vector<Vector3f> verts;
+    vector<Vector3f> normals;
+    vector<Vector3f> colors;
 
-    updateMeshFoam(m_faces, vertices, waveDirs, wavelengths, verts, ks, waves);
-
-    //updateFoam(m_faces, vertices, textureCoords, verts, tex, colors);
-
-
+    updateMeshFoam(m_faces, vertices, wavelengths, waveDirs, verts, normals, colors);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (waves.size() * 1)), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (normals.size() * 3) + (colors.size() * 3)), nullptr, GL_DYNAMIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * verts.size() * 3, static_cast<const void *>(verts.data()));
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * waves.size() * 1, static_cast<const void *>(waves.data()));
-    //glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (waves.size() * 1)), sizeof(float) * ks.size() * 2, static_cast<const void *>(ks.data()));
-    //glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1) + (waveDirs.size() * 2)), sizeof(float) * tex.size() * 2, static_cast<const void *>(tex.data()));
-   // glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (wavelengths.size() * 1) + (waveDirs.size() * 2) + (tex.size() * 2)), sizeof(float) * (norms.size() * 3), static_cast<const void *>(norms.data()));
-
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * normals.size() * 3, static_cast<const void *>(normals.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (normals.size() * 3)), sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -349,7 +336,7 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
         Vector3f n = getNormal(face);
 
         for (auto& v: {face[0], face[1], face[2]}) {
-            normals.push_back(n);
+            normals.push_back(Eigen::Vector3f(1,1,1));
             verts.push_back(vertices[v]);
 
             if (m_anchors.find(v) == m_anchors.end()) {
@@ -362,26 +349,24 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
 }
 
 void Shape::updateMeshFoam(const std::vector<Eigen::Vector3i> &faces,
-                       const std::vector<Eigen::Vector3f> &vertices,
-                       const std::vector<Eigen::Vector2f> &k_vectors,
-                       const std::vector<float> &wavelengths,
-
-                           std::vector<Eigen::Vector3f> &verts,
-                           std::vector<Eigen::Vector2f> &ks,
-                           std::vector<float> &waves)
+                           const std::vector<Eigen::Vector3f> &vertices,
+                           const std::vector<float> &wavelengths,
+                           const vector<Vector2f> &waveDirs,
+                           std::vector<Eigen::Vector3f>& verts,
+                           std::vector<Eigen::Vector3f>& normals,
+                           std::vector<Eigen::Vector3f>& colors)
 {
     verts.reserve(faces.size() * 3);
-    ks.reserve(faces.size() * 3);
-    waves.reserve(faces.size() * 3);
+    normals.reserve(faces.size() * 3);
+    colors.reserve(faces.size() * 3);
 
 
     for (const Eigen::Vector3i& face : faces) {
 
         for (auto& v: {face[0], face[1], face[2]}) {
-            ks.push_back(k_vectors[v]);
+            normals.push_back(Eigen::Vector3f(wavelengths[v],0,0));
             verts.push_back(vertices[v]);
-            waves.push_back(wavelengths[v]);
-
+            colors.push_back(Eigen::Vector3f(waveDirs[v][0], waveDirs[v][1], 0));
         }
     }
 }

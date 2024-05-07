@@ -42,13 +42,13 @@ public:
                            std::vector<Eigen::Vector3f>& colors);
 
     void updateMeshFoam(const std::vector<Eigen::Vector3i> &faces,
-                           const std::vector<Eigen::Vector3f> &vertices,
-                           const std::vector<Eigen::Vector2f> &k_vectors,
-                           const std::vector<float> &wavelengths,
+                               const std::vector<Eigen::Vector3f> &vertices,
+                               const std::vector<float> &wavelengths,
+                                 const std::vector<Eigen::Vector2f> &waveDirs,
 
-                               std::vector<Eigen::Vector3f> &verts,
-                               std::vector<Eigen::Vector2f> &ks,
-                               std::vector<float> &waves);
+                               std::vector<Eigen::Vector3f>& verts,
+                               std::vector<Eigen::Vector3f>& normals,
+                               std::vector<Eigen::Vector3f>& colors);
 
 
 

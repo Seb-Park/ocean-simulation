@@ -86,7 +86,7 @@ void GLWidget::initializeGL()
     m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
 
     m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
-    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
+    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam4.png").textureID;
 
 
 
@@ -316,9 +316,9 @@ void GLWidget::paintGL()
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 //    return;
 //    paintTexture(m_ground_texture, false);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable( GL_BLEND );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
