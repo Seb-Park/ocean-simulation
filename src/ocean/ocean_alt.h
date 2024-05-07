@@ -75,14 +75,14 @@ private:
 
 
 
-    const double Lx = 512.0;
-    const double Lz = 512.0;
+    const double Lx = 1024.0;
+    const double Lz = 1024.0;
 
     const int num_rows = 256;
     const int num_cols = 256;
 	const int N = num_rows*num_cols; // total number of grid points
     const double lambda = 2.5; // how much displacement matters
-    const double spacing = 75.0; // spacing between grid points
+    const double spacing = 25.0; // spacing between grid points
 
     const double A = 200; // numeric constant for the Phillips spectrum
     const double V = 200; // wind speed

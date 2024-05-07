@@ -332,10 +332,12 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
 
 
        // m_foam_constants.wavelengths[i] = 2.f* M_PI * m_slopes[i].dot(m_slopes[i]) /  Lx;
-        m_foam_constants.wavelengths[i] = ((height -200 ) / (1000.f -200 ));
+        float h_0 = m_waveIndexConstants[i].h0_prime[0]; // min*.2f;
+        float h_max = max*.01f; // the smaller the constant, the more foam there is
+        m_foam_constants.wavelengths[i] = (height - h_0 ) / (h_max - h_0);
 
 //        if (i < 5){
-//            //std::cout << min << ", " << max << std::endl;
+//            std::cout << h_0 << ", " << h_max << std::endl;
 //            std::cout << m_foam_constants.wavelengths[i] << std::endl;
 //        }
 
