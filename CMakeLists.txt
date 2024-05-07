@@ -57,6 +57,8 @@ add_executable(${PROJECT_NAME}
 
     src/ocean/ocean_alt.h src/ocean/ocean_alt.cpp
     src/ocean/halftone.h src/ocean/halftone.cpp
+
+    src/skybox.h src/skybox.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
@@ -111,6 +113,10 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
 
         resources/shaders/foam.frag
         resources/shaders/foam.vert
+
+        resources/shaders/skybox.frag
+        resources/shaders/skybox.vert
+
 
 
 

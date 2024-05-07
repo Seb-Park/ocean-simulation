@@ -1,8 +1,8 @@
 #pragma once
 
-#ifdef __APPLE__
-#define GL_SILENCE_DEPRECATION
-#endif
+#include "skybox.h"
+#include <GL/glew.h>
+
 
 #include "arap.h"
 #include "graphics/camera.h"
@@ -52,6 +52,8 @@ private:
     void paintCaustics();
 
     TextureData loadTextureFromFile(const char *path);
+    GLuint loadCubeMap(std::vector<const char*> textureFiles);
+
 
 private slots:
     // Physics Tick
@@ -66,6 +68,8 @@ private:
 
     Shader *m_colorShader;
     Shader *m_foamShader;
+    Shader *m_skyboxShader;
+
 
 
     GLuint m_fullscreen_vbo;
@@ -110,4 +114,6 @@ private:
     bool m_rightCapture;
     SelectMode m_rightClickSelectMode;
     int m_lastSelectedVertex = -1;
+
+    skybox m_skybox;
 };
