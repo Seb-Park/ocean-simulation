@@ -68,8 +68,8 @@ void GLWidget::initializeGL()
 
     // Enable depth-testing and backface culling
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
 //    glShadeModel(GL_SMOOTH);
 
 
@@ -169,30 +169,38 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintCaustics() {
     glClearColor(0.68f, 0.58f, 0.38f, 1);
+//    glClearColor(0., 0., 0., 1);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+//    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 
-    // Task 15: Clear the screen here
-
-    // TA SOLUTION
+    // Clear Screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
 
-    // Bind the shader
+//    // Bind the shader
+//    m_colorShader->bind();
+
+////    m_colorShader->setUniform("asdf", m_arap.minCorner[0], m_arap.maxCorner[0]);
+////    // Bind VAO
+//    glBindVertexArray(m_floor_vao);
+
+////    // Draw the VAO
+//    glDrawArrays(GL_TRIANGLES, 0, 3);
+
     m_colorShader->bind();
+    //
+    m_colorShader->setUniform("proj", m_camera.getProjection());
+    m_colorShader->setUniform("view", m_camera.getView());
+    Eigen::Matrix4f inverseView = m_camera.getView().inverse();
+    m_colorShader->setUniform("inverseView", inverseView);
+    //
+    m_colorShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
+    m_colorShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+    m_arap.draw(m_colorShader, GL_TRIANGLES);
 
-    // Task 16: Bind your VAO here
-
-    // TA SOLUTION
-    glBindVertexArray(m_floor_vao);
-
-    // Task 17: Draw your VAO here
-
-    // TA SOLUTION
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    // Task 18: Unbind your VAO here
-
-    // TA SOLUTION
+    // Unbind the VAO
     glBindVertexArray(0);
 
     // Unbind the shader
@@ -309,9 +317,9 @@ void GLWidget::paintGL()
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 //    return;
 //    paintTexture(m_ground_texture, false);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable( GL_BLEND );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
@@ -345,6 +353,10 @@ void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
     m_camera.setAspect(static_cast<float>(w) / h);
+    glDeleteTextures(1, &m_fbo_texture);
+    glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
+    glDeleteFramebuffers(1, &m_fbo);
+    makeFBO();
 }
 
 // ================== Event Listeners

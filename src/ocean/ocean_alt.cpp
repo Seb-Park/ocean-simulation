@@ -43,7 +43,8 @@ void ocean_alt::init_wave_index_constants(){
         m_waveIndexConstants[i] = wave_const;
 
         // initialize m_current_h to be h0 for now
-        m_current_h.push_back(h0_prime);
+//        m_current_h.push_back(h0_prime);
+        m_current_h.push_back(Eigen::Vector2d(0.0, 0.0));
         m_displacements.push_back(Eigen::Vector2d(0.0, 0.0));
         m_slopes.push_back(Eigen::Vector2d(0.0, 0.0));
         m_normals.push_back(Eigen::Vector3f(0.0, 1.0, 0.0));
@@ -269,11 +270,11 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         float ys = 1.f + s[1]*s[1];
         float zs = 1.f + s[2]*s[2];
 
-//        Eigen::Vector3f diff = y - s;
-//        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
+        Eigen::Vector3f diff = y - s;
+        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
 
          // NEW
-         Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
+//         Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
          norm.normalize();
          //NEW
 

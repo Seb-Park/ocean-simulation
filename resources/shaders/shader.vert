@@ -2,9 +2,9 @@
 
 layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in vec3 normal;   // Normal of the vertex
-layout(location = 3) in vec3 texCoords;   // Normal of the vertex
+layout(location = 2) in vec3 texCoords;   // Normal of the vertex
 
-uniform float depth = -1500.f;
+uniform float depth = -3000.f;
 uniform float skyHeight = 500.f;
 uniform mat4 proj;
 uniform mat4 view;
@@ -26,7 +26,7 @@ out vec2 uv;
 out float matIor;
 
 vec4 getRefrPos() {
-//    float depth = -1000.f; // TODO: Pass as uniform
+//    float depth = -1500.f; // TODO: Pass as uniform
     vec3 w_o = normalize(pos - camera_worldSpace);
     float cos_theta_i = dot(-w_o, normal_worldSpace);
     float n_i = 1;
