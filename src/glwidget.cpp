@@ -80,7 +80,7 @@ void GLWidget::initializeGL()
     m_colorShader   = new Shader(":resources/shaders/color.vert",      ":resources/shaders/color.frag");
 
 
-    initCaustics();
+//    initCaustics();
     // INITIALIZE TEXTURE STUFF
 
     // Prepare filepath
@@ -103,11 +103,13 @@ void GLWidget::initializeGL()
 
     m_devicePixelRatio = this->devicePixelRatio();
 
-    m_defaultFBO = 2;
+//    m_defaultFBO = 2;
     m_fbo_width = size().width() * m_devicePixelRatio;
     m_fbo_height = size().height() * m_devicePixelRatio;
 
-    makeFBO();
+//    makeFBO();
+
+    m_arap.makeFBO(m_fbo_width, m_fbo_height);
 
     // FBO STUFF END
 
@@ -188,7 +190,7 @@ void GLWidget::paintCaustics() {
     // Task 17: Draw your VAO here
 
     // TA SOLUTION
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 4);
 
     // Task 18: Unbind your VAO here
 
@@ -212,15 +214,19 @@ void GLWidget::initCaustics() {
     // TA SOLUTION
     std::vector<GLfloat> triangle =
     {   //    POSITIONS    //    COLORS    //
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
+         0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
     };
 
     // Task 9: Pass the triangle vector into your VBO here
 
     // TA SOLUTION
     glBufferData(GL_ARRAY_BUFFER, triangle.size() * sizeof(GLfloat), triangle.data(), GL_STATIC_DRAW);
+
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (normals.size() * 3)), nullptr, GL_STATIC_DRAW);
+//    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * verts.size() * 3, static_cast<const void *>(verts.data()));
+//    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * normals.size() * 3, static_cast<const void *>(normals.data()));
 
     // ================== Vertex Array Objects
 
@@ -246,6 +252,7 @@ void GLWidget::initCaustics() {
     // ================== Returning to Default State
 
     // Task 14: Unbind your VBO and VAO here
+
 
     // TA SOLUTION
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -304,9 +311,9 @@ void GLWidget::makeFBO() {
 
 void GLWidget::paintGL()
 {
-    paintCaustics();
+//    paintCaustics();
     glClearColor(0.56f, 0.69f, 0.74f, 1);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+//    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 //    return;
 //    paintTexture(m_ground_texture, false);
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -322,12 +329,22 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
 
     // Set the ocean floor to the painted caustics
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-    glUniform1i(glGetUniformLocation(m_defaultShader->id(), "groundSampler"), 2);
+//    glActiveTexture(GL_TEXTURE2);
+//    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+//    glUniform1i(glGetUniformLocation(m_defaultShader->id(), "groundSampler"), 2);
 
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
     m_defaultShader->unbind();
+
+    m_colorShader->bind();
+    m_colorShader->setUniform("proj", m_camera.getProjection());
+    m_colorShader->setUniform("view", m_camera.getView());
+    m_colorShader->setUniform("inverseView", inverseView);
+
+    m_arap.drawCaustics(m_colorShader);
+    m_colorShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
 

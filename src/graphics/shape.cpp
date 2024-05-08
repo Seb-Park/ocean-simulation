@@ -78,6 +78,44 @@ void Shape::init(const vector<Vector3f> &vertices, const vector<Vector3i> &trian
     m_blue  = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
     m_green = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
     m_alpha = 1.0f;
+
+}
+
+void Shape::makeFBO(int fbo_width, int fbo_height) {
+
+
+    m_defaultFBO = 2;
+    m_fbo_width = fbo_width;
+    m_fbo_height = fbo_height;
+
+    // Task 19
+    glActiveTexture(GL_TEXTURE2);
+    glGenTextures(1, &m_fbo_texture);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_fbo_width, m_fbo_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Task 20
+    glGenRenderbuffers(1, &m_fbo_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER,
+                          GL_DEPTH24_STENCIL8,
+                          m_fbo_width,
+                          m_fbo_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Task 18
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+    // Task 21
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
+
+    // Task 22
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
 
 void Shape::setVertices(const vector<Vector3f> &vertices)
@@ -138,13 +176,13 @@ void Shape::draw(Shader *shader, GLenum mode)
     // Not that one texture is overwriting the other, because if we just load sky it doesn't work
     // Draws whatever is bound to texture0 no matter what.
     // Drawing the ground texture.
-    /* // When ground is being rendered dynamically, don't use static ground image.
+     // When ground is being rendered dynamically, don't use static ground image.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_ground_texture);
 //    glBindTexture(GL_TEXTURE_2D, 0);
     shader->setUniform("groundSampler", 0);
     glUniform1i(glGetUniformLocation(shader->id(), "groundSampler"), 0);
-    */
+
 
     // https://stackoverflow.com/questions/67277087/opengl-glsl-multiple-texture-binding-not-working
     // FIGURED OUT THE PROBLEM. it was that SAMPLERS WERE DEFAULTING TO SLOT 0 AND SETUNIFORM WASN'T WORKING
@@ -161,6 +199,14 @@ void Shape::draw(Shader *shader, GLenum mode)
     switch(mode) {
     case GL_TRIANGLES:
     {
+        glClearColor(0.68f, 0.58f, 0.38f, 1);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+        // Task 15: Clear the screen here
+        // TA SOLUTION
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         shader->setUniform("wire", 0);
         shader->setUniform("model", m_modelMatrix);
         shader->setUniform("inverseTransposeModel", inverseTransposeModel);
@@ -188,6 +234,19 @@ void Shape::draw(Shader *shader, GLenum mode)
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Shape::drawCaustics(Shader *shader) {
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+    glUniform1i(glGetUniformLocation(shader->id(), "water"), 2);
+
+    glBindVertexArray(m_surfaceVao);
+    glDrawElements(GL_TRIANGLES, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
+    glBindVertexArray(0);
+
+    glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 

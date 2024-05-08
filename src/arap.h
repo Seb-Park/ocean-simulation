@@ -47,8 +47,16 @@ public:
         m_shape.initGroundPlane(texturePath, depth, shader);
     }
 
+    void drawCaustics(Shader *shader) {
+        m_shape.drawCaustics(shader);
+    }
+
     void initSkyPlane(std::string texturePath, float height, Shader* shader) {
         m_shape.initSkyPlane(texturePath, height, shader);
+    }
+
+    void makeFBO(int width, int height) {
+        m_shape.makeFBO(width, height);
     }
 
     SelectMode select(Shader *shader, int vertex)

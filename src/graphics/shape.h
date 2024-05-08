@@ -50,6 +50,9 @@ public:
     const std::vector<Eigen::Vector3i>& getFaces();
     const std::unordered_set<int>& getAnchors();
 
+    void makeFBO(int fbo_width, int fbo_height);
+    void drawCaustics(Shader *shader);
+
 private:
     GLuint m_surfaceVao;
     GLuint m_surfaceVbo;
@@ -66,6 +69,14 @@ private:
     float m_blue;
     float m_green;
     float m_alpha;
+
+    int m_fbo_width;
+    int m_fbo_height;
+
+    GLuint m_fbo;
+    GLuint m_fbo_texture;
+    GLuint m_fbo_renderbuffer;
+    GLuint m_defaultFBO;
 
     std::vector<Eigen::Vector3i> m_faces;
     std::vector<Eigen::Vector3f> m_vertices;
