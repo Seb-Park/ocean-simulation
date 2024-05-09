@@ -2,8 +2,7 @@
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/arap.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/ocean/ocean.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.cpp
-/Users/sotech117/Documents/final/adv/ocean-simulation/util/tiny_obj_loader.h
-/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.h
+/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/shape.cpp
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/glwidget.h
  mmc:Q_OBJECT
  mdp:/Users/sotech117/Documents/final/adv/ocean-simulation/src/glwidget.h
@@ -1388,7 +1387,8 @@
  mdp:/Users/sotech117/Qt/6.5.2/macos/lib/QtWidgets.framework/Versions/A/Headers/qtwidgetsexports.h
  mdp:/Users/sotech117/Qt/6.5.2/macos/lib/QtWidgets.framework/Versions/A/Headers/qtwidgetsglobal.h
  mdp:/Users/sotech117/Qt/6.5.2/macos/lib/QtWidgets.framework/Versions/A/Headers/qwidget.h
-/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/shape.cpp
+/Users/sotech117/Documents/final/adv/ocean-simulation/util/tiny_obj_loader.h
+/Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/camera.h
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/arap.cpp
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/meshloader.cpp
 /Users/sotech117/Documents/final/adv/ocean-simulation/src/graphics/shader.h

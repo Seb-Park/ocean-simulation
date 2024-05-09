@@ -34,7 +34,7 @@ void ARAP::init
 //	if (MeshLoader::loadTriMesh(m_mesh_path, vertices, triangles)) {
 //		m_shape.init(vertices, triangles);
 //	}
-
+	m_ocean.update_ocean();
     vertices = m_ocean.get_vertices();
     triangles = m_ocean.get_faces();
 	m_shape.init(vertices, triangles);
@@ -102,10 +102,16 @@ void ARAP::update(double seconds)
 
     // Note that the "seconds" parameter represents the amount of time that has passed since
     // the last update
-
-    m_ocean.fft_prime(m_time);
-	// m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
-	m_shape.setVertices(m_ocean.get_vertices());
+	m_ocean.fft_prime(m_time);
+	m_ocean.update_ocean();
+	// std::cout << "updating ocean" << std::endl;
+	auto tmp = m_ocean.get_vertices();
+	 // print the vertex
+//	std::cout << "faces\t" << m_ocean.get_faces().size() << std::endl;
+//	std::cout << "noormals\t" << m_ocean.getNormals().size() << std::endl;
+//	std::cout << "vertices\t" << tmp.size() << std::endl;
+	m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+	// m_shape.setVertices(m_ocean.get_vertices());
 
 
      m_time += m_timestep;

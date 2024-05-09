@@ -15,6 +15,8 @@
     <file alias="resources/shaders/anchorPoint.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/anchorPoint.frag</file>
     <file alias="resources/shaders/texture.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/texture.vert</file>
     <file alias="resources/shaders/texture.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/texture.frag</file>
+    <file alias="resources/shaders/color.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/color.vert</file>
+    <file alias="resources/shaders/color.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/color.frag</file>
   </qresource>
 </RCC>
 

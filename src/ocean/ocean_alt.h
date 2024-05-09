@@ -25,6 +25,7 @@ class ocean_alt
 public:
     ocean_alt();
     void updateVertexAmplitudes(double t);
+	void update_ocean();
     std::vector<Eigen::Vector3f> get_vertices();
     std::vector<Eigen::Vector3i> get_faces();
     void fft_prime(double t);
@@ -66,26 +67,33 @@ private:
 	const int num_rows = 256;
 	const int num_cols = 256;
 
-	const int N = num_rows*num_cols; // total number of grid points
-	const double lambda = 0; // how much displacement matters
-	const double spacing = 35.0; // spacing between grid points
+	const int num_tiles_x = 5;
+	const int num_tiles_z = 1;
 
-	const double A = 100; // numeric constant for the Phillips spectrum
-	const double V = 50; // wind speed
+	const double vertex_displacement = Lx / 2;
+
+	const int N = num_rows*num_cols; // total number of grid points
+	const double lambda = .5; // how much displacement matters
+	const double spacing = 1.0; // spacing between grid points
+
+	const double A = 15000; // numeric constant for the Phillips spectrum
+	const double V = 1000; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation
 
     std::vector<Eigen::Vector2d> m_current_h; // current height fields for each K
-    std::vector<Eigen::Vector2d> m_displacements; // current displacement vector for each K
-    std::vector<Eigen::Vector2d> m_slopes; // current displacement vector for each K
+   	// std::vector<Eigen::Vector2d> m_displacements; // current displacement vector for each K
+    // std::vector<Eigen::Vector2d> m_slopes; // current displacement vector for each K
+	std::vector<Eigen::Vector2d> m_slopes_x;
+	std::vector<Eigen::Vector2d> m_slopes_z;
+	std::vector<Eigen::Vector2d> m_displacements_x;
+	std::vector<Eigen::Vector2d> m_displacements_z;
     //std::vector<Eigen::Vector3f> m_slope_vectors; // current displacement vector for each K
 
     std::vector<Eigen::Vector3f> m_normals; // current displacement vector for each K
 
-
-
-
+	std::vector<Eigen::Vector3f> m_vertices; // current displacement vector for each K
 
     const double D = 1.0; // Depth below mean water level (for dispersion relation)
 

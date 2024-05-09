@@ -45,10 +45,17 @@ void ocean_alt::init_wave_index_constants(){
         // initialize m_current_h to be h0 for now
 //        m_current_h.push_back(h0_prime);
         m_current_h.push_back(Eigen::Vector2d(0.0, 0.0));
-        m_displacements.push_back(Eigen::Vector2d(0.0, 0.0));
-        m_slopes.push_back(Eigen::Vector2d(0.0, 0.0));
+        // m_displacements.push_back(Eigen::Vector2d(0.0, 0.0));
+        // m_slopes.push_back(Eigen::Vector2d(0.0, 0.0));
         m_normals.push_back(Eigen::Vector3f(0.0, 1.0, 0.0));
 
+		m_slopes_x.push_back(Eigen::Vector2d(0.0, 0.0));
+		m_slopes_z.push_back(Eigen::Vector2d(0.0, 0.0));
+
+		m_displacements_x.push_back(Eigen::Vector2d(0.0, 0.0));
+		m_displacements_z.push_back(Eigen::Vector2d(0.0, 0.0));
+
+		m_vertices.push_back(Eigen::Vector3f(0.0, 0.0, 0.0));
     }
 }
 
@@ -57,8 +64,14 @@ void ocean_alt::fft_prime(double t){
 
     // FFT
 	std::vector<Eigen::Vector2d> h_tildas = std::vector<Eigen::Vector2d>();
-	std::vector<Eigen::Vector2d> ikh = std::vector<Eigen::Vector2d>();
-	std::vector<Eigen::Vector2d> neg_ik_hat_h = std::vector<Eigen::Vector2d>();
+	// std::vector<Eigen::Vector2d> ikh = std::vector<Eigen::Vector2d>();
+//	std::vector<Eigen::Vector2d> neg_ik_hat_h = std::vector<Eigen::Vector2d>();
+
+	std::vector<Eigen::Vector2d> ikhx = std::vector<Eigen::Vector2d>();
+	std::vector<Eigen::Vector2d> ikhz = std::vector<Eigen::Vector2d>();
+
+	std::vector<Eigen::Vector2d> neg_ik_hat_h_x = std::vector<Eigen::Vector2d>();
+	std::vector<Eigen::Vector2d> neg_ik_hat_h_z = std::vector<Eigen::Vector2d>();
 
     // find each h_tilda at each index, to be used for next for loop
 	for (int i=0; i<N; i++){
@@ -67,25 +80,47 @@ void ocean_alt::fft_prime(double t){
 		h_tildas.emplace_back(h_t_prime);
 
 		Eigen::Vector2d k_vector = m_waveIndexConstants[i].k_vector;
-		ikh.emplace_back(-h_t_prime[1] * k_vector[0], -h_t_prime[1] * k_vector[1]);
+		// ikh.emplace_back(-h_t_prime[1] * k_vector[0], -h_t_prime[1] * k_vector[1]);
+		ikhx.emplace_back(-h_t_prime[1] * k_vector[0], -h_t_prime[1] * k_vector[0]);
+		ikhz.emplace_back(-h_t_prime[1] * k_vector[1], -h_t_prime[1] * k_vector[1]);
 
-		Eigen::Vector2d k_normalized = k_vector.normalized();
-		Eigen::Vector2d neg_ik_hat_h_val =
-			Eigen::Vector2d(k_normalized[1] * h_t_prime[1], k_normalized[0] * h_t_prime[1]);
-		neg_ik_hat_h.emplace_back(neg_ik_hat_h_val);
+
+//		Eigen::Vector2d neg_ik_hat_h_val =
+//			Eigen::Vector2d(k_normalized[1] * h_t_prime[1], k_normalized[0] * h_t_prime[1]);
+//		neg_ik_hat_h.emplace_back(neg_ik_hat_h_val);
+		double len = k_vector.norm();
+		if (len < .000001)
+		{
+			neg_ik_hat_h_x.emplace_back(0.0, 0.0);
+			neg_ik_hat_h_z.emplace_back(0.0, 0.0);
+		}
+		else
+		{
+			Eigen::Vector2d k_normalized = k_vector.normalized();
+			neg_ik_hat_h_x.emplace_back(k_normalized[0] * h_t_prime[1], k_normalized[0] * h_t_prime[1]);
+			neg_ik_hat_h_z.emplace_back(k_normalized[1] * h_t_prime[1], k_normalized[1] * h_t_prime[1]);
+		}
 	}
 
 	bool fast = true;
 	if (fast)
 	{
 		std::vector<Eigen::Vector2d> tmp = fast_fft(h_tildas);
-		std::vector<Eigen::Vector2d> tmp2 = fast_fft(ikh);
-		std::vector<Eigen::Vector2d> tmp3 = fast_fft(neg_ik_hat_h);
+//		std::vector<Eigen::Vector2d> tmp2 = fast_fft(ikh);
+		// std::vector<Eigen::Vector2d> tmp3 = fast_fft(neg_ik_hat_h);
+		std::vector<Eigen::Vector2d> tmp4 = fast_fft(ikhx);
+		std::vector<Eigen::Vector2d> tmp5 = fast_fft(ikhz);
+		std::vector<Eigen::Vector2d> tmp6 = fast_fft(neg_ik_hat_h_x);
+		std::vector<Eigen::Vector2d> tmp7 = fast_fft(neg_ik_hat_h_z);
 		for (int i = 0; i < N; i++)
 		{
 			m_current_h[i] = tmp[i];
-			m_slopes[i] = tmp2[i];
-			m_displacements[i] = tmp3[i];
+			// m_slopes[i] = tmp2[i];
+			// m_displacements[i] = tmp3[i];
+			m_slopes_x[i] = tmp4[i];
+			m_slopes_z[i] = tmp5[i];
+			m_displacements_x[i] = tmp6[i];
+			m_displacements_z[i] = tmp7[i];
 		}
 
 		return;
@@ -95,8 +130,8 @@ void ocean_alt::fft_prime(double t){
     for (int i=0; i<N; i++){
         Eigen::Vector2d x_vector = m_waveIndexConstants[i].base_horiz_pos;
         m_current_h[i] = Eigen::Vector2d(0.0, 0.0);
-        m_displacements[i] = Eigen::Vector2d(0.0, 0.0);
-        m_slopes[i] = Eigen::Vector2d(0.0, 0.0);
+        // m_displacements[i] = Eigen::Vector2d(0.0, 0.0);
+        // m_slopes[i] = Eigen::Vector2d(0.0, 0.0);
 
 
 
@@ -116,8 +151,8 @@ void ocean_alt::fft_prime(double t){
 
             Eigen::Vector2d k_normalized = k_vector.normalized();
 
-            m_displacements[i] += k_normalized*imag_comp;
-            m_slopes[i] += -k_vector*imag_comp;
+            // m_displacements[i] += k_normalized*imag_comp;
+            //  m_slopes[i] += -k_vector*imag_comp;
         }
     }
 
@@ -254,78 +289,136 @@ Eigen::Vector2d ocean_alt::complex_exp(double exponent){
     return Eigen::Vector2d(real, imag);
 }
 
-std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
+void ocean_alt::update_ocean()
 {
-    std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
+	// reset normals & vertices arrays for the single tile
+    m_vertices = std::vector<Eigen::Vector3f>(N);
+	m_normals = std::vector<Eigen::Vector3f>(N);
     for (int i = 0; i < N; i++){
         Eigen::Vector2d horiz_pos = spacing*m_waveIndexConstants[i].base_horiz_pos;
         Eigen::Vector2d amplitude = m_current_h[i];
         float height = amplitude[0];
 
-        Eigen::Vector2d slope = m_slopes[i] * .3f;
-        Eigen::Vector3f s = Eigen::Vector3f(-slope[0], 0.0, -slope[1]);
-        Eigen::Vector3f y = Eigen::Vector3f(0.0, 1.0, 0.0);
+        // Eigen::Vector2d slope = m_slopes[i] * .3f;
+        // Eigen::Vector3f s = Eigen::Vector3f(-slope[0], 0.0, -slope[1]);
+        // Eigen::Vector3f y = Eigen::Vector3f(0.0, 1.0, 0.0);
 
-        float xs = 1.f + s[0]*s[0];
-        float ys = 1.f + s[1]*s[1];
-        float zs = 1.f + s[2]*s[2];
-
-        Eigen::Vector3f diff = y - s;
-        Eigen::Vector3f norm = Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
+//        float xs = 1.f + s[0]*s[0];
+//        float ys = 1.f + s[1]*s[1];
+//        float zs = 1.f + s[2]*s[2];
+//
+//        Eigen::Vector3f diff = y - s;
+//        Eigen::Vector3f Eigen::Vector3f(diff[0]/ sqrt(xs), diff[1]/ sqrt(ys), diff[2]/sqrt(zs));
 
          // NEW
-//         Eigen::Vector3f norm = Eigen::Vector3f(-slope[0], 1.0, -slope[1]);
-         norm.normalize();
-         //NEW
-
-
-
-
+		 Eigen::Vector3f norm = Eigen::Vector3f(-m_slopes_x[i][0], 1.0, -m_slopes_z[i][0]);
+         norm = -norm.normalized(); // FIXME: why do I have to be inverted?
 
         //if (i==6) std::cout << amplitude[0] << std::endl;
 
         // calculate displacement
-        Eigen::Vector2d disp = lambda*m_displacements[i];
-
-        //
+        // Eigen::Vector2d disp = lambda*m_displacements[i];
+		Eigen::Vector2d disp = lambda*Eigen::Vector2d(m_displacements_x[i][0], m_displacements_z[i][0])
+			+ Eigen::Vector2d(vertex_displacement, vertex_displacement); // set corner at 0,0 for retiling
 
 
         // for final vertex position, use the real number component of amplitude vector
-        vertices.push_back(Eigen::Vector3f(horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]));
+		m_vertices[i] = {horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]};
         m_normals[i] = norm.normalized();//Eigen::Vector3f(-slope[0], 1.0, -slope[1]).normalized();
         //std::cout << "normal: " << m_normals[i] << std::endl
     }
-    return vertices;
+}
+
+std::vector<Eigen::Vector3f> ocean_alt::get_vertices(){
+	// extend the returned array based on the tilecount
+	std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
+	for (int i = 0; i < num_tiles_x; i++)
+	{
+		for (int j = 0; j < num_tiles_z; j++)
+		{
+			for (int k = 0; k < N; k++)
+			{
+				double c = Lx - 2 / (num_rows / Lx);
+				Eigen::Vector3f vertex = m_vertices[k] + Eigen::Vector3f(i*(c), 0.0, (j)*(c));
+				vertices.push_back(vertex);
+			}
+		}
+	}
+
+	return vertices;
 }
 
 std::vector<Eigen::Vector3f> ocean_alt::getNormals(){
-    return m_normals;
+	// based on the tile count, add more to the normals
+	std::vector<Eigen::Vector3f> normals = std::vector<Eigen::Vector3f>();
+	// do the x 1D direction first
+	for (int i = 0; i < num_tiles_x; i++)
+	{
+		for (int j = 0; j < num_tiles_z; j++)
+		{
+			for (int k = 0; k < N; k++)
+			{
+				normals.push_back(m_normals[k]);
+			}
+		}
+	}
+
+
+    return normals;
 }
 
 std::vector<Eigen::Vector3i> ocean_alt::get_faces()
 {
     // connect the vertices into faces
     std::vector<Eigen::Vector3i> faces = std::vector<Eigen::Vector3i>();
-    for (int i = 0; i < N; i++)
-    {
-        int x = i / num_rows;
-        int z = i % num_rows;
+	for (int i = 0; i < num_tiles_x; i++)
+	{
+		for (int j = 0; j < num_tiles_z; j++)
+		{
+			for (int k = 0; k < N; k++)
+			{
+				int x = k % num_rows;
+				int z = k / num_rows;
 
-        // connect the vertices into faces
-        if (x < num_rows - 1 && z < num_cols - 1)
-        {
-            int i1 = i;
-            int i2 = i + 1;
-            int i3 = i + num_rows;
-            int i4 = i + num_rows + 1;
+				// connect the vertices into faces
+				if (x < num_rows - 1 && z < num_cols - 1)
+				{
+					int tile_index_offset = (j + num_tiles_z * i) * N;
+					int i1 = k + tile_index_offset;
+					int i2 = k + 1 + tile_index_offset;
+					int i3 = k + num_rows + tile_index_offset;
+					int i4 = k + num_rows + 1 + tile_index_offset;
 
+					faces.emplace_back(i2, i1, i3);
+					faces.emplace_back(i2, i3, i4);
+				}
+			}
+		}
+	}
+
+	return faces;
+
+
+//    for (int i = 0; i < N; i++)
+//    {
+//        int x = i / num_rows;
+//        int z = i % num_rows;
+//
+//        // connect the vertices into faces
+//        if (x < num_rows - 1 && z < num_cols - 1)
+//        {
+//            int i1 = i;
+//            int i2 = i + 1;
+//            int i3 = i + num_rows;
+//            int i4 = i + num_rows + 1;
+//
 //            faces.emplace_back(i2, i1, i3);
 //            faces.emplace_back(i2, i3, i4);
-                        faces.emplace_back(i1, i2, i3);
-                        faces.emplace_back(i3, i2, i4);
-        }
-    }
-    return faces;
+//			faces.emplace_back(i1, i2, i3);
+//			faces.emplace_back(i3, i2, i4);
+//        }
+//    }
+//    return faces;
 }
 
 Eigen::Vector2d muliply_complex(Eigen::Vector2d a, Eigen::Vector2d b)
@@ -442,11 +535,11 @@ std::vector<Eigen::Vector2d> ocean_alt::fast_fft
 	}
 
 	// divide by N*N and add the signs based on the indices
-	double sign[] = {1, -1};
+	double sign[] = {1.0, -1.0};
 	for (int i = 0; i < N; i++)
 	{
-		// h[i] /= N;
-		h[i] /= sqrt(N);
+		h[i] /= N;
+		// h[i] /= sqrt(N);
 		h[i] *= sign[(i / num_rows + i % num_cols) % 2];
 	}
 
