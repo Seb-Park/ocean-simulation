@@ -49,17 +49,7 @@ private:
     Eigen::Vector2d get_horiz_pos(int i);
     std::pair<double, double> sample_complex_gaussian();
 
-
-
-
-
-
-
-
-
     std::map<int, WaveIndexConstant> m_waveIndexConstants; // stores constants that only need to be calculate once for each grid constant
-
-
 
 	const double Lx = 512.0;
 	const double Lz = 512.0;
@@ -67,7 +57,7 @@ private:
 	const int num_rows = 256;
 	const int num_cols = 256;
 
-	const int num_tiles_x = 5;
+	const int num_tiles_x = 1;
 	const int num_tiles_z = 1;
 
 	const double vertex_displacement = Lx / 2;
