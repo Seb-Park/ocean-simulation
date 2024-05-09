@@ -51,42 +51,6 @@ void ARAP::init
 
     minCorner = coeffMin;
     maxCorner = coeffMax;
-
-
-//    m_shape.initGroundPlane("cornell_box_full_lighting.png")
-//    QImage ocean_floor_image;
-//    GLuint ocean_floor_texture;
-//    // Prepare filepath
-//    QString ocean_floor_filepath = QString(":/resources/images/kitten.png");
-
-//    // TASK 1: Obtain image from filepath
-//    ocean_floor_image = QImage(ocean_floor_filepath);
-
-//    // TASK 2: Format image to fit OpenGL
-//    ocean_floor_image = ocean_floor_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-
-//    // TASK 3: Generate kitten texture
-//    glGenTextures(1, &ocean_floor_texture);
-
-//    // TASK 9: Set the active texture slot to texture slot 0
-//    glActiveTexture(GL_TEXTURE0);
-
-//    // TASK 4: Bind kitten texture
-//    glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
-
-//    // TASK 5: Load image into kitten texture
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ocean_floor_image.width(), ocean_floor_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, ocean_floor_image.bits());
-
-//    // TASK 6: Set min and mag filters' interpolation mode to linear
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-//    // TASK 7: Unbind kitten texture
-//    glBindTexture(GL_TEXTURE_2D, 0);
-
-//    // TASK 10: set the texture.frag uniform for our texture
-//    glUseProgram(m_texture_shader);
-//    glUniform1i(glGetUniformLocation(m_texture_shader, "sampler"), 0);
 }
 
 void ARAP::update(double seconds)
@@ -104,12 +68,12 @@ void ARAP::update(double seconds)
     // the last update
 
     m_ocean.fft_prime(m_time);
-	// m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
-	m_shape.setVertices(m_ocean.get_vertices());
+//    m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+    m_shape.setVertices(m_ocean.get_vertices());
 
 
      m_time += m_timestep;
-  // std::cout << m_time << std::endl;
+//   std::cout << m_time << std::endl;
 }
 
 // Move an anchored vertex, defined by its index, to targetPosition
