@@ -312,7 +312,7 @@ void ocean_alt::update_ocean()
 
          // NEW
 		 Eigen::Vector3f norm = Eigen::Vector3f(-m_slopes_x[i][0], 1.0, -m_slopes_z[i][0]);
-         norm = -norm.normalized(); // FIXME: why do I have to be inverted?
+         norm = norm.normalized(); // FIXME: why do I have to be inverted?
 
         //if (i==6) std::cout << amplitude[0] << std::endl;
 

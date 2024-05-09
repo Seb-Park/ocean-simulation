@@ -58,7 +58,7 @@ private:
 	const int num_cols = 256;
 
 	const int num_tiles_x = 1;
-	const int num_tiles_z = 1;
+	const int num_tiles_z = 2;
 
 	const double vertex_displacement = Lx / 2;
 

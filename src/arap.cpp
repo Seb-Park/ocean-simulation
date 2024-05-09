@@ -49,8 +49,20 @@ void ARAP::init
 	coeffMin = all_vertices.colwise().minCoeff();
 	coeffMax = all_vertices.colwise().maxCoeff();
 
-    minCorner = coeffMin;
-    maxCorner = coeffMax;
+//    minCorner = coeffMin;
+//    maxCorner = coeffMax;
+
+	std::cout << "minCorner: " << minCorner << std::endl;
+	std::cout << "maxCorner: " << maxCorner << std::endl;
+
+	minCorner = Vector3f(0.0f, 0.0f, 0.0f);
+	maxCorner = Vector3f(1.0f, 0.0f, 1.0f);
+
+	std::cout << "minCorner: " << minCorner << std::endl;
+	std::cout << "maxCorner: " << maxCorner << std::endl;
+//
+//	minCorner = Vector3f(-1.0f, -1.0f, -1.0f);
+//	maxCorner = Vector3f(1.0f, 1.0f, 1.0f);
 
 
 //    m_shape.initGroundPlane("cornell_box_full_lighting.png")
