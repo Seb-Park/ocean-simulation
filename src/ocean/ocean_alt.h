@@ -20,6 +20,13 @@ struct WaveIndexConstant{
     Eigen::Vector2d k_vector = Eigen::Vector2d(0.f, 0.f); // static horiz pos with no displacement
 };
 
+struct FoamConstants{
+    std::vector<Eigen::Vector3f> positions;
+    std::vector<Eigen::Vector2f> k_vectors;
+    std::vector<float> wavelengths;
+    std::vector<Eigen::Vector2f> texCoords;
+};
+
 class ocean_alt
 {
 public:
@@ -29,6 +36,10 @@ public:
     std::vector<Eigen::Vector3i> get_faces();
     void fft_prime(double t);
     std::vector<Eigen::Vector3f> getNormals();
+
+    FoamConstants getFoamConstants(){
+        return m_foam_constants;
+    }
 
 
 
@@ -49,6 +60,10 @@ private:
     std::pair<double, double> sample_complex_gaussian();
 
 
+    // FOAM
+    std::vector<float> m_saturation;
+
+
 
 
 
@@ -60,18 +75,17 @@ private:
 
 
 
-	const double Lx = 512.0;
-	const double Lz = 512.0;
+    const double Lx = 1024.0;
+    const double Lz = 1024.0;
 
-	const int num_rows = 256;
-	const int num_cols = 256;
-
+    const int num_rows = 256;
+    const int num_cols = 256;
 	const int N = num_rows*num_cols; // total number of grid points
-	const double lambda = 0; // how much displacement matters
-	const double spacing = 35.0; // spacing between grid points
+    const double lambda = 2.5; // how much displacement matters
+    const double spacing = 25.0; // spacing between grid points
 
-	const double A = 100; // numeric constant for the Phillips spectrum
-	const double V = 50; // wind speed
+    const double A = 200; // numeric constant for the Phillips spectrum
+    const double V = 200; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation
@@ -81,7 +95,16 @@ private:
     std::vector<Eigen::Vector2d> m_slopes; // current displacement vector for each K
     //std::vector<Eigen::Vector3f> m_slope_vectors; // current displacement vector for each K
 
-    std::vector<Eigen::Vector3f> m_normals; // current displacement vector for each K
+    std::vector<Eigen::Vector3f> m_normals; // normal calculations
+
+    // FOR FOAM:
+    FoamConstants m_foam_constants;
+
+
+    float max = 0;
+    float min = 0;
+    int iterations = 0;
+
 
 
 

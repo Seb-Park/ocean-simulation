@@ -38,6 +38,8 @@ void ARAP::init
     vertices = m_ocean.get_vertices();
     triangles = m_ocean.get_faces();
 	m_shape.init(vertices, triangles);
+    m_foam_shape.init(vertices, triangles);
+
     m_shape.setColor(0.27f, .803f, .96f);
 
 	// Students, please don't touch this code: get min and max for viewport stuff
@@ -104,8 +106,11 @@ void ARAP::update(double seconds)
     // the last update
 
     m_ocean.fft_prime(m_time);
-	// m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
-	m_shape.setVertices(m_ocean.get_vertices());
+    // m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+    m_shape.setVertices(m_ocean.get_vertices());
+
+    FoamConstants foam = m_ocean.getFoamConstants();
+    m_foam_shape.setFoamInputs(m_shape.getVertices(), foam.wavelengths, foam.k_vectors, foam.texCoords);
 
 
      m_time += m_timestep;

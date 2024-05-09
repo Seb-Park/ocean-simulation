@@ -10,6 +10,7 @@
 #include <util/unsupportedeigenthing/OpenGLSupport>
 
 
+
 class Shader {
 public:
     Shader(const std::string &vertexPath, const std::string &fragmentPath);

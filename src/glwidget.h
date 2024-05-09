@@ -1,8 +1,8 @@
 #pragma once
 
-#ifdef __APPLE__
-#define GL_SILENCE_DEPRECATION
-#endif
+#include "skybox.h"
+#include <GL/glew.h>
+
 
 #include "arap.h"
 #include "graphics/camera.h"
@@ -12,6 +12,12 @@
 #include <QElapsedTimer>
 #include <QTimer>
 #include <memory>
+
+struct TextureData{
+    GLuint textureID;
+    int width;
+    int height;
+};
 
 class GLWidget : public QOpenGLWidget
 {
@@ -45,6 +51,10 @@ private:
     void initCaustics();
     void paintCaustics();
 
+    TextureData loadTextureFromFile(const char *path);
+    GLuint loadCubeMap(std::vector<const char*> textureFiles);
+
+
 private slots:
     // Physics Tick
     void tick();
@@ -57,6 +67,10 @@ private:
     Shader *m_texture_shader;
 
     Shader *m_colorShader;
+    Shader *m_foamShader;
+    Shader *m_skyboxShader;
+
+
 
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
@@ -79,6 +93,11 @@ private:
     float m_vertexSelectionThreshold;
     float m_vSize;
 
+    // FOAM
+    GLuint m_halftone_tex;
+    GLuint m_foam_tex;
+
+
     // Timing
     QElapsedTimer m_deltaTimeProvider; // For measuring elapsed time
     QTimer        m_intervalTimer;     // For triggering timed events
@@ -95,4 +114,6 @@ private:
     bool m_rightCapture;
     SelectMode m_rightClickSelectMode;
     int m_lastSelectedVertex = -1;
+
+    skybox m_skybox;
 };

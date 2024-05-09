@@ -31,6 +31,25 @@ public:
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices_and_Normals(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3f> &normals);
+    void setFoamInputs(const std::vector<Eigen::Vector3f> &verts, const std::vector<float> &wavelengths,
+                       const std::vector<Eigen::Vector2f> &waveDirs, const std::vector<Eigen::Vector2f> &textureCoords);
+    void updateFoam(const std::vector<Eigen::Vector3i> &faces,
+                           const std::vector<Eigen::Vector3f> &vertices,
+                           const std::vector<Eigen::Vector2f> &texCoords,
+
+                           std::vector<Eigen::Vector3f>& verts,
+                           std::vector<Eigen::Vector2f>& tex,
+                           std::vector<Eigen::Vector3f>& colors);
+
+    void updateMeshFoam(const std::vector<Eigen::Vector3i> &faces,
+                               const std::vector<Eigen::Vector3f> &vertices,
+                               const std::vector<float> &wavelengths,
+                                 const std::vector<Eigen::Vector2f> &waveDirs,
+
+                               std::vector<Eigen::Vector3f>& verts,
+                               std::vector<Eigen::Vector3f>& normals,
+                               std::vector<Eigen::Vector3f>& colors);
+
 
 
     void setModelMatrix(const Eigen::Affine3f &model);

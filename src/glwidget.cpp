@@ -3,6 +3,11 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
+
+#include "stb/stb_image.h"
+
+
 
 #define SPEED 1.5
 #define ROTATE_SPEED 0.0025
@@ -45,12 +50,20 @@ GLWidget::GLWidget(QWidget *parent) :
 
     // Function tick() will be called once per interva
     connect(&m_intervalTimer, SIGNAL(timeout()), this, SLOT(tick()));
+
+    //m_skybox = new skybox();
 }
 
 GLWidget::~GLWidget()
 {
     if (m_defaultShader != nullptr) delete m_defaultShader;
     if (m_pointShader   != nullptr) delete m_pointShader;
+    if (m_foamShader   != nullptr) delete m_foamShader;
+
+    if (m_skyboxShader   != nullptr) delete m_skyboxShader;
+    //if (m_skybox   != nullptr) delete m_skybox;
+
+
 }
 
 // ================== Basic OpenGL Overrides
@@ -65,8 +78,12 @@ void GLWidget::initializeGL()
 
     // Set clear color to white
     glClearColor(0, 0, 0, 1);
+//    glEnable(GL_DEPTH_TEST);
+//        glEnable(GL_CULL_FACE);
+//        glEnable(GL_BLEND);
+//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Enable depth-testing and backface culling
+//    // Enable depth-testing and backface culling
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -78,9 +95,27 @@ void GLWidget::initializeGL()
     m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
 //    m_texture_shader = new Shader(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
     m_colorShader   = new Shader(":resources/shaders/color.vert",      ":resources/shaders/color.frag");
+    m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
+    m_skyboxShader   = new Shader(":resources/shaders/skybox.vert",      ":resources/shaders/skybox.frag");
+
+    // specify texture for skybox
+//      m_skyboxShader->bind();
+//      glUniform1i(glGetUniformLocation(m_skyboxShader->id(), "cubeMap"), 9); // bind texture at slot 9
+//      Eigen::Vector3f sc = Eigen::Vector3f(.77f, .85f, .99f); // skycolor for fade effect
+//      glUniform3f(glGetUniformLocation(m_skyboxShader->id(), "skyColor"), sc[0], sc[1], sc[2]);
+//      m_skyboxShader->unbind();
+
+
+    m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
+    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
+
 
 
     initCaustics();
+
+    // init skybox stuff
+    m_skybox.initializeVAO();
+
     // INITIALIZE TEXTURE STUFF
 
     // Prepare filepath
@@ -161,6 +196,9 @@ void GLWidget::initializeGL()
     m_camera.lookAt(eye, target);
     m_camera.setOrbitPoint(target);
     m_camera.setPerspective(120, width() / static_cast<float>(height()), nearPlane, farPlane);
+    m_camera.setPosition(Eigen::Vector3f(       0,
+                                                0,
+                                         -70289.5));
 
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
@@ -306,9 +344,9 @@ void GLWidget::paintGL()
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 //    return;
 //    paintTexture(m_ground_texture, false);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable( GL_BLEND );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
@@ -335,7 +373,130 @@ void GLWidget::paintGL()
 //    m_pointShader->setUniform("height", height());
 //    m_arap.draw(m_pointShader, GL_POINTS);
 //    m_pointShader->unbind();
+
+        m_foamShader->bind();
+        m_foamShader->setUniform("proj",   m_camera.getProjection());
+        m_foamShader->setUniform("view",   m_camera.getView());
+//        m_foamShader->setUniform("vSize",  m_vSize);
+//        m_foamShader->setUniform("width",  width());
+//        m_foamShader->setUniform("height", height());
+        glUniform1f(glGetUniformLocation(m_foamShader->id(), "time"), m_arap.getTime());
+        glUniform1f(glGetUniformLocation(m_foamShader->id(), "phaseC"), 1.f);
+        m_foamShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
+        m_foamShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
+        glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
+
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
+        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
+
+
+
+
+        m_arap.drawFoam(m_foamShader, GL_TRIANGLES);
+        m_foamShader->unbind();
+
+        // skybox
+
+
+
+        m_skybox.draw(m_skyboxShader, m_camera);
+
+
+
 }
+
+TextureData GLWidget::loadTextureFromFile(const char *path)
+{
+    std::string filename = std::string(path);
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    stbi_set_flip_vertically_on_load(false);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    TextureData newtex;
+    newtex.textureID = textureID;
+    newtex.height = height;
+    newtex.width = width;
+    return newtex;
+}
+
+GLuint GLWidget::loadCubeMap(std::vector<const char*> textureFiles){
+    std::cout << "hello 111" << std::endl;
+
+    // create empty texture
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    std::cout << "hello fssd" << std::endl;
+
+
+    //glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    std::cout << "hello fssd" << std::endl;
+
+    GLuint target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+    for (int i=0; i<6; i++){
+        std::string filename = std::string(textureFiles[i]);//directory + '/' + filename;
+        int width, height, nrChannels;
+        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+
+        if (data){
+            stbi_set_flip_vertically_on_load(false);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+
+        }    else {
+            std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+
+    return textureID;
+}
+
+
 
 void GLWidget::resizeGL(int w, int h)
 {
@@ -497,6 +658,8 @@ void GLWidget::tick()
 {
     float deltaSeconds = m_deltaTimeProvider.restart() / 1000.f;
     m_arap.update(deltaSeconds);
+    // rotate skybox
+    m_skybox.update(deltaSeconds);
 
     // Move camera
     auto look = m_camera.getLook();
@@ -507,6 +670,7 @@ void GLWidget::tick()
     moveVec *= m_movementScaling;
     moveVec *= deltaSeconds;
     m_camera.move(moveVec);
+
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
