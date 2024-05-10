@@ -569,7 +569,7 @@ std::vector<Eigen::Vector2d> ifft_1d
 
 				// calculate the twiddle factor
 				int index = group * pow(2, stage) + butterfly;
-				float w = index * 2 * M_PI / pow(2, stage);
+				float w = -index * 2 * M_PI / pow(2, stage);
 				Eigen::Vector2d twiddle_factor = {cos(w), sin(w)};
 
 				if (reading_buffer1)

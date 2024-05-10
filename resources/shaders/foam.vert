@@ -2,7 +2,7 @@
 
 layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in vec3 wavelength; // wavelenth adjusted for ocean depth
-layout(location = 2) in vec3 wavedirs; // wavelenth adjusted for ocean depth
+layout(location = 2) in vec3 normals; // normals
 
 //layout(location = 2) in vec2 direction; // wave slope
 //layout(location = 3) in vec2 texCoords; // texture coords
@@ -13,6 +13,8 @@ out vec2 constants;
 out vec2 dir;
 out vec2 tex;
 out vec3 pos;
+out vec3 norm;
+out vec3 camera_worldSpace;
 
 
 
@@ -45,11 +47,13 @@ vec2 calculateTexCoord(vec3 pos){
 }
 
 void main() {
-    dir = vec2(wavedirs[0],wavedirs[1]);
+//    dir = vec2(wavedirs[0],wavedirs[1]);
     constants = vec2(wavelength[0], phaseC);
 
     gl_Position = proj * view * model * vec4(position, 1);
     pos = vec3(gl_Position);
+    norm = normalize(normals);
+    camera_worldSpace = vec3(inverseView * vec4(0.f, 0.f, 0.f, 1.f));
 
     tex = calculateTexCoord(position);
 

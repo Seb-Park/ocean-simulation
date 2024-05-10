@@ -85,10 +85,10 @@ private:
 	const double vertex_displacement = Lx / 2;
 
 	const int N = num_rows*num_cols; // total number of grid points
-	const double lambda =0.0; // how much displacement matters
+	const double lambda = .5; // how much displacement matters
 	const double spacing = 1.0; // spacing between grid points
 
-    const double A = 6.5; // numeric constant for the Phillips spectrum
+    const double A = 10; // numeric constant for the Phillips spectrum
     const double V = 500; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;

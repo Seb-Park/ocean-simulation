@@ -4,6 +4,8 @@ in vec2 constants;
 in vec2 dir;
 in vec2 tex;
 in vec3 pos;
+in vec3 norm;
+in vec3 camera_worldSpace;
 
 
 uniform float time;
@@ -14,6 +16,9 @@ uniform sampler2D foam_texture;
 
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
+
+uniform vec4 sunColor = vec4(1.5f, .7, .39f, 1.f);
+uniform vec3 lightDir = -normalize(vec3(1, 0, -1));
 
 out vec4 fragColor;
 
@@ -45,8 +50,19 @@ void main() {
 
    // apply foam texture
    vec4 foam = texture(foam_texture, tex + time*.0003);
+
+    vec4 lightFromSun = vec4(1.f, 1.f, 1.f, 1.f);
+    vec4 foamAmbient = vec4(.5f, .5f, .5f, 1.f);
+
+    vec3 reflectedLight = lightDir - 2 * dot(lightDir, norm) * norm;
+    vec3 posToCam = normalize(camera_worldSpace - pos);
+    float spec = pow(clamp(dot(posToCam, reflectedLight), 0, 1), 2.f);
+
+    float diffuseComp = dot(normalize(norm), lightDir);
+    lightFromSun = vec4(vec3(diffuseComp * sunColor), 1.f);
+
    vec4 j = vec4(0,0,0,0);
-   if (saturation > m_threshold) j = g*foam;
+   if (saturation > m_threshold) j = g * foam * (lightFromSun + foamAmbient + spec * .6f);
 
 
     fragColor = j;

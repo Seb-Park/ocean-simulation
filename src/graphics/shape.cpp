@@ -123,16 +123,16 @@ void Shape::setVertices_and_Normals(const vector<Vector3f> &vertices, const vect
 ///
 
 void Shape::setFoamInputs(const vector<Vector3f> &vertices, const vector<float> &wavelengths,
-                          const vector<Vector2f> &waveDirs, const vector<Vector2f> &textures){
+                          const vector<Vector3f> &norms, const vector<Vector2f> &textures){
 
     m_vertices.clear();
     copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
 
     vector<Vector3f> verts;
-    vector<Vector3f> normals;
-    vector<Vector3f> colors;
+    vector<Vector3f> normals; // this is actually wavelengths
+    vector<Vector3f> colors; // this is actually norms
 
-    updateMeshFoam(m_faces, vertices, wavelengths, waveDirs, verts, normals, colors);
+    updateMeshFoam(m_faces, vertices, wavelengths, norms, verts, normals, colors);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (normals.size() * 3) + (colors.size() * 3)), nullptr, GL_DYNAMIC_DRAW);
@@ -351,7 +351,7 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
 void Shape::updateMeshFoam(const std::vector<Eigen::Vector3i> &faces,
                            const std::vector<Eigen::Vector3f> &vertices,
                            const std::vector<float> &wavelengths,
-                           const vector<Vector2f> &waveDirs,
+                           const vector<Vector3f> &norms,
                            std::vector<Eigen::Vector3f>& verts,
                            std::vector<Eigen::Vector3f>& normals,
                            std::vector<Eigen::Vector3f>& colors)
@@ -363,7 +363,7 @@ void Shape::updateMeshFoam(const std::vector<Eigen::Vector3i> &faces,
         for (auto& v: {face[0], face[1], face[2]}) {
             normals.push_back(Eigen::Vector3f(wavelengths[v],0,0));
             verts.push_back(vertices[v]);
-            colors.push_back(Eigen::Vector3f(waveDirs[v][0], waveDirs[v][1], 0));
+            colors.push_back(Eigen::Vector3f(norms[v]));
         }
     }
 }

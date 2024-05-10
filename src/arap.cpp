@@ -84,7 +84,9 @@ void ARAP::update(double seconds)
     // the last update
 	m_ocean.fft_prime(m_time);
     m_ocean.update_ocean();
-    m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+	std::vector<Eigen::Vector3f> normals = m_ocean.getNormals();
+
+	m_shape.setVertices_and_Normals(m_ocean.get_vertices(), normals );
 //      m_shape.setVertices(m_ocean.get_vertices());
 
 //	auto tmp = m_ocean.get_vertices();
@@ -101,7 +103,7 @@ void ARAP::update(double seconds)
 	FoamConstants foam = m_ocean.getFoamConstants();
 	std::vector<float> tiled_wavelengths = m_ocean.get_tiled_wavelengths();
 	std::vector<Eigen::Vector2f> tiled_k_vectors = m_ocean.get_tiled_k_vectors();
-    m_foam_shape.setFoamInputs(m_ocean.get_vertices(), tiled_wavelengths, tiled_k_vectors, foam.texCoords);
+    m_foam_shape.setFoamInputs(m_ocean.get_vertices(), tiled_wavelengths, normals, foam.texCoords);
 
 
      m_time += m_timestep;
