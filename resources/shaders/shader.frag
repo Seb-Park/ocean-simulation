@@ -22,7 +22,7 @@ uniform float alpha = 1.0;
 //layout(binding = 0) uniform sampler2D groundSampler;
 //layout(binding = 1) uniform sampler2D skySampler;
 uniform sampler2D groundSampler;
-uniform sampler2D skySampler;
+uniform samplerCube skySampler;
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
 //uniform float test = 0;
@@ -86,7 +86,7 @@ void main() {
     vec4 transmissive = texture(groundSampler, vec2(refrUVBlurry));
     vec4 murk = (vec4(waterVolumeColor * d * murkDiffuse + waterVolumeColor * murkAmbient, 1.0f));
 
-    vec4 skyRefl = texture(skySampler, vec2(reflUV));
+    vec4 skyRefl = texture(skySampler, reflPos);
 //    refrProb *= beerAtt;
 
     fragColor = 0.75f * diffuse; // Diffuse

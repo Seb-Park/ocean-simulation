@@ -173,10 +173,10 @@ void Shape::draw(Shader *shader, GLenum mode)
     // FIGURED OUT THE PROBLEM. it was that SAMPLERS WERE DEFAULTING TO SLOT 0 AND SETUNIFORM WASN'T WORKING
     // BECAUSE IT WAS CALLING SETUNIFORM WITH FREAKING FLOATS. WHAT THE FRICK C++.
     // https://learnopengl.com/Getting-started/Textures
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_sky_texture);
-    shader->setUniform("skySampler", 1);
-    glUniform1i(glGetUniformLocation(shader->id(), "skySampler"), 1);
+//    glActiveTexture(GL_TEXTURE1);
+//    glBindTexture(GL_TEXTURE_2D, m_sky_texture);
+//    shader->setUniform("skySampler", 1);
+//    glUniform1i(glGetUniformLocation(shader->id(), "skySampler"), 1);
 
     Eigen::Matrix3f m3 = m_modelMatrix.topLeftCorner(3, 3);
     Eigen::Matrix3f inverseTransposeModel = m3.inverse().transpose();

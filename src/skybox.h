@@ -202,12 +202,13 @@ public:
 
 
 
-        {"/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_rt.png",
-     "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_lf.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_up.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_dn.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_bk.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_ft.png",
+        {"/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/right.jpg",
+     "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/left.jpg",
+               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/top.jpg",
+               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/bottom.jpg",
+               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/front.jpg",
+               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/back.jpg",
+
    };
 
        float ROTATE_SPEED = .01f; // 1 degree per sec

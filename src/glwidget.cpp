@@ -106,8 +106,8 @@ void GLWidget::initializeGL()
 //      m_skyboxShader->unbind();
 
 
-    m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
-    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
+    m_halftone_tex = loadTextureFromFile("/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
+    m_foam_tex = loadTextureFromFile("/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
 
 
 
@@ -359,6 +359,12 @@ void GLWidget::paintGL()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
     glUniform1i(glGetUniformLocation(m_defaultShader->id(), "groundSampler"), 2);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox.getSkyboxTex());
+    m_defaultShader->setUniform("skySampler", 1);
+    glUniform1i(glGetUniformLocation(m_defaultShader->id(), "skySampler"), 1);
+
 
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();

@@ -84,7 +84,7 @@ void skybox::draw(Shader *skybox_shader, Camera  m_camera){
 ///
 ///
 
-    std::cout << m_camera.getPosition() << std::endl;
+//    std::cout << m_camera.getPosition() << std::endl;
 
    // sky_shape.draw(skybox_shader, GL_TRIANGLES);
 
