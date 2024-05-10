@@ -104,6 +104,8 @@ void GLWidget::initializeGL()
     m_halftone_tex = loadTextureFromFile(":resources/images/halftone.png").textureID;
     m_foam_tex = loadTextureFromFile(":resources/images/foam3.png").textureID;
 
+    m_particle_tex = loadTextureFromFile(":resources/images/particle.png").textureID;
+
 
     m_causticsShader = new Shader(":resources/shaders/caustics.vert",      ":resources/shaders/caustics.frag");
 
@@ -464,7 +466,7 @@ void GLWidget::paintGL()
 
 
         m_skybox.draw(m_skyboxShader, m_camera);
-        m_particles.draw(m_particleShader, m_camera);
+        m_particles.draw(m_particleShader, m_camera, m_particle_tex);
 
 
 

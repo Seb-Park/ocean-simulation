@@ -105,6 +105,7 @@ private:
     // FOAM
     GLuint m_halftone_tex;
     GLuint m_foam_tex;
+    GLuint m_particle_tex;
 
 
     // Timing
