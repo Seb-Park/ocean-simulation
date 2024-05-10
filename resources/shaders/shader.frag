@@ -44,8 +44,8 @@ float rand(vec4 n) {
 }
 
 vec2 uvFromWorldPoint(vec3 point) {
-    float u = (point.x - widthBounds[0]) / (widthBounds[1] - widthBounds[0]);
-    float v = (point.z - lengthBounds[0]) / (lengthBounds[1] - lengthBounds[0]);
+    float u = (point.x - widthBounds[0] * 50) / (widthBounds[1] * 50 - widthBounds[0] * 50);
+    float v = (point.z - lengthBounds[0] * 50) / (lengthBounds[1] * 50 - lengthBounds[0] * 50);
     return vec2(u, v);
 }
 

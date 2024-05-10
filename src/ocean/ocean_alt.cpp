@@ -316,17 +316,6 @@ Eigen::Vector2d ocean_alt::complex_exp(double exponent){
 void ocean_alt::update_ocean()
 {
     std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
-    if (iterations < 10){
-        for (int i = 0; i < N; i++){
-            Eigen::Vector2d amplitude = m_current_h[i];
-            float height = amplitude[0];
-
-            if (height < min) min = height;
-            if (height > max) max = height;
-
-        }
-        iterations ++;
-    }
 	// reset normals & vertices arrays for the single tile
     m_vertices = std::vector<Eigen::Vector3f>(N);
 	m_normals = std::vector<Eigen::Vector3f>(N);
@@ -336,7 +325,18 @@ void ocean_alt::update_ocean()
         Eigen::Vector2d amplitude = m_current_h[i];
         float height = amplitude[0];
 
-        // Eigen::Vector2d slope = m_slopes[i] * .3f;
+		if (iterations++ > 1)
+		{
+			if (height < min) min = height;
+			if (height > max)
+			{
+				max = height;
+//				std::cout << "changed!! max: " << max << std::endl;
+			}
+		}
+
+
+		// Eigen::Vector2d slope = m_slopes[i] * .3f;
         // Eigen::Vector3f s = Eigen::Vector3f(-slope[0], 0.0, -slope[1]);
         // Eigen::Vector3f y = Eigen::Vector3f(0.0, 1.0, 0.0);
 
@@ -368,10 +368,18 @@ void ocean_alt::update_ocean()
 
 
        // m_foam_constants.wavelengths[i] = 2.f* M_PI * m_slopes[i].dot(m_slopes[i]) /  Lx;
-        float h_0 = m_waveIndexConstants[i].h0_prime[0]; // min*.2f;
-        float h_max = max*.001f; // the smaller the constant, the more foam there is
-        float waveheight = (height - h_0 ) / (h_max - h_0);
-        m_foam_constants.wavelengths[i] = waveheight;
+//        float h_0 = m_waveIndexConstants[i].h0_prime[0]; // min*.2f;
+//        float h_max = max*.001f; // the smaller the constant, the more foam there is
+//        float waveheight = (height - h_0 ) / (h_max - h_0);
+//        m_foam_constants.wavelengths[i] = waveheight;
+        float h_0 = 0; // min*.2f;
+        float h_max = max*.35f; // the smaller the constant, the more foam there is
+        m_foam_constants.wavelengths[i] = (height - h_0 ) / (h_max - h_0);
+
+//        if (i < 5){
+//            std::cout << h_0 << ", " << h_max << std::endl;
+//            std::cout << m_foam_constants.wavelengths[i] << std::endl;
+//        }
 
         if (waveheight >= height_threshold){
                  //std::cout << "push" << std::endl;
@@ -380,6 +388,7 @@ void ocean_alt::update_ocean()
 
 
     }
+
 
     // populate foam constants
     m_foam_constants.positions = vertices;
@@ -427,54 +436,54 @@ std::vector<Eigen::Vector3i> ocean_alt::get_faces()
 {
     // connect the vertices into faces
     std::vector<Eigen::Vector3i> faces = std::vector<Eigen::Vector3i>();
-	for (int i = 0; i < num_tiles_x; i++)
-	{
-		for (int j = 0; j < num_tiles_z; j++)
-		{
-			for (int k = 0; k < N; k++)
-			{
-				int x = k % num_rows;
-				int z = k / num_rows;
-
-				// connect the vertices into faces
-				if (x < num_rows - 1 && z < num_cols - 1)
-				{
-					int tile_index_offset = (j + num_tiles_z * i) * N;
-					int i1 = k + tile_index_offset;
-					int i2 = k + 1 + tile_index_offset;
-					int i3 = k + num_rows + tile_index_offset;
-					int i4 = k + num_rows + 1 + tile_index_offset;
-
-					faces.emplace_back(i2, i1, i3);
-					faces.emplace_back(i2, i3, i4);
-				}
-			}
-		}
-	}
-
-	return faces;
-
-
-//    for (int i = 0; i < N; i++)
-//    {
-//        int x = i / num_rows;
-//        int z = i % num_rows;
+//	for (int i = 0; i < num_tiles_x; i++)
+//	{
+//		for (int j = 0; j < num_tiles_z; j++)
+//		{
+//			for (int k = 0; k < N; k++)
+//			{
+//				int x = k % num_rows;
+//				int z = k / num_rows;
 //
-//        // connect the vertices into faces
-//        if (x < num_rows - 1 && z < num_cols - 1)
-//        {
-//            int i1 = i;
-//            int i2 = i + 1;
-//            int i3 = i + num_rows;
-//            int i4 = i + num_rows + 1;
+//				// connect the vertices into faces
+//				if (x < num_rows - 1 && z < num_cols - 1)
+//				{
+//					int tile_index_offset = (j + num_tiles_z * i) * N;
+//					int i1 = k + tile_index_offset;
+//					int i2 = k + 1 + tile_index_offset;
+//					int i3 = k + num_rows + tile_index_offset;
+//					int i4 = k + num_rows + 1 + tile_index_offset;
 //
-//            faces.emplace_back(i2, i1, i3);
-//            faces.emplace_back(i2, i3, i4);
-//			faces.emplace_back(i1, i2, i3);
-//			faces.emplace_back(i3, i2, i4);
-//        }
-//    }
-//    return faces;
+//					faces.emplace_back(i2, i1, i3);
+//					faces.emplace_back(i2, i3, i4);
+//				}
+//			}
+//		}
+//	}
+//
+//	return faces;
+
+
+    for (int i = 0; i < N; i++)
+    {
+        int x = i / num_rows;
+        int z = i % num_rows;
+
+        // connect the vertices into faces
+        if (x < num_rows - 1 && z < num_cols - 1)
+        {
+            int i1 = i;
+            int i2 = i + 1;
+            int i3 = i + num_rows;
+            int i4 = i + num_rows + 1;
+
+            faces.emplace_back(i2, i1, i3);
+            faces.emplace_back(i2, i3, i4);
+			faces.emplace_back(i1, i2, i3);
+			faces.emplace_back(i3, i2, i4);
+        }
+    }
+    return faces;
 }
 
 Eigen::Vector2d muliply_complex(Eigen::Vector2d a, Eigen::Vector2d b)

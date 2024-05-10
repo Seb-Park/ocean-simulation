@@ -49,5 +49,7 @@ void main() {
    if (saturation > m_threshold) j = g*foam*1.8;
 
 
-   fragColor = j; //vec4(vec3(g), 1);
+    fragColor = j;
+    // fragColor = vec4(vec3(g), 1);
+   //  fragColor = vec4(vec3(saturation), 1);
 }
