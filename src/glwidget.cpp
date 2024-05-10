@@ -51,7 +51,6 @@ GLWidget::GLWidget(QWidget *parent) :
     // Function tick() will be called once per interva
     connect(&m_intervalTimer, SIGNAL(timeout()), this, SLOT(tick()));
 
-    //m_skybox = new skybox();
 }
 
 GLWidget::~GLWidget()
@@ -61,6 +60,8 @@ GLWidget::~GLWidget()
     if (m_foamShader   != nullptr) delete m_foamShader;
 
     if (m_skyboxShader   != nullptr) delete m_skyboxShader;
+    if (m_particleShader   != nullptr) delete m_particleShader;
+
     //if (m_skybox   != nullptr) delete m_skybox;
 
 
@@ -97,6 +98,8 @@ void GLWidget::initializeGL()
     m_colorShader   = new Shader(":resources/shaders/color.vert",      ":resources/shaders/color.frag");
     m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
     m_skyboxShader   = new Shader(":resources/shaders/skybox.vert",      ":resources/shaders/skybox.frag");
+    m_particleShader   = new Shader(":resources/shaders/particles.vert",      ":resources/shaders/particles.frag");
+
 
     // specify texture for skybox
 //      m_skyboxShader->bind();
@@ -115,6 +118,7 @@ void GLWidget::initializeGL()
 
     // init skybox stuff
     m_skybox.initializeVAO();
+
 
     // INITIALIZE TEXTURE STUFF
 
@@ -202,6 +206,11 @@ void GLWidget::initializeGL()
 
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
+
+
+    // OCEAN SPRAY
+    m_particles.setVerts(m_arap.getVerts());
+    m_particles.init();
 
 }
 
@@ -404,6 +413,10 @@ void GLWidget::paintGL()
 
 
         m_skybox.draw(m_skyboxShader, m_camera);
+
+        //glClear(GL_DEPTH_BUFFER_BIT);
+
+        m_particles.draw(m_particleShader, m_camera);
 
 
 
@@ -660,6 +673,7 @@ void GLWidget::tick()
     m_arap.update(deltaSeconds);
     // rotate skybox
     m_skybox.update(deltaSeconds);
+    m_particles.update(deltaSeconds);
 
     // Move camera
     auto look = m_camera.getLook();

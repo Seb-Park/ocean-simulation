@@ -117,6 +117,7 @@ void ARAP::update(double seconds)
   // std::cout << m_time << std::endl;
 }
 
+
 // Move an anchored vertex, defined by its index, to targetPosition
 void ARAP::move
 	(

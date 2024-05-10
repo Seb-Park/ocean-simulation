@@ -22,8 +22,17 @@ private:
     Shape m_foam_shape;
 
 
+
 public:
     ARAP();
+
+    std::vector<Eigen::Vector3f> getVerts(){
+        return m_ocean.get_vertices();
+    }
+
+    Eigen::Matrix4f getModel(){
+        return m_shape.getModel();
+    }
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
@@ -96,7 +105,7 @@ public:
 
     ocean_alt m_ocean;
         double m_time = 0.00;
-        double m_timestep = 0.3;
+        double m_timestep = 0.03;
 
     Eigen::Vector3f minCorner, maxCorner;
 };

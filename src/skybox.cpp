@@ -77,16 +77,9 @@ void skybox::draw(Shader *skybox_shader, Camera  m_camera){
 
 
 //    glDrawElements(GL_TRIANGLES, m_vertices.size(), GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
-//    glBindVertexArray(0);
-////        glBindTexture(GL_TEXTURE_2D, 0);
-///
-///
-///
-///
+    glBindVertexArray(0);
 
-    std::cout << m_camera.getPosition() << std::endl;
-
-   // sky_shape.draw(skybox_shader, GL_TRIANGLES);
+   // std::cout << m_camera.getPosition() << std::endl;
 
    glDepthFunc(GL_LESS);
 

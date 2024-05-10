@@ -69,6 +69,11 @@ public:
     const std::vector<Eigen::Vector3i>& getFaces();
     const std::unordered_set<int>& getAnchors();
 
+    Eigen::Matrix4f getModel(){
+        return m_modelMatrix;
+    }
+
+
 private:
     GLuint m_surfaceVao;
     GLuint m_surfaceVbo;
