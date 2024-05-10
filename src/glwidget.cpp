@@ -176,7 +176,7 @@ void GLWidget::initializeGL()
     float extentLength  = (coeffMax - coeffMin).norm();
 
     // Screen-space size of vertex points
-    m_vSize = 0.005 * extentLength;
+    m_vSize = 10;
 
     // Scale all movement by this amount
     m_movementScaling = extentLength * 0.5;

@@ -73,23 +73,23 @@ private:
 
     std::map<int, WaveIndexConstant> m_waveIndexConstants; // stores constants that only need to be calculate once for each grid constant
 
-	const double Lx = 512.0;
-	const double Lz = 512.0;
+	const double Lx = pow(2, 14);
+	const double Lz = pow(2, 14);
 
     const int num_rows = 256;
     const int num_cols = 256;
 
-    const int num_tiles_x = 1;
-    const int num_tiles_z = 1;
+    const int num_tiles_x = 2;
+    const int num_tiles_z = 2;
 
 	const double vertex_displacement = Lx / 2;
 
 	const int N = num_rows*num_cols; // total number of grid points
-	const double lambda = .75; // how much displacement matters
+	const double lambda =0.0; // how much displacement matters
 	const double spacing = 1.0; // spacing between grid points
 
-    const double A = 10000; // numeric constant for the Phillips spectrum
-    const double V = 700; // wind speed
+    const double A = 6.5; // numeric constant for the Phillips spectrum
+    const double V = 500; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation

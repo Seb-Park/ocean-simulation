@@ -438,7 +438,7 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices(){
 		{
 			for (int k = 0; k < N; k++)
 			{
-				double c = Lx - 2 / (num_rows / Lx);
+				double c = Lx - 2 / (num_rows / Lx); // FIXME: when I am not perfect
 				Eigen::Vector3f vertex = m_vertices[k] + Eigen::Vector3f(-i*(c), 0.0, (j)*(c));
 				vertices.push_back(vertex);
 
