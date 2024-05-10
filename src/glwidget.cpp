@@ -425,6 +425,11 @@ void GLWidget::paintGL()
     glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
     glUniform1i(glGetUniformLocation(m_defaultShader->id(), "groundSampler"), 2);
 
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox.getSkyboxTex());
+    m_defaultShader->setUniform("skySampler", 1);
+    glUniform1i(glGetUniformLocation(m_defaultShader->id(), "skySampler"), 1);
+
     m_arap.draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
