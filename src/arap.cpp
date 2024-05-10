@@ -52,7 +52,7 @@ void ARAP::init
     minCorner = coeffMin;
     maxCorner = coeffMax;
 
-    initCausticsShape(10);
+    initCausticsShape(1000);
 }
 
 void ARAP::update(double seconds)
