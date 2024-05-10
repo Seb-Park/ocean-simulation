@@ -98,13 +98,6 @@ void GLWidget::initializeGL()
     m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
     m_skyboxShader   = new Shader(":resources/shaders/skybox.vert",      ":resources/shaders/skybox.frag");
 
-    // specify texture for skybox
-//      m_skyboxShader->bind();
-//      glUniform1i(glGetUniformLocation(m_skyboxShader->id(), "cubeMap"), 9); // bind texture at slot 9
-//      Eigen::Vector3f sc = Eigen::Vector3f(.77f, .85f, .99f); // skycolor for fade effect
-//      glUniform3f(glGetUniformLocation(m_skyboxShader->id(), "skyColor"), sc[0], sc[1], sc[2]);
-//      m_skyboxShader->unbind();
-
 
     m_halftone_tex = loadTextureFromFile(":resources/images/halftone.png").textureID;
     m_foam_tex = loadTextureFromFile(":resources/images/foam3.png").textureID;
@@ -438,36 +431,33 @@ void GLWidget::paintGL()
 //    m_arap.draw(m_pointShader, GL_POINTS);
 //    m_pointShader->unbind();
 
-//        m_foamShader->bind();
-//        m_foamShader->setUniform("proj",   m_camera.getProjection());
-//        m_foamShader->setUniform("view",   m_camera.getView());
-////        m_foamShader->setUniform("vSize",  m_vSize);
-////        m_foamShader->setUniform("width",  width());
-////        m_foamShader->setUniform("height", height());
-//        glUniform1f(glGetUniformLocation(m_foamShader->id(), "time"), m_arap.getTime());
-//        glUniform1f(glGetUniformLocation(m_foamShader->id(), "phaseC"), 1.f);
-//        m_foamShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
-//        m_foamShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
-//
-//        glActiveTexture(GL_TEXTURE5);
-//        glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
-//        glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
-//
-//        glActiveTexture(GL_TEXTURE6);
-//        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
-//        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
+        m_foamShader->bind();
+        m_foamShader->setUniform("proj",   m_camera.getProjection());
+        m_foamShader->setUniform("view",   m_camera.getView());
+        glUniform1f(glGetUniformLocation(m_foamShader->id(), "time"), m_arap.getTime());
+        glUniform1f(glGetUniformLocation(m_foamShader->id(), "phaseC"), 1.f);
+        m_foamShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
+        m_foamShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
+        glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
+
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
+        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
 
 
 
 
-//        m_arap.drawFoam(m_foamShader, GL_TRIANGLES);
-//        m_foamShader->unbind();
-//
-//        // skybox
-//
-//
-//
-//        m_skybox.draw(m_skyboxShader, m_camera);
+        m_arap.drawFoam(m_foamShader, GL_TRIANGLES);
+        m_foamShader->unbind();
+
+        // skybox
+
+
+
+        m_skybox.draw(m_skyboxShader, m_camera);
 
 
 
@@ -477,25 +467,32 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
 {
     std::string filename = std::string(path);
 
+    QString filepath = QString(filename.c_str());
+    QImage tex_image = QImage(filepath);
+    tex_image = tex_image.convertToFormat(QImage::Format_RGBA8888);
+    auto data = tex_image.bits();
+    int width = tex_image.width();
+    int height = tex_image.height();
+
     GLuint textureID;
     glGenTextures(1, &textureID);
 
-    int width, height, nrComponents;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    stbi_set_flip_vertically_on_load(false);
+//    int width, height, nrComponents;
+//    stbi_set_flip_vertically_on_load(true);
+//    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+//    stbi_set_flip_vertically_on_load(false);
     if (data)
     {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
+//        GLenum format;
+//        if (nrComponents == 1)
+//            format = GL_RED;
+//        else if (nrComponents == 3)
+//            format = GL_RGB;
+//        else if (nrComponents == 4)
+//            format = GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -503,13 +500,13 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        stbi_image_free(data);
+//        stbi_image_free(data);
 
     }
     else
     {
         std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
+//        stbi_image_free(data);
     }
 
     TextureData newtex;
@@ -518,50 +515,6 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
     newtex.width = width;
     return newtex;
 }
-
-GLuint GLWidget::loadCubeMap(std::vector<const char*> textureFiles){
-    std::cout << "hello 111" << std::endl;
-
-    // create empty texture
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-
-    std::cout << "hello fssd" << std::endl;
-
-
-    //glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    std::cout << "hello fssd" << std::endl;
-
-    GLuint target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-    for (int i=0; i<6; i++){
-        std::string filename = std::string(textureFiles[i]);//directory + '/' + filename;
-        int width, height, nrChannels;
-        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-
-        if (data){
-            stbi_set_flip_vertically_on_load(false);
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            stbi_image_free(data);
-
-        }    else {
-            std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
-            stbi_image_free(data);
-        }
-    }
-
-    return textureID;
-}
-
-
-
 void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);

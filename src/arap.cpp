@@ -51,8 +51,8 @@ void ARAP::init
 	coeffMin = all_vertices.colwise().minCoeff();
 	coeffMax = all_vertices.colwise().maxCoeff();
 
-//    minCorner = coeffMin;
-//    maxCorner = coeffMax;
+    minCorner = coeffMin;
+    maxCorner = coeffMax;
 //
 	std::cout << "minCorner: " << minCorner << std::endl;
 	std::cout << "maxCorner: " << maxCorner << std::endl;
@@ -84,8 +84,8 @@ void ARAP::update(double seconds)
     // the last update
 	m_ocean.fft_prime(m_time);
     m_ocean.update_ocean();
-//    m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
-    m_shape.setVertices(m_ocean.get_vertices());
+    m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+  //  m_shape.setVertices(m_ocean.get_vertices());
 
 //	auto tmp = m_ocean.get_vertices();
 	// print the min and max of the vertices
@@ -99,7 +99,7 @@ void ARAP::update(double seconds)
 //std::cout << "max: " << max << std::endl;
 
 	FoamConstants foam = m_ocean.getFoamConstants();
-	m_foam_shape.setFoamInputs(m_shape.getVertices(), foam.wavelengths, foam.k_vectors, foam.texCoords);
+    m_foam_shape.setFoamInputs(m_ocean.m_vertices, foam.wavelengths, foam.k_vectors, foam.texCoords);
 
 
      m_time += m_timestep;

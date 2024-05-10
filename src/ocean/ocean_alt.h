@@ -42,6 +42,9 @@ public:
         return m_foam_constants;
     }
 
+    std::vector<Eigen::Vector3f> m_vertices; // current displacement vector for each K
+
+
 
 
 
@@ -71,8 +74,8 @@ private:
 	const int num_rows = 256;
 	const int num_cols = 256;
 
-	const int num_tiles_x = 2;
-	const int num_tiles_z = 2;
+    const int num_tiles_x = 1;
+    const int num_tiles_z = 1;
 
 	const double vertex_displacement = Lx / 2;
 
@@ -106,7 +109,6 @@ private:
     int iterations = 0;
 
 
-	std::vector<Eigen::Vector3f> m_vertices; // current displacement vector for each K
 
     const double D = 1.0; // Depth below mean water level (for dispersion relation)
 

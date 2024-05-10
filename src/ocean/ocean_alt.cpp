@@ -589,7 +589,7 @@ std::vector<Eigen::Vector2d> ocean_alt::fast_fft
 	}
 
 	// divide by N*N and add the signs based on the indices
-	double sign[] = {1.0, -1.0};
+    double sign[] = {-1.0, 1.0};
 	for (int i = 0; i < N; i++)
 	{
 		h[i] /= N;

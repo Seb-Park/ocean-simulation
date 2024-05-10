@@ -33,7 +33,7 @@ float getSaturation(vec2 k, vec2 xzPos, float adjWaveLength, float phaseC){
 void main() {
     float height = pos.y;
    float saturation = constants[0];//getSaturation(dir, vec2(pos.x, pos.z), 200.f, constants[0]);
-   vec4 m_uv = texture(halftone_texture, tex*2);
+   vec4 m_uv = texture(halftone_texture, tex*1);
    float m_threshold = (m_uv.r + m_uv.g + m_uv.b) / 3;
 
    // final rgba color at x,z pos

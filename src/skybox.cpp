@@ -69,24 +69,8 @@ void skybox::draw(Shader *skybox_shader, Camera  m_camera){
     // apply rotation matrix
     skybox_shader->setUniform("rotation", m_rotation_mat);
 
-    //glUniformMatrix4fv(glGetUniformLocation(skybox_shader., "rotation"), 1, GL_FALSE, glm::value_ptr(m_rotation_mat->getRotation()[0]));
-
-    //Global::graphics.setGlobalData(glm::vec3(.5f));
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
-
-
-//    glDrawElements(GL_TRIANGLES, m_vertices.size(), GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
-//    glBindVertexArray(0);
-////        glBindTexture(GL_TEXTURE_2D, 0);
-///
-///
-///
-///
-
-    // std::cout << m_camera.getPosition() << std::endl;
-
-   // sky_shape.draw(skybox_shader, GL_TRIANGLES);
 
    glDepthFunc(GL_LESS);
 
@@ -97,12 +81,6 @@ void skybox::draw(Shader *skybox_shader, Camera  m_camera){
 
 void skybox::update(double deltaTime){
     m_rotation += ROTATE_SPEED * deltaTime;
-
-//    Eigen::Rotation2Df f = Eigen::Rotation2Df(m_rotation);
-
-
-//    m_rotation_mat = f.toRotationMatrix();
-
 
         auto sinA = std::sin(m_rotation / 2);
         auto cosA = std::cos(m_rotation/ 2);
@@ -119,12 +97,6 @@ void skybox::update(double deltaTime){
 
 
         m_rotation_mat = mat4;
-
-
-
-
-
-
 }
 
 GLuint skybox::loadCubeMap(std::vector<const char*> textureFiles){
@@ -132,7 +104,7 @@ GLuint skybox::loadCubeMap(std::vector<const char*> textureFiles){
     GLuint textureID;
     glGenTextures(1, &textureID);
 
-    // std::cout << "hello fssd" << std::endl;
+    std::cout << "hello fssd" << std::endl;
 
 
     //glActiveTexture(GL_TEXTURE3);
@@ -144,22 +116,24 @@ GLuint skybox::loadCubeMap(std::vector<const char*> textureFiles){
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    // std::cout << "hello fssd" << std::endl;
 
     GLuint target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
     for (int i=0; i<6; i++){
+        std::cout << i << std::endl;
         std::string filename = std::string(textureFiles[i]);//directory + '/' + filename;
-        int width, height, nrChannels;
-        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+
+        QString sky_texture_filepath = QString(filename.c_str());
+        QImage box_image = QImage(sky_texture_filepath);
+        box_image = box_image.convertToFormat(QImage::Format_RGBA8888);
+        auto data = box_image.bits();
+        int width = box_image.width();
+        int height = box_image.height();
 
         if (data){
-            stbi_set_flip_vertically_on_load(false);
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            stbi_image_free(data);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
         }    else {
-            // std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
-            stbi_image_free(data);
+            std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
         }
     }
 

@@ -53,7 +53,6 @@ private:
     void paintCaustics();
 
     TextureData loadTextureFromFile(const char *path);
-    GLuint loadCubeMap(std::vector<const char*> textureFiles);
 
 
 private slots:
