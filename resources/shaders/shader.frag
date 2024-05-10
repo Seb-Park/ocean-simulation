@@ -44,8 +44,9 @@ float rand(vec4 n) {
 }
 
 vec2 uvFromWorldPoint(vec3 point) {
-    float u = (point.x - widthBounds[0] * 50) / (widthBounds[1] * 50 - widthBounds[0] * 50);
-    float v = (point.z - lengthBounds[0] * 50) / (lengthBounds[1] * 50 - lengthBounds[0] * 50);
+    float scale = 5.f;
+    float u = (point.x - widthBounds[0] * scale) / (widthBounds[1] * scale - widthBounds[0] * scale);
+    float v = (point.z - lengthBounds[0] * scale) / (lengthBounds[1] * scale - lengthBounds[0] * scale);
     return vec2(u, v);
 }
 
@@ -70,9 +71,9 @@ void main() {
     vec2 refrUV = uvFromWorldPoint(refrPos);
     vec2 reflUV = uvFromWorldPoint(reflPos);
 
-//    float waterMurkiness = 0.002f; // TODO: Make uniform
+    float waterMurkiness = 0.003f; // TODO: Make uniform
 //    float waterMurkiness = 0.0005f; // TODO: Make uniform
-    float waterMurkiness = 0.0005f; // TODO: Make uniform
+//    float waterMurkiness = 0.000f; // TODO: Make uniform
     vec3 waterVolumeColor = vec3(red * 0.1f, green * 0.2f, blue * 0.2f);
     float murkDiffuse = 0.3f;
     float murkAmbient = 0.8f;
