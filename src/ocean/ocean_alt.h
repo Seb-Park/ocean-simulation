@@ -115,6 +115,12 @@ private:
 	(
 		std::vector<Eigen::Vector2d> h
 	);
+
+	void fft_gpu
+	(
+		std::vector<Eigen::Vector2d> h
+	);
+	void fft_prime_gpu(double t);
 };
 
 #endif // OCEAN_ALT_H

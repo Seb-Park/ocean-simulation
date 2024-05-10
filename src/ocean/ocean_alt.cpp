@@ -83,6 +83,16 @@ void ocean_alt::init_wave_index_constants(){
     }
 }
 
+void ocean_alt::fft_gpu(double t)
+{
+
+}
+
+void ocean_alt::fft_prime_gpu(double t)
+{
+
+}
+
 // fast fourier transform at time t
 void ocean_alt::fft_prime(double t){
 

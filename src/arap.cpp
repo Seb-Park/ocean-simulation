@@ -56,9 +56,15 @@ void ARAP::init
 //
 	std::cout << "minCorner: " << minCorner << std::endl;
 	std::cout << "maxCorner: " << maxCorner << std::endl;
+
+	GLint texSize; glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &texSize);
+	std::cout << texSize << std::endl;
+
+//	std::cout << GL_MAX_TEXTURE_BUFFER_SIZE << std::endl;
+//	std::cout << GL_PROXY_TEXTURE_2D << std::endl;
 //
-//	minCorner = Vector3f(0.0f, 0.0f, 0.0f);
-//	maxCorner = Vector3f(1.0f, 0.0f, 1.0f);
+	minCorner = Vector3f(0.0f, 0.0f, 0.0f);
+	maxCorner = Vector3f(1.0f, 0.0f, 1.0f);
 //
 //	std::cout << "minCorner: " << minCorner << std::endl;
 //	std::cout << "maxCorner: " << maxCorner << std::endl;
@@ -121,16 +127,16 @@ void ARAP::update(double seconds)
 	m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
 	// m_shape.setVertices(m_ocean.get_vertices());
 
-	auto tmp = m_ocean.get_vertices();
-	// print the min and max of the vertices
-	Vector3f min = Vector3f::Ones() * 1000000;
-	Vector3f max = Vector3f::Ones() * -1000000;
-	for (int i = 0; i < tmp.size(); i++) {
-		min = min.cwiseMin(tmp[i]);
-		max = max.cwiseMax(tmp[i]);
-	}
-	std::cout << "min: " << min << std::endl;
-std::cout << "max: " << max << std::endl;
+//	auto tmp = m_ocean.get_vertices();
+//	// print the min and max of the vertices
+//	Vector3f min = Vector3f::Ones() * 1000000;
+//	Vector3f max = Vector3f::Ones() * -1000000;
+//	for (int i = 0; i < tmp.size(); i++) {
+//		min = min.cwiseMin(tmp[i]);
+//		max = max.cwiseMax(tmp[i]);
+//	}
+//	std::cout << "min: " << min << std::endl;
+//std::cout << "max: " << max << std::endl;
 
 	FoamConstants foam = m_ocean.getFoamConstants();
 	m_foam_shape.setFoamInputs(m_shape.getVertices(), foam.wavelengths, foam.k_vectors, foam.texCoords);
