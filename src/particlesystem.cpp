@@ -35,11 +35,23 @@ float getRandomInRange(float max, float min){
 float getRandomY(){
     return getRandomInRange(.001,.2);
 }
+
+
 Eigen::Vector3f particlesystem::getRandomInitialVel(){
 
 
     std::pair<float, float> r = sample_complex_gaussian();
     return factor*Eigen::Vector3f(r.first, getRandomY(), r.second);
+}
+
+Eigen::Vector3f getInitVel(OceanSpray s){
+    float x = getRandomInRange(0,1);
+    float y = getRandomInRange(0.1, .9);
+    Eigen::Vector3f v = Eigen::Vector3f(s.slope_vector[0], y, s.slope_vector[1]) + Eigen::Vector3f(x,0,0);
+    return v*10.f;
+    //p.vel[1] = 0.1;
+
+
 }
 
 void particlesystem::init(std::vector<OceanSpray> verts){
@@ -51,10 +63,10 @@ void particlesystem::init(std::vector<OceanSpray> verts){
     for (auto v : m_verts){
         Particle p;
         p.pos = Eigen::Vector3f(v.height);
-        p.vel = v.slope*factor;
+        p.life = getRandomInRange(.1,1);
+       // p.vel = v.slope*factor;
         //p.vel = getRandomInitialVel();
-        p.vel = getRandomInitialVel().asDiagonal() * v.slope;
-        p.vel[1] = 0.1;
+        p.vel = getInitVel(v);
 
 
         m_particles.push_back(p);
@@ -95,7 +107,7 @@ void particlesystem::update(double deltaTime){
 
         // if particle is still alive, update pos
         if (p.life >= 0.f){
-            float r = getRandomInRange(.5, 1.f);
+            float r = getRandomInRange(.5, 1.6f);
             p.vel += gravity*dt*r;
             p.pos += p.vel * dt * 10.f;
 //            p.vel[1] -= (p.vel.dot(p.vel) / 2 + gravity[0]) * dt;
@@ -134,13 +146,10 @@ int particlesystem::getUnusedParticleIndex(){
     return -1;
 }
 
-void particlesystem::respawn_particle(Particle &p, OceanSpray new_pos){
+void particlesystem::respawn_particle(Particle &p, OceanSpray s){
 
-    p.pos = Eigen::Vector3f(new_pos.height);
-    p.vel = new_pos.slope*factor;
-    //p.vel = getRandomInitialVel();
-    p.vel = getRandomInitialVel().asDiagonal() * new_pos.slope;
-   p.vel[1] = .01;
+    p.pos = Eigen::Vector3f(s.height);
+    p.vel = getInitVel(s);
 
 
     // reset life

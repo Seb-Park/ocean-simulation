@@ -11,5 +11,5 @@ uniform float alpha;
 void main()
 {
    // color = (texture(sprite, TexCoords) * ParticleColor);
-    fragColor = vec4(0,1,0,alpha);
+    fragColor = vec4(1,1,1,alpha);
 }

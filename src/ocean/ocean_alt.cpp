@@ -386,6 +386,8 @@ void ocean_alt::update_ocean()
             OceanSpray s;
             s.height = v;
             s.slope = norm;
+            s.slope_vector = Eigen::Vector2f(m_slopes_x[i][0], m_slopes_z[i][0]);
+            //std::cout << s.slope_vector << std::endl;
                  m_heights.push_back(s);
         }
 

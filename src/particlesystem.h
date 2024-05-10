@@ -35,7 +35,7 @@ public:
     void init(std::vector<OceanSpray> verts);
 
     void setVerts(std::vector<OceanSpray> verts){
-        std::cout << "VERTS SIZE:" << verts.size() << std::endl;
+        //std::cout << "VERTS SIZE:" << verts.size() << std::endl;
         m_verts = verts;
 
     }
