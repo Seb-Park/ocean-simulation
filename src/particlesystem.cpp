@@ -63,7 +63,7 @@ void particlesystem::init(std::vector<OceanSpray> verts){
     for (auto v : m_verts){
         Particle p;
         p.pos = Eigen::Vector3f(v.height);
-        p.life = getRandomInRange(.1,1);
+        p.life = getRandomInRange(.6,1);
        // p.vel = v.slope*factor;
         //p.vel = getRandomInitialVel();
         p.vel = getInitVel(v);
@@ -80,7 +80,7 @@ void particlesystem::init(std::vector<OceanSpray> verts){
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, m_vertices.size()*sizeof(float), m_vertices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
 
     // unbind
     glEnableVertexAttribArray(0);
@@ -103,7 +103,7 @@ void particlesystem::update(double deltaTime){
     float dt = deltaTime;
     // update all particles values
     for (Particle &p : m_particles){
-       p.life -= deltaTime * getRandomInRange(.1f, .5f);
+       p.life -= deltaTime * getRandomInRange(.1f, .9f);
 
         // if particle is still alive, update pos
         if (p.life >= 0.f){
@@ -157,7 +157,7 @@ void particlesystem::respawn_particle(Particle &p, OceanSpray s){
 
 }
 
-void particlesystem::draw(Shader *shader, Camera  m_camera){
+void particlesystem::draw(Shader *shader, Camera  m_camera, GLuint texture){
 
     shader->bind();
 
@@ -165,9 +165,10 @@ void particlesystem::draw(Shader *shader, Camera  m_camera){
 
 
     // activate texture
-//    glActiveTexture(GL_TEXTURE10);
-//    glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_tex);
-//    glUniform1i(glGetUniformLocation(shader->id(), "cubeMap"), 9); // bind texture at slot 9
+    glActiveTexture(GL_TEXTURE10);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(glGetUniformLocation(shader->id(), "particle_texture"), 10);
+
 
 
     // manually set view and projection, for non-translating view

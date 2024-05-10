@@ -29,8 +29,7 @@ public:
     particlesystem();
 
     void update(double deltaTime);
-    void draw(Shader *skybox_shader, Camera  m_camera);
-    void draw(Shader *shader, Camera  m_camera, std::vector<Eigen::Vector3f> verts, Eigen::Matrix4f model);
+    void draw(Shader *shader, Camera  m_camera, GLuint texture);
 
     void init(std::vector<OceanSpray> verts);
 
@@ -60,12 +59,14 @@ private:
 
     float d = 2.f;
     std::vector<float> m_vertices = {
-        -d, d,
-        d,d,
-        -d, -d,
-        d, d,
-        d, -d,
-        -d, -d
+        -d, d, 0,1,
+        -d, -d, 0, 0,
+        d,d, 1,1,
+        //
+        d,d, 1,1,
+        -d, -d, 0, 0,
+
+        d, -d, 1, 0
     };
 
     GLuint VAO, VBO; // holds quad shape
