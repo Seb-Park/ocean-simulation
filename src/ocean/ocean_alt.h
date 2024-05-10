@@ -20,6 +20,13 @@ struct WaveIndexConstant{
     Eigen::Vector2d k_vector = Eigen::Vector2d(0.f, 0.f); // static horiz pos with no displacement
 };
 
+struct FoamConstants{
+    std::vector<Eigen::Vector3f> positions;
+    std::vector<Eigen::Vector2f> k_vectors;
+    std::vector<float> wavelengths;
+    std::vector<Eigen::Vector2f> texCoords;
+};
+
 class ocean_alt
 {
 public:
@@ -30,6 +37,10 @@ public:
     std::vector<Eigen::Vector3i> get_faces();
     void fft_prime(double t);
     std::vector<Eigen::Vector3f> getNormals();
+
+    FoamConstants getFoamConstants(){
+        return m_foam_constants;
+    }
 
 
 
@@ -49,6 +60,9 @@ private:
     Eigen::Vector2d get_horiz_pos(int i);
     std::pair<double, double> sample_complex_gaussian();
 
+    // FOAM
+    std::vector<float> m_saturation;
+
     std::map<int, WaveIndexConstant> m_waveIndexConstants; // stores constants that only need to be calculate once for each grid constant
 
 	const double Lx = 512.0;
@@ -57,7 +71,7 @@ private:
 	const int num_rows = 256;
 	const int num_cols = 256;
 
-	const int num_tiles_x = 1;
+	const int num_tiles_x = 2;
 	const int num_tiles_z = 2;
 
 	const double vertex_displacement = Lx / 2;
@@ -66,8 +80,8 @@ private:
 	const double lambda = .5; // how much displacement matters
 	const double spacing = 1.0; // spacing between grid points
 
-	const double A = 15000; // numeric constant for the Phillips spectrum
-	const double V = 1000; // wind speed
+	const double A = 10000; // numeric constant for the Phillips spectrum
+	const double V = 500; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation
@@ -81,7 +95,16 @@ private:
 	std::vector<Eigen::Vector2d> m_displacements_z;
     //std::vector<Eigen::Vector3f> m_slope_vectors; // current displacement vector for each K
 
-    std::vector<Eigen::Vector3f> m_normals; // current displacement vector for each K
+    std::vector<Eigen::Vector3f> m_normals; // normal calculations
+
+    // FOR FOAM:
+    FoamConstants m_foam_constants;
+
+
+    float max = 0;
+    float min = 0;
+    int iterations = 0;
+
 
 	std::vector<Eigen::Vector3f> m_vertices; // current displacement vector for each K
 

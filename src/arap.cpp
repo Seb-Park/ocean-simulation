@@ -38,6 +38,8 @@ void ARAP::init
     vertices = m_ocean.get_vertices();
     triangles = m_ocean.get_faces();
 	m_shape.init(vertices, triangles);
+    m_foam_shape.init(vertices, triangles);
+
     m_shape.setColor(0.27f, .803f, .96f);
 
 	// Students, please don't touch this code: get min and max for viewport stuff
@@ -51,15 +53,15 @@ void ARAP::init
 
 //    minCorner = coeffMin;
 //    maxCorner = coeffMax;
-
+//
 	std::cout << "minCorner: " << minCorner << std::endl;
 	std::cout << "maxCorner: " << maxCorner << std::endl;
-
-	minCorner = Vector3f(0.0f, 0.0f, 0.0f);
-	maxCorner = Vector3f(1.0f, 0.0f, 1.0f);
-
-	std::cout << "minCorner: " << minCorner << std::endl;
-	std::cout << "maxCorner: " << maxCorner << std::endl;
+//
+//	minCorner = Vector3f(0.0f, 0.0f, 0.0f);
+//	maxCorner = Vector3f(1.0f, 0.0f, 1.0f);
+//
+//	std::cout << "minCorner: " << minCorner << std::endl;
+//	std::cout << "maxCorner: " << maxCorner << std::endl;
 //
 //	minCorner = Vector3f(-1.0f, -1.0f, -1.0f);
 //	maxCorner = Vector3f(1.0f, 1.0f, 1.0f);
@@ -116,14 +118,22 @@ void ARAP::update(double seconds)
     // the last update
 	m_ocean.fft_prime(m_time);
 	m_ocean.update_ocean();
-	// std::cout << "updating ocean" << std::endl;
-	auto tmp = m_ocean.get_vertices();
-	 // print the vertex
-//	std::cout << "faces\t" << m_ocean.get_faces().size() << std::endl;
-//	std::cout << "noormals\t" << m_ocean.getNormals().size() << std::endl;
-//	std::cout << "vertices\t" << tmp.size() << std::endl;
 	m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
 	// m_shape.setVertices(m_ocean.get_vertices());
+
+	auto tmp = m_ocean.get_vertices();
+	// print the min and max of the vertices
+	Vector3f min = Vector3f::Ones() * 1000000;
+	Vector3f max = Vector3f::Ones() * -1000000;
+	for (int i = 0; i < tmp.size(); i++) {
+		min = min.cwiseMin(tmp[i]);
+		max = max.cwiseMax(tmp[i]);
+	}
+	std::cout << "min: " << min << std::endl;
+std::cout << "max: " << max << std::endl;
+
+	FoamConstants foam = m_ocean.getFoamConstants();
+	m_foam_shape.setFoamInputs(m_shape.getVertices(), foam.wavelengths, foam.k_vectors, foam.texCoords);
 
 
      m_time += m_timestep;
