@@ -399,6 +399,36 @@ void ocean_alt::update_ocean()
     m_foam_constants.positions = vertices;
 }
 
+std::vector<float> ocean_alt::get_tiled_wavelengths(){
+	std::vector<float> wavelengths = std::vector<float>();
+	for (int i = 0; i < num_tiles_x; i++)
+	{
+		for (int j = 0; j < num_tiles_z; j++)
+		{
+			for (int k = 0; k < N; k++)
+			{
+				wavelengths.push_back(m_foam_constants.wavelengths[k]);
+			}
+		}
+	}
+	return wavelengths;
+}
+
+std::vector<Eigen::Vector2f> ocean_alt::get_tiled_k_vectors(){
+	std::vector<Eigen::Vector2f> k_vectors = std::vector<Eigen::Vector2f>();
+	for (int i = 0; i < num_tiles_x; i++)
+	{
+		for (int j = 0; j < num_tiles_z; j++)
+		{
+			for (int k = 0; k < N; k++)
+			{
+				k_vectors.push_back(m_foam_constants.k_vectors[k]);
+			}
+		}
+	}
+	return k_vectors;
+}
+
 std::vector<Eigen::Vector3f> ocean_alt::get_vertices(){
 	// extend the returned array based on the tilecount
 	std::vector<Eigen::Vector3f> vertices = std::vector<Eigen::Vector3f>();
@@ -409,8 +439,10 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices(){
 			for (int k = 0; k < N; k++)
 			{
 				double c = Lx - 2 / (num_rows / Lx);
-				Eigen::Vector3f vertex = m_vertices[k] + Eigen::Vector3f(i*(c), 0.0, (j)*(c));
+				Eigen::Vector3f vertex = m_vertices[k] + Eigen::Vector3f(-i*(c), 0.0, (j)*(c));
 				vertices.push_back(vertex);
+
+//				std::cout << "vertex: " << vertex << std::endl;
 			}
 		}
 	}
@@ -432,8 +464,6 @@ std::vector<Eigen::Vector3f> ocean_alt::getNormals(){
 			}
 		}
 	}
-
-
     return normals;
 }
 
@@ -441,54 +471,54 @@ std::vector<Eigen::Vector3i> ocean_alt::get_faces()
 {
     // connect the vertices into faces
     std::vector<Eigen::Vector3i> faces = std::vector<Eigen::Vector3i>();
-//	for (int i = 0; i < num_tiles_x; i++)
-//	{
-//		for (int j = 0; j < num_tiles_z; j++)
-//		{
-//			for (int k = 0; k < N; k++)
-//			{
-//				int x = k % num_rows;
-//				int z = k / num_rows;
+	for (int i = 0; i < num_tiles_x; i++)
+	{
+		for (int j = 0; j < num_tiles_z; j++)
+		{
+			for (int k = 0; k < N; k++)
+			{
+				int x = k / num_rows;
+				int z = k % num_rows;
+
+				// connect the vertices into faces
+				if (x < num_rows - 1 && z < num_cols - 1)
+				{
+					int tile_index_offset = (j + num_tiles_z * i) * N;
+					int i1 = k + tile_index_offset;
+					int i2 = k + 1 + tile_index_offset;
+					int i3 = k + num_rows + tile_index_offset;
+					int i4 = k + num_rows + 1 + tile_index_offset;
+
+					faces.emplace_back(i2, i1, i3);
+					faces.emplace_back(i2, i3, i4);
+				}
+			}
+		}
+	}
+
+	return faces;
+
+
+//    for (int i = 0; i < N; i++)
+//    {
+//        int x = i / num_rows;
+//        int z = i % num_rows;
 //
-//				// connect the vertices into faces
-//				if (x < num_rows - 1 && z < num_cols - 1)
-//				{
-//					int tile_index_offset = (j + num_tiles_z * i) * N;
-//					int i1 = k + tile_index_offset;
-//					int i2 = k + 1 + tile_index_offset;
-//					int i3 = k + num_rows + tile_index_offset;
-//					int i4 = k + num_rows + 1 + tile_index_offset;
+//        // connect the vertices into faces
+//        if (x < num_rows - 1 && z < num_cols - 1)
+//        {
+//            int i1 = i;
+//            int i2 = i + 1;
+//            int i3 = i + num_rows;
+//            int i4 = i + num_rows + 1;
 //
-//					faces.emplace_back(i2, i1, i3);
-//					faces.emplace_back(i2, i3, i4);
-//				}
-//			}
-//		}
-//	}
-//
-//	return faces;
-
-
-    for (int i = 0; i < N; i++)
-    {
-        int x = i / num_rows;
-        int z = i % num_rows;
-
-        // connect the vertices into faces
-        if (x < num_rows - 1 && z < num_cols - 1)
-        {
-            int i1 = i;
-            int i2 = i + 1;
-            int i3 = i + num_rows;
-            int i4 = i + num_rows + 1;
-
-            faces.emplace_back(i2, i1, i3);
-            faces.emplace_back(i2, i3, i4);
-			faces.emplace_back(i1, i2, i3);
-			faces.emplace_back(i3, i2, i4);
-        }
-    }
-    return faces;
+//            faces.emplace_back(i2, i1, i3);
+//            faces.emplace_back(i2, i3, i4);
+//			faces.emplace_back(i1, i2, i3);
+//			faces.emplace_back(i3, i2, i4);
+//        }
+//    }
+//    return faces;
 }
 
 Eigen::Vector2d muliply_complex(Eigen::Vector2d a, Eigen::Vector2d b)
@@ -605,7 +635,7 @@ std::vector<Eigen::Vector2d> ocean_alt::fast_fft
 	}
 
 	// divide by N*N and add the signs based on the indices
-    double sign[] = {-1.0, 1.0};
+    double sign[] = {1.0, -1.0};
 	for (int i = 0; i < N; i++)
 	{
 		h[i] /= N;

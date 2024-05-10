@@ -25,7 +25,7 @@ uniform sampler2D groundSampler;
 uniform sampler2D skySampler;
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
-uniform vec4 sunColor = vec4(1, 0.5f, 0, 1.f);
+uniform vec4 sunColor = vec4(128, 10, 0, 1.f);
 //uniform float test = 0;
 
 // Random methods from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
@@ -53,7 +53,7 @@ vec2 uvFromWorldPoint(vec3 point) {
 
 void main() {
     // Do lighting in camera space
-    vec3 lightDir = -normalize(vec3(1, -1, 1));
+    vec3 lightDir = -normalize(vec3(-1, 0, 1));
 //    lightDir = normalize(vec3(0.f, 3.f, 0.f) - pos);
 //    float d = clamp(dot(normal_cameraSpace, lightDir), 0, 1);
     float d = clamp(dot(normal_worldSpace, lightDir), 0, 1);

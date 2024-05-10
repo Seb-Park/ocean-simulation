@@ -99,7 +99,9 @@ void ARAP::update(double seconds)
 //std::cout << "max: " << max << std::endl;
 
 	FoamConstants foam = m_ocean.getFoamConstants();
-    m_foam_shape.setFoamInputs(m_ocean.m_vertices, foam.wavelengths, foam.k_vectors, foam.texCoords);
+	std::vector<float> tiled_wavelengths = m_ocean.get_tiled_wavelengths();
+	std::vector<Eigen::Vector2f> tiled_k_vectors = m_ocean.get_tiled_k_vectors();
+    m_foam_shape.setFoamInputs(m_ocean.get_vertices(), tiled_wavelengths, tiled_k_vectors, foam.texCoords);
 
 
      m_time += m_timestep;

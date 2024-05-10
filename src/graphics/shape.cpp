@@ -359,10 +359,7 @@ void Shape::updateMeshFoam(const std::vector<Eigen::Vector3i> &faces,
     verts.reserve(faces.size() * 3);
     normals.reserve(faces.size() * 3);
     colors.reserve(faces.size() * 3);
-
-
     for (const Eigen::Vector3i& face : faces) {
-
         for (auto& v: {face[0], face[1], face[2]}) {
             normals.push_back(Eigen::Vector3f(wavelengths[v],0,0));
             verts.push_back(vertices[v]);
