@@ -57,14 +57,11 @@ void ARAP::init
 	std::cout << "minCorner: " << minCorner << std::endl;
 	std::cout << "maxCorner: " << maxCorner << std::endl;
 
-	GLint texSize; glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &texSize);
-	std::cout << texSize << std::endl;
+	GLint texSize; glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &texSize);
+	std::cout << "max geometry \t" << texSize << std::endl;
 
 //	std::cout << GL_MAX_TEXTURE_BUFFER_SIZE << std::endl;
 //	std::cout << GL_PROXY_TEXTURE_2D << std::endl;
-//
-	minCorner = Vector3f(0.0f, 0.0f, 0.0f);
-	maxCorner = Vector3f(1.0f, 0.0f, 1.0f);
 //
 //	std::cout << "minCorner: " << minCorner << std::endl;
 //	std::cout << "maxCorner: " << maxCorner << std::endl;
