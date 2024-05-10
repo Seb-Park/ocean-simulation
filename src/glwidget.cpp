@@ -97,6 +97,8 @@ void GLWidget::initializeGL()
     m_colorShader   = new Shader(":resources/shaders/color.vert",      ":resources/shaders/color.frag");
     m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
     m_skyboxShader   = new Shader(":resources/shaders/skybox.vert",      ":resources/shaders/skybox.frag");
+    m_particleShader   = new Shader(":resources/shaders/particles.vert",      ":resources/shaders/particles.frag");
+
 
 
     m_halftone_tex = loadTextureFromFile(":resources/images/halftone.png").textureID;
@@ -197,6 +199,10 @@ void GLWidget::initializeGL()
 
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
+
+    // OCEAN SPRAY
+     m_arap.update(0); // important to get initial heights
+     m_particles.init(m_arap.m_ocean.m_heights);
 
 }
 
@@ -458,6 +464,8 @@ void GLWidget::paintGL()
 
 
         m_skybox.draw(m_skyboxShader, m_camera);
+        m_particles.draw(m_particleShader, m_camera);
+
 
 
 
@@ -684,7 +692,10 @@ void GLWidget::tick()
     float deltaSeconds = m_deltaTimeProvider.restart() / 1000.f;
     m_arap.update(deltaSeconds);
     // rotate skybox
+    m_particles.setVerts(m_arap.m_ocean.m_heights);
     m_skybox.update(deltaSeconds);
+    m_particles.update(deltaSeconds);
+
 
     // Move camera
     auto look = m_camera.getLook();
