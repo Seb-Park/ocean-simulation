@@ -83,7 +83,10 @@ void ocean_alt::init_wave_index_constants(){
     }
 }
 
-void ocean_alt::fft_gpu(double t)
+void ocean_alt::fft_gpu
+(
+	std::vector<Eigen::Vector2d> frequencies
+)
 {
 
 }
