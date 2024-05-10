@@ -32,6 +32,9 @@ public:
     void move(int vertex, Eigen::Vector3f pos);
     void update(double seconds);
 
+    ocean_alt m_ocean;
+
+
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
@@ -96,7 +99,6 @@ public:
 	int m_num_iterations;
 	const char * m_mesh_path;
 
-    ocean_alt m_ocean;
         double m_time = 0.00;
         double m_timestep = 0.3;
 

@@ -330,6 +330,7 @@ void ocean_alt::update_ocean()
 	// reset normals & vertices arrays for the single tile
     m_vertices = std::vector<Eigen::Vector3f>(N);
 	m_normals = std::vector<Eigen::Vector3f>(N);
+    m_heights.clear();
     for (int i = 0; i < N; i++){
         Eigen::Vector2d horiz_pos = spacing*m_waveIndexConstants[i].base_horiz_pos;
         Eigen::Vector2d amplitude = m_current_h[i];
@@ -357,9 +358,10 @@ void ocean_alt::update_ocean()
 		Eigen::Vector2d disp = lambda*Eigen::Vector2d(m_displacements_x[i][0], m_displacements_z[i][0])
 			+ Eigen::Vector2d(vertex_displacement, vertex_displacement); // set corner at 0,0 for retiling
 
+        Eigen::Vector3f v = Eigen::Vector3f(horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]);
 
         // for final vertex position, use the real number component of amplitude vector
-		m_vertices[i] = {horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]};
+        m_vertices[i] = v;
         m_normals[i] = norm.normalized();//Eigen::Vector3f(-slope[0], 1.0, -slope[1]).normalized();
         //std::cout << "normal: " << m_normals[i] << std::endl
         Eigen::Vector2i m_n = index_1d_to_2d(i);
@@ -367,14 +369,14 @@ void ocean_alt::update_ocean()
 
        // m_foam_constants.wavelengths[i] = 2.f* M_PI * m_slopes[i].dot(m_slopes[i]) /  Lx;
         float h_0 = m_waveIndexConstants[i].h0_prime[0]; // min*.2f;
-        float h_max = max*.01f; // the smaller the constant, the more foam there is
-        m_foam_constants.wavelengths[i] = (height - h_0 ) / (h_max - h_0);
+        float h_max = max*.001f; // the smaller the constant, the more foam there is
+        float waveheight = (height - h_0 ) / (h_max - h_0);
+        m_foam_constants.wavelengths[i] = waveheight;
 
-//        if (i < 5){
-//            std::cout << h_0 << ", " << h_max << std::endl;
-//            std::cout << m_foam_constants.wavelengths[i] << std::endl;
-//        }
-
+        if (waveheight >= height_threshold){
+                 //std::cout << "push" << std::endl;
+                 m_heights.push_back(v);
+        }
 
 
     }
