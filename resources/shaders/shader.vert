@@ -24,6 +24,10 @@ out vec3 refrPos;
 out float refrProb;
 out vec2 uv;
 out float matIor;
+out float visibility;
+
+const float density = .001f;
+const float gradient = 4.f;
 
 vec4 getRefrPos() {
 //    float depth = -1500.f; // TODO: Pass as uniform
@@ -69,8 +73,8 @@ vec3 getReflPos() {
 void main() {
 //    float depth = -4.f;
 //    float dist = position.y - depth;
-    float width = 81.f * 2.f;
-    float length = 81.f * 2.f;
+//    float width = 81.f * 2.f;
+//    float length = 81.f * 2.f;
     matIor = 1.33f;
 
     normal_cameraSpace = normalize(inverse(transpose(mat3(view))) * inverseTransposeModel * normal);
@@ -91,4 +95,10 @@ void main() {
     reflPos = getReflPos();
 
     gl_Position = proj * view * model * vec4(position, 1);
+
+//    vec4 positionRelationToCam = view * vec4(pos, 1.f);
+//        float distance = length(positionRelationToCam.xyz);
+//        visibility = exp(-pow((distance*density), gradient));
+//        //visibility = distance * .0009f;
+//       visibility = clamp(visibility, 0.f, 1.f);
 }

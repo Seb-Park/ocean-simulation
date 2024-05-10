@@ -10,6 +10,7 @@ in vec3 refrPos;
 in float refrProb;
 in vec2 uv;
 in float matIor;
+in float visibility;
 
 uniform sampler2D texture_img;
 
@@ -26,6 +27,8 @@ uniform sampler2D skySampler;
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
 //uniform float test = 0;
+
+uniform vec4 skyColor = vec4(1);
 
 // Random methods from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
 
@@ -120,4 +123,7 @@ void main() {
 //    fragColor = texture(groundSampler, vec2(refrUV));
 //    fragColor = vec4(normal_worldSpace[0], 0, normal_worldSpace[1], 1.f);
 //    fragColor = diffuse;
+
+      //fragColor = vec4(vec3(visibility), 1);
+     // fragColor = mix(vec4(skyColor, 1.f), fragColor, 1.f);
 }

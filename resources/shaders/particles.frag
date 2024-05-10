@@ -11,5 +11,5 @@ uniform float alpha;
 void main()
 {
     vec4 c = texture(particle_texture, TexCoords);
-    fragColor = c*vec4(1,1,1,alpha)*1.6;
+    fragColor = c*vec4(1,1,1,alpha);
 }
