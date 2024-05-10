@@ -66,7 +66,7 @@ void ARAP::init
 //	minCorner = Vector3f(-1.0f, -1.0f, -1.0f);
 //	maxCorner = Vector3f(1.0f, 1.0f, 1.0f);
 
-    initCausticsShape(10);
+    initCausticsShape(1000);
 }
 
 void ARAP::update(double seconds)

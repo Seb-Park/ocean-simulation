@@ -45,7 +45,7 @@ void main() {
     vec4 sampledNormal = texture(normSamp, vec2((pos + 1) / 2));
     sampledNormal = (sampledNormal * 2.f) - 1.f;
     col = sampledNormal;
-    vec4 newPosAndProb = refractToFloor(vec3(0, 0, 1), pos, normalize(vec3(sampledNormal)), 0.01f);
+    vec4 newPosAndProb = refractToFloor(vec3(0, 0, 1), pos, normalize(vec3(sampledNormal)), 0.005f);
     newPos = vec3(newPosAndProb[0], newPosAndProb[1], 0.f);
     refractProb = newPosAndProb[3];
 //    newPos = pos;
