@@ -110,7 +110,7 @@ void GLWidget::initializeGL()
 
 
     m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
-    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
+    m_foam_tex = loadTextureFromFile("foam3.png").textureID;
 
 
 
@@ -209,6 +209,7 @@ void GLWidget::initializeGL()
 
 
     // OCEAN SPRAY
+    m_arap.update(0);
     m_particles.setVerts(m_arap.getVerts());
     m_particles.init();
 

@@ -27,7 +27,7 @@ public:
     ARAP();
 
     std::vector<Eigen::Vector3f> getVerts(){
-        return m_ocean.get_vertices();
+        return m_ocean.m_heights;
     }
 
     Eigen::Matrix4f getModel(){

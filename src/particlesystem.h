@@ -1,6 +1,7 @@
 #ifndef PARTICLESYSTEM_H
 #define PARTICLESYSTEM_H
 
+#include <iostream>
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 #define EIGEN_DONT_VECTORIZE
 #include "graphics/shader.h"
@@ -32,6 +33,7 @@ public:
     void init();
 
     void setVerts(std::vector<Eigen::Vector3f> verts){
+        std::cout << verts.size() << std::endl;
         m_verts = verts;
 
     }

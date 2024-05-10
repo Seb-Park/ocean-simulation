@@ -41,6 +41,7 @@ Eigen::Vector3f particlesystem::getRandomInitialVel(){
 
 void particlesystem::init(){
 
+    m_particles.reserve(4000);
 
     for (Eigen::Vector3f v : m_verts){
         Particle p;
@@ -73,6 +74,7 @@ void particlesystem::update(double deltaTime){
     for (int i=0; i<m_particles.size(); i++){
         int particle_index = getUnusedParticleIndex();
         if (particle_index == -1) continue;
+        if (particle_index >= m_particles.size() - 1 || particle_index >= m_verts.size() - 1) continue;
         respawn_particle(m_particles[particle_index], m_verts[particle_index]);
 
     }
@@ -81,7 +83,7 @@ void particlesystem::update(double deltaTime){
     float dt = deltaTime;
     // update all particles values
     for (Particle &p : m_particles){
-        p.life -= deltaTime * getRandomInRange(.1f, 2.f);
+       // p.life -= deltaTime * getRandomInRange(.1f, 2.f);
 
         // if particle is still alive, update pos
         if (p.life >= 0.f){
@@ -99,7 +101,7 @@ void particlesystem::update(double deltaTime){
 int particlesystem::getUnusedParticleIndex(){
 
     // search from last used index
-    for (int i=lastUsedIndex; i<m_amount; ++i){
+    for (int i=lastUsedIndex; i<m_particles.size(); ++i){
         if (m_particles[i].life <= 0.f){
             lastUsedIndex = i;
             return i;

@@ -42,6 +42,7 @@ public:
     }
 
 
+    std::vector<Eigen::Vector3f> m_heights; // stores height above threshold
 
 
 
@@ -94,6 +95,9 @@ private:
     std::vector<Eigen::Vector2d> m_displacements; // current displacement vector for each K
     std::vector<Eigen::Vector2d> m_slopes; // current displacement vector for each K
     //std::vector<Eigen::Vector3f> m_slope_vectors; // current displacement vector for each K
+
+    float height_threshold = .5f;
+
 
     std::vector<Eigen::Vector3f> m_normals; // normal calculations
 

@@ -291,6 +291,8 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
         }
         iterations ++;
     }
+
+    //m_heights.clear();
     for (int i = 0; i < N; i++){
         Eigen::Vector2d horiz_pos = spacing*m_waveIndexConstants[i].base_horiz_pos;
         Eigen::Vector2d amplitude = m_current_h[i];
@@ -325,7 +327,8 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
 
 
         // for final vertex position, use the real number component of amplitude vector
-        vertices.push_back(Eigen::Vector3f(horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]));
+        Eigen::Vector3f v = Eigen::Vector3f(horiz_pos[0] + disp[0], height, horiz_pos[1] + disp[1]);
+        vertices.push_back(v);
         m_normals[i] = norm.normalized();//Eigen::Vector3f(-slope[0], 1.0, -slope[1]).normalized();
         //std::cout << "normal: " << m_normals[i] << std::endl
         Eigen::Vector2i m_n = index_1d_to_2d(i);
@@ -334,7 +337,13 @@ std::vector<Eigen::Vector3f> ocean_alt::get_vertices()
        // m_foam_constants.wavelengths[i] = 2.f* M_PI * m_slopes[i].dot(m_slopes[i]) /  Lx;
         float h_0 = m_waveIndexConstants[i].h0_prime[0]; // min*.2f;
         float h_max = max*.01f; // the smaller the constant, the more foam there is
-        m_foam_constants.wavelengths[i] = (height - h_0 ) / (h_max - h_0);
+        float waveheight = (height - h_0 ) / (h_max - h_0);
+        m_foam_constants.wavelengths[i] = waveheight;
+
+        if (waveheight >= height_threshold){
+            //std::cout << "push" << std::endl;
+            m_heights.push_back(v);
+        }
 
 //        if (i < 5){
 //            std::cout << h_0 << ", " << h_max << std::endl;
