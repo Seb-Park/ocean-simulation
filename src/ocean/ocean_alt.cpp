@@ -138,7 +138,7 @@ void ocean_alt::fft_prime(double t){
 		std::vector<Eigen::Vector2d> tmp7 = fast_fft(neg_ik_hat_h_z);
 		for (int i = 0; i < N; i++)
 		{
-			m_current_h[i] = tmp[i];
+			m_current_h[i] = -tmp[i];
 			// m_slopes[i] = tmp2[i];
 			// m_displacements[i] = tmp3[i];
 			m_slopes_x[i] = tmp4[i];

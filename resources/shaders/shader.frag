@@ -25,7 +25,7 @@ uniform sampler2D groundSampler;
 uniform samplerCube skySampler;
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
-uniform vec4 sunColor = vec4(64, 1, 0, 1.f);
+uniform vec4 sunColor = vec4(1.5f, .7, .39f, 1.f);
 //uniform float test = 0;
 
 // Random methods from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
