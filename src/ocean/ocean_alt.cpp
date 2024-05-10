@@ -381,9 +381,12 @@ void ocean_alt::update_ocean()
 //            std::cout << m_foam_constants.wavelengths[i] << std::endl;
 //        }
 
-        if (waveheight >= height_threshold){
+        if (m_foam_constants.wavelengths[i] >= height_threshold){
                  //std::cout << "push" << std::endl;
-                 m_heights.push_back(v);
+            OceanSpray s;
+            s.height = v;
+            s.slope = norm;
+                 m_heights.push_back(s);
         }
 
 

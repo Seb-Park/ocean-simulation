@@ -32,23 +32,29 @@ float getRandomInRange(float max, float min){
 
 }
 
+float getRandomY(){
+    return getRandomInRange(.001,.2);
+}
 Eigen::Vector3f particlesystem::getRandomInitialVel(){
 
 
     std::pair<float, float> r = sample_complex_gaussian();
-    return factor*Eigen::Vector3f(r.first, getRandomInRange(1.f, 10.f), r.second);
+    return factor*Eigen::Vector3f(r.first, getRandomY(), r.second);
 }
 
-void particlesystem::init(std::vector<Eigen::Vector3f> verts){
+void particlesystem::init(std::vector<OceanSpray> verts){
     // make sure to set m_verts
     setVerts(verts);
 
     m_particles.reserve(4000);
 
-    for (Eigen::Vector3f v : m_verts){
+    for (auto v : m_verts){
         Particle p;
-        p.pos = Eigen::Vector3f(v);
-        p.vel = getRandomInitialVel();
+        p.pos = Eigen::Vector3f(v.height);
+        p.vel = v.slope*factor;
+        //p.vel = getRandomInitialVel();
+        p.vel = getRandomInitialVel().asDiagonal() * v.slope;
+        p.vel[1] = 0.1;
 
 
         m_particles.push_back(p);
@@ -85,14 +91,18 @@ void particlesystem::update(double deltaTime){
     float dt = deltaTime;
     // update all particles values
     for (Particle &p : m_particles){
-       p.life -= deltaTime * getRandomInRange(.01f, .5f);
+       p.life -= deltaTime * getRandomInRange(.1f, .5f);
 
         // if particle is still alive, update pos
         if (p.life >= 0.f){
-            p.vel += gravity*dt;
+            float r = getRandomInRange(.5, 1.f);
+            p.vel += gravity*dt*r;
             p.pos += p.vel * dt * 10.f;
-
+//            p.vel[1] -= (p.vel.dot(p.vel) / 2 + gravity[0]) * dt;
+//            p.pos += p.vel * dt * 10.f;
         }
+
+        if (p.pos[1] < 0.f) p.life = 0.f;
 
     }
 }
@@ -124,10 +134,14 @@ int particlesystem::getUnusedParticleIndex(){
     return -1;
 }
 
-void particlesystem::respawn_particle(Particle &p, Eigen::Vector3f new_pos){
+void particlesystem::respawn_particle(Particle &p, OceanSpray new_pos){
 
-    p.pos = new_pos;
-    p.vel = getRandomInitialVel(); // TODO: change to more accurate vel
+    p.pos = Eigen::Vector3f(new_pos.height);
+    p.vel = new_pos.slope*factor;
+    //p.vel = getRandomInitialVel();
+    p.vel = getRandomInitialVel().asDiagonal() * new_pos.slope;
+   p.vel[1] = .01;
+
 
     // reset life
     p.life = 1.f;

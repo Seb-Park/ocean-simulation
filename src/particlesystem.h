@@ -2,6 +2,7 @@
 #ifndef PARTICLESYSTEM_H
 #define PARTICLESYSTEM_H
 
+#include "ocean/ocean_alt.h"
 #include <iostream>
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 #define EIGEN_DONT_VECTORIZE
@@ -31,9 +32,9 @@ public:
     void draw(Shader *skybox_shader, Camera  m_camera);
     void draw(Shader *shader, Camera  m_camera, std::vector<Eigen::Vector3f> verts, Eigen::Matrix4f model);
 
-    void init(std::vector<Eigen::Vector3f> verts);
+    void init(std::vector<OceanSpray> verts);
 
-    void setVerts(std::vector<Eigen::Vector3f> verts){
+    void setVerts(std::vector<OceanSpray> verts){
         std::cout << "VERTS SIZE:" << verts.size() << std::endl;
         m_verts = verts;
 
@@ -46,18 +47,18 @@ private:
     int m_new_amount = 100; // new particles per frame
     int lastUsedIndex = 0;
     Eigen::Vector3f gravity = Eigen::Vector3f(0,-9.81f,0);
-    float factor = 10.f; // velocity multiplier
+    float factor = 40.f; // velocity multiplier
 
 
 
-    void respawn_particle(Particle &p, Eigen::Vector3f new_pos);
+    void respawn_particle(Particle &p, OceanSpray new_pos);
     int getUnusedParticleIndex();
     Eigen::Vector3f getRandomInitialVel();
 
 
 
 
-    float d = 5.f;
+    float d = 2.f;
     std::vector<float> m_vertices = {
         -d, d,
         d,d,
@@ -76,7 +77,7 @@ private:
 
     std::vector<Particle> m_particles;
 
-    std::vector<Eigen::Vector3f> m_verts;
+    std::vector<OceanSpray> m_verts;
 
 };
 
