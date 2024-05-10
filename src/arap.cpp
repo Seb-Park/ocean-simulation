@@ -51,6 +51,8 @@ void ARAP::init
 
     minCorner = coeffMin;
     maxCorner = coeffMax;
+
+    initCausticsShape(10);
 }
 
 void ARAP::update(double seconds)
@@ -96,5 +98,66 @@ void ARAP::move
 	//   - Left-click an anchored point to move it around
 	//
 	// - Minus and equal keys (click repeatedly) to change the size of the vertices
+}
+
+void ARAP::initCausticsShape(int res) {
+//    std::vector<Eigen::Vector3f> gridPoints;
+//    float step = 2.f / ((float) res);
+
+//    for (int i = 0; i < res; ++i) {
+//        for (int j = 0; j < res; ++j) {
+//            float x = -1.f + i * step; // calculate x coordinate
+//            float y = -1.f + j * step; // calculate y coordinate
+//            gridPoints.push_back(Eigen::Vector3f(x, y, 0.f)); // add point to grid
+//        }
+//    }
+//    std::vector<Eigen::Vector3f> verts;
+//    float step = 2.f / ((float) res);
+
+//    for (int i = 0; i < res; ++i) {
+//        for (int j = 0; j < res; ++j) {
+//            float x = -1.f + i * step; // calculate x coordinate
+//            float y = -1.f + j * step; // calculate y coordinate
+//            Eigen::Vector3f bottomLeft = Eigen::Vector3f(x, y, 0.f);
+//            Eigen::Vector3f bottomRight = Eigen::Vector3f(x + step, y, 0.f);
+//            Eigen::Vector3f topRight = Eigen::Vector3f(x + step, y + step, 0.f);
+//            Eigen::Vector3f topLeft = Eigen::Vector3f(x, y + step, 0.f);
+//            verts.push_back(topLeft);
+//            verts.push_back(bottomLeft);
+//            verts.push_back(bottomRight);
+//            verts.push_back(topLeft);
+//            verts.push_back(bottomRight);
+//            verts.push_back(topRight);
+//        }
+//    }
+//    m_causticsShape.setVertices(verts);
+    std::vector<Eigen::Vector3f> verts;
+    std::vector<Eigen::Vector3i> faces;
+    float size = 2.f;
+    float step = size / ((float) res);
+
+    for (int i = 0; i <= res; ++i) {
+        for (int j = 0; j <= res; ++j) {
+            float x = -(size / 2.f) + i * step; // calculate x coordinate
+            float y = -(size / 2.f) + j * step; // calculate y coordinate
+            Eigen::Vector3f bottomLeft = Eigen::Vector3f(x, y, 0.f);
+            verts.push_back(bottomLeft);
+        }
+    }
+
+    for (int i = 0; i < res; ++i) {
+        for (int j = 0; j < res; ++j) {
+            int bottomLeft = i * (res + 1) + j;
+            int bottomRight = i * (res + 1) + j + 1;
+            int topRight = (i + 1) * (res + 1) + j + 1;
+            int topLeft = (i + 1) * (res + 1) + j;
+            faces.push_back(Eigen::Vector3i(topLeft, bottomLeft, bottomRight));
+            faces.push_back(Eigen::Vector3i(topLeft, bottomRight, topRight));
+            faces.push_back(Eigen::Vector3i(bottomRight, bottomLeft, topLeft));
+            faces.push_back(Eigen::Vector3i(topRight, bottomRight, topLeft));
+        }
+    }
+    m_causticsShape.init(verts, faces);
+    m_causticsShape.setColor(0.27f, .803f, .96f);
 }
 

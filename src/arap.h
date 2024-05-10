@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/shape.h"
+//#include "graphics/simpleshape.h"
 //#include "graphics/oceanshape.h"
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
@@ -20,7 +21,7 @@ class ARAP
 private:
     Shape m_shape;
 //    OceanShape m_oceanShape;
-
+    void initCausticsShape(int res);
 public:
     ARAP();
 
@@ -38,6 +39,7 @@ public:
 
     void draw(Shader *shader, GLenum mode)
     {
+//        m_causticsShape.draw(shader, mode);
         m_shape.draw(shader, mode);
     }
 
@@ -85,5 +87,7 @@ public:
         double m_timestep = 0.1;
 
     Eigen::Vector3f minCorner, maxCorner;
+
+    Shape m_causticsShape;
 };
 

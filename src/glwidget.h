@@ -41,6 +41,7 @@ private:
     void keyReleaseEvent  (QKeyEvent   *event) override;
 
     void makeFBO();
+    void makeFBO1();
 
     void initCaustics();
     void paintCaustics();
@@ -55,6 +56,7 @@ private:
     Shader *m_defaultShader;
     Shader *m_pointShader;
     Shader *m_texture_shader;
+    Shader *m_causticsShader;
 
     Shader *m_colorShader;
 
@@ -70,6 +72,11 @@ private:
     GLuint m_fbo;
     GLuint m_fbo_texture;
     GLuint m_fbo_renderbuffer;
+
+    GLuint m_fbo1;
+    GLuint m_fbo_texture1;
+    GLuint m_fbo_renderbuffer1;
+
     GLuint m_defaultFBO;
 
     GLuint m_floor_vbo;
