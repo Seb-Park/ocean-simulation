@@ -13,15 +13,15 @@ in float intensity;
 //uniform float intExp = 0.5f;
 //uniform float scale = 1.f;
 
-uniform float multiplier = .9f;
-uniform float contrast = 20.f;
-uniform float intExp = 0.f;
-uniform float scale = 1.f;
-
-//uniform float multiplier = .5f;
-//uniform float contrast = 1.5f;
+//uniform float multiplier = .9f;
+//uniform float contrast = 20.f;
 //uniform float intExp = 0.f;
 //uniform float scale = 1.f;
+
+uniform float multiplier = .5f;
+uniform float contrast = 1.5f;
+uniform float intExp = 0.f;
+uniform float scale = 1.f;
 
 //uniform vec4 baseColor =vec4();
 
@@ -39,4 +39,5 @@ void main() {
     finalInt = clamp(finalInt, 0, 1);
     fragColor = vec4(1, 1, 1, finalInt * scale);
 //    fragColor = vec4(vec3(1), pow(oldArea / newArea * .2f, 1.5f));
+    fragColor = vec4((normal_worldSpace + 1) / 2, 1.f);
 }

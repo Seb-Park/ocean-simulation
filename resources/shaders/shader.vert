@@ -4,8 +4,8 @@ layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in vec3 normal;   // Normal of the vertex
 layout(location = 2) in vec3 texCoords;   // Normal of the vertex
 
-uniform float depth = -3000.f;
-uniform float skyHeight = 500.f;
+uniform float depth = -500.f;
+uniform float skyHeight = 100.f;
 uniform mat4 proj;
 uniform mat4 view;
 uniform mat4 model;

@@ -161,12 +161,12 @@ void Shape::draw(Shader *shader, GLenum mode)
     // Not that one texture is overwriting the other, because if we just load sky it doesn't work
     // Draws whatever is bound to texture0 no matter what.
     // Drawing the ground texture.
-/*     // When ground is being rendered dynamically, don't use static ground image.
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
-//    glBindTexture(GL_TEXTURE_2D, 0);
-    shader->setUniform("groundSampler", 0);
-    glUniform1i(glGetUniformLocation(shader->id(), "groundSampler"), 0);*/
+     // When ground is being rendered dynamically, don't use static ground image.
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, m_ground_texture);
+////    glBindTexture(GL_TEXTURE_2D, 0);
+//    shader->setUniform("groundSampler", 0);
+//    glUniform1i(glGetUniformLocation(shader->id(), "groundSampler"), 0);
 
 
     // https://stackoverflow.com/questions/67277087/opengl-glsl-multiple-texture-binding-not-working
@@ -336,7 +336,7 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
         Vector3f n = getNormal(face);
 
         for (auto& v: {face[0], face[1], face[2]}) {
-            normals.push_back(Eigen::Vector3f(1,1,1));
+            normals.push_back(n);
             verts.push_back(vertices[v]);
 
             if (m_anchors.find(v) == m_anchors.end()) {

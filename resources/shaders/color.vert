@@ -4,7 +4,7 @@ layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in vec3 normal;   // Normal of the vertex
 layout(location = 2) in vec3 texCoords;   // Normal of the vertex
 
-uniform float depth = -3000.f;
+uniform float depth = -1000.f;
 uniform float skyHeight = 500.f;
 uniform mat4 proj;
 uniform mat4 view;
@@ -89,4 +89,5 @@ void main() {
     oldPosFlat = moveToTopDown(position);
     pos = moveToTopDown(vec3(refractedPositionAndProb));
     gl_Position = vec4(pos, 1.f);
+    gl_Position = vec4(oldPosFlat, 1.f);
 }

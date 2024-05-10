@@ -98,18 +98,12 @@ void GLWidget::initializeGL()
     m_foamShader   = new Shader(":resources/shaders/foam.vert",      ":resources/shaders/foam.frag");
     m_skyboxShader   = new Shader(":resources/shaders/skybox.vert",      ":resources/shaders/skybox.frag");
 
-    // specify texture for skybox
-//      m_skyboxShader->bind();
-//      glUniform1i(glGetUniformLocation(m_skyboxShader->id(), "cubeMap"), 9); // bind texture at slot 9
-//      Eigen::Vector3f sc = Eigen::Vector3f(.77f, .85f, .99f); // skycolor for fade effect
-//      glUniform3f(glGetUniformLocation(m_skyboxShader->id(), "skyColor"), sc[0], sc[1], sc[2]);
-//      m_skyboxShader->unbind();
-
 
     m_halftone_tex = loadTextureFromFile(":resources/images/halftone.png").textureID;
     m_foam_tex = loadTextureFromFile(":resources/images/foam3.png").textureID;
 
 
+    m_causticsShader = new Shader(":resources/shaders/caustics.vert",      ":resources/shaders/caustics.frag");
 
     initCaustics();
 
@@ -138,11 +132,12 @@ void GLWidget::initializeGL()
 
     m_devicePixelRatio = this->devicePixelRatio();
 
-    m_defaultFBO = 2;
+    m_defaultFBO = 3;
     m_fbo_width = size().width() * m_devicePixelRatio;
     m_fbo_height = size().height() * m_devicePixelRatio;
 
     makeFBO();
+    makeFBO1();
 
     // FBO STUFF END
 
@@ -209,7 +204,7 @@ void GLWidget::paintCaustics() {
     glClearColor(0.68f, 0.58f, 0.38f, 1);
 //    glClearColor(0., 0., 0., 1);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo1);
 //    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 
     // Clear Screen
@@ -227,6 +222,7 @@ void GLWidget::paintCaustics() {
 ////    // Draw the VAO
 //    glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
     m_colorShader->bind();
     //
     m_colorShader->setUniform("proj", m_camera.getProjection());
@@ -242,6 +238,24 @@ void GLWidget::paintCaustics() {
     glBindVertexArray(0);
 
     // Unbind the shader
+    glUseProgram(0);
+
+    m_causticsShader->bind();
+
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
+    glDisable( GL_DEPTH_TEST );
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture1);
+    glUniform1i(glGetUniformLocation(m_causticsShader ->id(), "normSamp"), 2);
+
+    m_arap.m_causticsShape.draw(m_causticsShader, GL_TRIANGLES);
+    glBindVertexArray(0);
     glUseProgram(0);
 }
 
@@ -345,7 +359,37 @@ void GLWidget::makeFBO() {
 
     // Task 22
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+}
 
+void GLWidget::makeFBO1() {
+    // Task 19
+    glActiveTexture(GL_TEXTURE2);
+    glGenTextures(1, &m_fbo_texture1);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_fbo_width, m_fbo_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Task 20
+    glGenRenderbuffers(1, &m_fbo_renderbuffer1);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer1);
+    glRenderbufferStorage(GL_RENDERBUFFER,
+                          GL_DEPTH24_STENCIL8,
+                          m_fbo_width,
+                          m_fbo_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Task 18
+    glGenFramebuffers(1, &m_fbo1);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo1);
+
+    // Task 21
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture1, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer1);
+
+    // Task 22
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
 
 void GLWidget::paintGL()
@@ -358,6 +402,7 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_BLEND );
+    glEnable(GL_DEPTH_TEST);
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
@@ -386,36 +431,33 @@ void GLWidget::paintGL()
 //    m_arap.draw(m_pointShader, GL_POINTS);
 //    m_pointShader->unbind();
 
-//        m_foamShader->bind();
-//        m_foamShader->setUniform("proj",   m_camera.getProjection());
-//        m_foamShader->setUniform("view",   m_camera.getView());
-////        m_foamShader->setUniform("vSize",  m_vSize);
-////        m_foamShader->setUniform("width",  width());
-////        m_foamShader->setUniform("height", height());
-//        glUniform1f(glGetUniformLocation(m_foamShader->id(), "time"), m_arap.getTime());
-//        glUniform1f(glGetUniformLocation(m_foamShader->id(), "phaseC"), 1.f);
-//        m_foamShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
-//        m_foamShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
-//
-//        glActiveTexture(GL_TEXTURE5);
-//        glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
-//        glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
-//
-//        glActiveTexture(GL_TEXTURE6);
-//        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
-//        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
+        m_foamShader->bind();
+        m_foamShader->setUniform("proj",   m_camera.getProjection());
+        m_foamShader->setUniform("view",   m_camera.getView());
+        glUniform1f(glGetUniformLocation(m_foamShader->id(), "time"), m_arap.getTime());
+        glUniform1f(glGetUniformLocation(m_foamShader->id(), "phaseC"), 1.f);
+        m_foamShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
+        m_foamShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
+        glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
+
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
+        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
 
 
 
 
-//        m_arap.drawFoam(m_foamShader, GL_TRIANGLES);
-//        m_foamShader->unbind();
-//
-//        // skybox
-//
-//
-//
-//        m_skybox.draw(m_skyboxShader, m_camera);
+        m_arap.drawFoam(m_foamShader, GL_TRIANGLES);
+        m_foamShader->unbind();
+
+        // skybox
+
+
+
+        m_skybox.draw(m_skyboxShader, m_camera);
 
 
 
@@ -425,25 +467,32 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
 {
     std::string filename = std::string(path);
 
+    QString filepath = QString(filename.c_str());
+    QImage tex_image = QImage(filepath);
+    tex_image = tex_image.convertToFormat(QImage::Format_RGBA8888);
+    auto data = tex_image.bits();
+    int width = tex_image.width();
+    int height = tex_image.height();
+
     GLuint textureID;
     glGenTextures(1, &textureID);
 
-    int width, height, nrComponents;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    stbi_set_flip_vertically_on_load(false);
+//    int width, height, nrComponents;
+//    stbi_set_flip_vertically_on_load(true);
+//    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+//    stbi_set_flip_vertically_on_load(false);
     if (data)
     {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
+//        GLenum format;
+//        if (nrComponents == 1)
+//            format = GL_RED;
+//        else if (nrComponents == 3)
+//            format = GL_RGB;
+//        else if (nrComponents == 4)
+//            format = GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -451,13 +500,13 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        stbi_image_free(data);
+//        stbi_image_free(data);
 
     }
     else
     {
         std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
+//        stbi_image_free(data);
     }
 
     TextureData newtex;
@@ -466,50 +515,6 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
     newtex.width = width;
     return newtex;
 }
-
-GLuint GLWidget::loadCubeMap(std::vector<const char*> textureFiles){
-    std::cout << "hello 111" << std::endl;
-
-    // create empty texture
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-
-    std::cout << "hello fssd" << std::endl;
-
-
-    //glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    std::cout << "hello fssd" << std::endl;
-
-    GLuint target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-    for (int i=0; i<6; i++){
-        std::string filename = std::string(textureFiles[i]);//directory + '/' + filename;
-        int width, height, nrChannels;
-        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-
-        if (data){
-            stbi_set_flip_vertically_on_load(false);
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            stbi_image_free(data);
-
-        }    else {
-            std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
-            stbi_image_free(data);
-        }
-    }
-
-    return textureID;
-}
-
-
-
 void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
@@ -517,7 +522,11 @@ void GLWidget::resizeGL(int w, int h)
     glDeleteTextures(1, &m_fbo_texture);
     glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
     glDeleteFramebuffers(1, &m_fbo);
+    glDeleteTextures(1, &m_fbo_texture1);
+    glDeleteRenderbuffers(1, &m_fbo_renderbuffer1);
+    glDeleteFramebuffers(1, &m_fbo1);
     makeFBO();
+    makeFBO1();
 }
 
 // ================== Event Listeners
