@@ -202,12 +202,12 @@ public:
 
 
 
-        {":resources/images/cupertin-lake_rt.png",
-     ":resources/images/cupertin-lake_lf.png",
-               ":resources/images/cupertin-lake_up.png",
-               ":resources/images/cupertin-lake_dn.png",
-               ":resources/images/cupertin-lake_bk.png",
-               ":resources/images/cupertin-lake_ft.png",
+        {":resources/images/px.png",
+     ":resources/images/nx.png",
+               ":resources/images/py.png",
+               ":resources/images/ny.png",
+               ":resources/images/pz.png",
+               ":resources/images/nz.png",
    };
 
        float ROTATE_SPEED = .01f; // 1 degree per sec
