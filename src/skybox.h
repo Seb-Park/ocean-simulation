@@ -202,12 +202,12 @@ public:
 
 
 
-        {"/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_rt.png",
-     "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_lf.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_up.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_dn.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_bk.png",
-               "/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/cupertin-lake_ft.png",
+        {":resources/images/cupertin-lake_rt.png",
+     ":resources/images/cupertin-lake_lf.png",
+               ":resources/images/cupertin-lake_up.png",
+               ":resources/images/cupertin-lake_dn.png",
+               ":resources/images/cupertin-lake_bk.png",
+               ":resources/images/cupertin-lake_ft.png",
    };
 
        float ROTATE_SPEED = .01f; // 1 degree per sec

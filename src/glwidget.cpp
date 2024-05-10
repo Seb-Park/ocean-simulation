@@ -85,8 +85,8 @@ void GLWidget::initializeGL()
 
 //    // Enable depth-testing and backface culling
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
 //    glShadeModel(GL_SMOOTH);
 
 
@@ -106,8 +106,8 @@ void GLWidget::initializeGL()
 //      m_skyboxShader->unbind();
 
 
-    m_halftone_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
-    m_foam_tex = loadTextureFromFile("/Users/jesswan/Desktop/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
+    m_halftone_tex = loadTextureFromFile(":resources/images/halftone.png").textureID;
+    m_foam_tex = loadTextureFromFile(":resources/images/foam3.png").textureID;
 
 
 
@@ -198,7 +198,7 @@ void GLWidget::initializeGL()
     m_camera.setPerspective(120, width() / static_cast<float>(height()), nearPlane, farPlane);
     m_camera.setPosition(Eigen::Vector3f(       0,
                                                 0,
-                                         -70289.5));
+                                         0));
 
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
@@ -206,29 +206,39 @@ void GLWidget::initializeGL()
 }
 
 void GLWidget::paintCaustics() {
+    glClearColor(0.68f, 0.58f, 0.38f, 1);
+//    glClearColor(0., 0., 0., 1);
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+//    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 
-    // Task 15: Clear the screen here
-
-    // TA SOLUTION
+    // Clear Screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
 
-    // Bind the shader
+//    // Bind the shader
+//    m_colorShader->bind();
+
+////    m_colorShader->setUniform("asdf", m_arap.minCorner[0], m_arap.maxCorner[0]);
+////    // Bind VAO
+//    glBindVertexArray(m_floor_vao);
+
+////    // Draw the VAO
+//    glDrawArrays(GL_TRIANGLES, 0, 3);
+
     m_colorShader->bind();
+    //
+    m_colorShader->setUniform("proj", m_camera.getProjection());
+    m_colorShader->setUniform("view", m_camera.getView());
+    Eigen::Matrix4f inverseView = m_camera.getView().inverse();
+    m_colorShader->setUniform("inverseView", inverseView);
+    //
+    m_colorShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
+    m_colorShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+    m_arap.draw(m_colorShader, GL_TRIANGLES);
 
-    // Task 16: Bind your VAO here
-
-    // TA SOLUTION
-    glBindVertexArray(m_floor_vao);
-
-    // Task 17: Draw your VAO here
-
-    // TA SOLUTION
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    // Task 18: Unbind your VAO here
-
-    // TA SOLUTION
+    // Unbind the VAO
     glBindVertexArray(0);
 
     // Unbind the shader
@@ -341,6 +351,7 @@ void GLWidget::makeFBO() {
 void GLWidget::paintGL()
 {
     paintCaustics();
+    glClearColor(0.56f, 0.69f, 0.74f, 1);
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 //    return;
 //    paintTexture(m_ground_texture, false);
@@ -356,6 +367,7 @@ void GLWidget::paintGL()
     m_defaultShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
     m_defaultShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
 
+    // Set the ocean floor to the painted caustics
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
     glUniform1i(glGetUniformLocation(m_defaultShader->id(), "groundSampler"), 2);
@@ -374,36 +386,36 @@ void GLWidget::paintGL()
 //    m_arap.draw(m_pointShader, GL_POINTS);
 //    m_pointShader->unbind();
 
-        m_foamShader->bind();
-        m_foamShader->setUniform("proj",   m_camera.getProjection());
-        m_foamShader->setUniform("view",   m_camera.getView());
-//        m_foamShader->setUniform("vSize",  m_vSize);
-//        m_foamShader->setUniform("width",  width());
-//        m_foamShader->setUniform("height", height());
-        glUniform1f(glGetUniformLocation(m_foamShader->id(), "time"), m_arap.getTime());
-        glUniform1f(glGetUniformLocation(m_foamShader->id(), "phaseC"), 1.f);
-        m_foamShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
-        m_foamShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
-
-        glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
-        glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
-
-        glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
-        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
-
-
-
-
-        m_arap.drawFoam(m_foamShader, GL_TRIANGLES);
-        m_foamShader->unbind();
-
-        // skybox
+//        m_foamShader->bind();
+//        m_foamShader->setUniform("proj",   m_camera.getProjection());
+//        m_foamShader->setUniform("view",   m_camera.getView());
+////        m_foamShader->setUniform("vSize",  m_vSize);
+////        m_foamShader->setUniform("width",  width());
+////        m_foamShader->setUniform("height", height());
+//        glUniform1f(glGetUniformLocation(m_foamShader->id(), "time"), m_arap.getTime());
+//        glUniform1f(glGetUniformLocation(m_foamShader->id(), "phaseC"), 1.f);
+//        m_foamShader->setUniform("widthBounds", m_arap.minCorner[0], m_arap.maxCorner[0]);
+//        m_foamShader->setUniform("lengthBounds", m_arap.minCorner[2], m_arap.maxCorner[2]);
+//
+//        glActiveTexture(GL_TEXTURE5);
+//        glBindTexture(GL_TEXTURE_2D, m_halftone_tex);
+//        glUniform1i(glGetUniformLocation(m_foamShader->id(), "halftone_texture"), 5);
+//
+//        glActiveTexture(GL_TEXTURE6);
+//        glBindTexture(GL_TEXTURE_2D, m_foam_tex);
+//        glUniform1i(glGetUniformLocation(m_foamShader->id(), "foam_texture"), 6);
 
 
 
-        m_skybox.draw(m_skyboxShader, m_camera);
+
+//        m_arap.drawFoam(m_foamShader, GL_TRIANGLES);
+//        m_foamShader->unbind();
+//
+//        // skybox
+//
+//
+//
+//        m_skybox.draw(m_skyboxShader, m_camera);
 
 
 
@@ -502,6 +514,10 @@ void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
     m_camera.setAspect(static_cast<float>(w) / h);
+    glDeleteTextures(1, &m_fbo_texture);
+    glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
+    glDeleteFramebuffers(1, &m_fbo);
+    makeFBO();
 }
 
 // ================== Event Listeners

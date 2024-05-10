@@ -117,10 +117,14 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/skybox.frag
         resources/shaders/skybox.vert
 
-
-
-
-
+        resources/images/cupertin-lake_rt.png
+        resources/images/cupertin-lake_lf.png
+        resources/images/cupertin-lake_up.png
+        resources/images/cupertin-lake_dn.png
+        resources/images/cupertin-lake_bk.png
+        resources/images/cupertin-lake_ft.png
+        resources/images/halftone.png
+        resources/images/foam3.png
 
 
 )

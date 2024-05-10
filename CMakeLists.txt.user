@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< HEAD
 <!-- Written by QtCreator 8.0.1, 2024-05-07T03:41:57. -->
+=======
+<!-- Written by QtCreator 8.0.1, 2024-05-07T05:26:10. -->
+>>>>>>> let-em-cook
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>

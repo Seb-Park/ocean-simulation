@@ -2,9 +2,10 @@
 
 layout(location = 0) in vec3 position; // Position of the vertex
 layout(location = 1) in vec3 normal;   // Normal of the vertex
-layout(location = 3) in vec3 texCoords;   // Normal of the vertex
+layout(location = 2) in vec3 texCoords;   // Normal of the vertex
 
-
+uniform float depth = -3000.f;
+uniform float skyHeight = 500.f;
 uniform mat4 proj;
 uniform mat4 view;
 uniform mat4 model;
@@ -25,7 +26,7 @@ out vec2 uv;
 out float matIor;
 
 vec4 getRefrPos() {
-    float depth = -1000.f; // TODO: Pass as uniform
+//    float depth = -1500.f; // TODO: Pass as uniform
     vec3 w_o = normalize(pos - camera_worldSpace);
     float cos_theta_i = dot(-w_o, normal_worldSpace);
     float n_i = 1;
@@ -55,11 +56,11 @@ vec4 getRefrPos() {
 }
 
 vec3 getReflPos() {
-    float depth = 500.f; // TODO: Pass as uniform
+//    float depth = 500.f; // TODO: Pass as uniform
     vec3 w_o = normalize(pos - camera_worldSpace);
     vec3 reflectedRay = w_o - 2 * dot(w_o, normal_worldSpace) * normal_worldSpace;
 
-    float dist = depth - position.y;
+    float dist = skyHeight - position.y;
     float depthScale = dist / reflectedRay.y;
     vec3 skyContactPoint = (reflectedRay * depthScale) + position;
     return skyContactPoint;

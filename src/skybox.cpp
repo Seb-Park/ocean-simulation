@@ -18,7 +18,7 @@ skybox::skybox()
 
 void skybox::initializeVAO(){
     sky_shape.init(m_vertices_eigen, m_faces);
-    std::cout << "hehee" << std::endl;
+    // std::cout << "hehee" << std::endl;
     skybox_tex = loadCubeMap(m_skyboxTextureFiles);
 
     glGenVertexArrays(1, &VAO);
@@ -84,7 +84,7 @@ void skybox::draw(Shader *skybox_shader, Camera  m_camera){
 ///
 ///
 
-    std::cout << m_camera.getPosition() << std::endl;
+    // std::cout << m_camera.getPosition() << std::endl;
 
    // sky_shape.draw(skybox_shader, GL_TRIANGLES);
 
@@ -132,7 +132,7 @@ GLuint skybox::loadCubeMap(std::vector<const char*> textureFiles){
     GLuint textureID;
     glGenTextures(1, &textureID);
 
-    std::cout << "hello fssd" << std::endl;
+    // std::cout << "hello fssd" << std::endl;
 
 
     //glActiveTexture(GL_TEXTURE3);
@@ -144,7 +144,7 @@ GLuint skybox::loadCubeMap(std::vector<const char*> textureFiles){
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    std::cout << "hello fssd" << std::endl;
+    // std::cout << "hello fssd" << std::endl;
 
     GLuint target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
     for (int i=0; i<6; i++){
@@ -158,7 +158,7 @@ GLuint skybox::loadCubeMap(std::vector<const char*> textureFiles){
             stbi_image_free(data);
 
         }    else {
-            std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
+            // std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
             stbi_image_free(data);
         }
     }
