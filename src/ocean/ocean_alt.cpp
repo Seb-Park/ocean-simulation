@@ -138,7 +138,7 @@ void ocean_alt::fft_prime(double t){
 		std::vector<Eigen::Vector2d> tmp7 = fast_fft(neg_ik_hat_h_z);
 		for (int i = 0; i < N; i++)
 		{
-			m_current_h[i] = -tmp[i];
+			m_current_h[i] = tmp[i];
 			// m_slopes[i] = tmp2[i];
 			// m_displacements[i] = tmp3[i];
 			m_slopes_x[i] = tmp4[i];
@@ -373,7 +373,7 @@ void ocean_alt::update_ocean()
 //        float waveheight = (height - h_0 ) / (h_max - h_0);
 //        m_foam_constants.wavelengths[i] = waveheight;
         float h_0 = 0; // min*.2f;
-        float h_max = max*.35f; // the smaller the constant, the more foam there is
+        float h_max = max*.25f; // the smaller the constant, the more foam there is
         m_foam_constants.wavelengths[i] = (height - h_0 ) / (h_max - h_0);
 
 //        if (i < 5){
