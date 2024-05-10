@@ -85,7 +85,7 @@ void ARAP::update(double seconds)
 	m_ocean.fft_prime(m_time);
     m_ocean.update_ocean();
     m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
-  //  m_shape.setVertices(m_ocean.get_vertices());
+//      m_shape.setVertices(m_ocean.get_vertices());
 
 //	auto tmp = m_ocean.get_vertices();
 	// print the min and max of the vertices
@@ -94,7 +94,7 @@ void ARAP::update(double seconds)
 //	for (int i = 0; i < tmp.size(); i++) {
 //		min = min.cwiseMin(tmp[i]);
 //		max = max.cwiseMax(tmp[i]);
-//	}
+//	}w
 //	std::cout << "min: " << min << std::endl;
 //std::cout << "max: " << max << std::endl;
 

@@ -30,6 +30,8 @@
     <file alias="resources/images/cupertin-lake_ft.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/cupertin-lake_ft.png</file>
     <file alias="resources/images/halftone.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/halftone.png</file>
     <file alias="resources/images/foam3.png">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/images/foam3.png</file>
+    <file alias="resources/shaders/caustics.vert">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/caustics.vert</file>
+    <file alias="resources/shaders/caustics.frag">/Users/sotech117/Documents/final/adv/ocean-simulation/resources/shaders/caustics.frag</file>
   </qresource>
 </RCC>
 

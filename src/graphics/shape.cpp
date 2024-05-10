@@ -336,7 +336,7 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
         Vector3f n = getNormal(face);
 
         for (auto& v: {face[0], face[1], face[2]}) {
-            normals.push_back(Eigen::Vector3f(1,1,1));
+            normals.push_back(n);
             verts.push_back(vertices[v]);
 
             if (m_anchors.find(v) == m_anchors.end()) {
