@@ -57,7 +57,7 @@ private:
 
 
 
-    float d = 2.f;
+    float d = 50.f;
     std::vector<float> m_vertices = {
         -d, d, 0,1,
         -d, -d, 0, 0,

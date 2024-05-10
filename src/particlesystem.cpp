@@ -45,10 +45,10 @@ Eigen::Vector3f particlesystem::getRandomInitialVel(){
 }
 
 Eigen::Vector3f getInitVel(OceanSpray s){
-    float x = getRandomInRange(0,1);
-    float y = getRandomInRange(0.1, .9);
+    float x = getRandomInRange(.6,4);
+    float y = getRandomInRange(0.5, 1.5);
     Eigen::Vector3f v = Eigen::Vector3f(s.slope_vector[0], y, s.slope_vector[1]) + Eigen::Vector3f(x,0,0);
-    return v*10.f;
+    return v*300.f;
     //p.vel[1] = 0.1;
 
 
@@ -107,9 +107,9 @@ void particlesystem::update(double deltaTime){
 
         // if particle is still alive, update pos
         if (p.life >= 0.f){
-            float r = getRandomInRange(.5, 1.6f);
+            float r = getRandomInRange(30, 80.f);
             p.vel += gravity*dt*r;
-            p.pos += p.vel * dt * 10.f;
+            p.pos += p.vel * dt;
 //            p.vel[1] -= (p.vel.dot(p.vel) / 2 + gravity[0]) * dt;
 //            p.pos += p.vel * dt * 10.f;
         }
