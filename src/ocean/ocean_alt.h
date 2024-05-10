@@ -27,6 +27,13 @@ struct FoamConstants{
     std::vector<Eigen::Vector2f> texCoords;
 };
 
+struct OceanSpray{
+    Eigen::Vector3f height;
+    Eigen::Vector3f slope;
+    Eigen::Vector2f slope_vector;
+
+};
+
 class ocean_alt
 {
 public:
@@ -43,6 +50,8 @@ public:
     }
 
     std::vector<Eigen::Vector3f> m_vertices; // current displacement vector for each K
+    std::vector<OceanSpray> m_heights; // stores height above threshold
+
 
 
 
@@ -71,8 +80,8 @@ private:
 	const double Lx = 512.0;
 	const double Lz = 512.0;
 
-	const int num_rows = 256;
-	const int num_cols = 256;
+    const int num_rows = 256;
+    const int num_cols = 256;
 
     const int num_tiles_x = 1;
     const int num_tiles_z = 1;
@@ -83,8 +92,8 @@ private:
 	const double lambda = .5; // how much displacement matters
 	const double spacing = 1.0; // spacing between grid points
 
-	const double A = 10000; // numeric constant for the Phillips spectrum
-	const double V = 500; // wind speed
+    const double A = 10000; // numeric constant for the Phillips spectrum
+    const double V = 100; // wind speed
     const double gravity = 9.81;
     const double L = V*V/gravity;
     const Eigen::Vector2d omega_wind = Eigen::Vector2d(1.0, 0.0); // wind direction, used in Phillips equation
@@ -102,6 +111,8 @@ private:
 
     // FOR FOAM:
     FoamConstants m_foam_constants;
+    float height_threshold = 2.f;
+
 
 
     float max = 0;

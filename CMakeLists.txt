@@ -61,6 +61,8 @@ add_executable(${PROJECT_NAME}
     src/ocean/halftone.h src/ocean/halftone.cpp
 
     src/skybox.h src/skybox.cpp
+
+    src/particlesystem.h src/particlesystem.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
@@ -131,6 +133,9 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
 
         resources/shaders/caustics.vert
         resources/shaders/caustics.frag
+
+        resources/shaders/particles.vert
+        resources/shaders/particles.frag
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

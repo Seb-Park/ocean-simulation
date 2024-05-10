@@ -1,6 +1,8 @@
 #pragma once
 
 #include "skybox.h"
+#include "particlesystem.h"
+
 #include <GL/glew.h>
 
 
@@ -70,6 +72,7 @@ private:
     Shader *m_colorShader;
     Shader *m_foamShader;
     Shader *m_skyboxShader;
+    Shader *m_particleShader;
 
 
 
@@ -122,4 +125,5 @@ private:
     int m_lastSelectedVertex = -1;
 
     skybox m_skybox;
+    particlesystem m_particles;
 };
