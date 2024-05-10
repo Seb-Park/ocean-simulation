@@ -25,6 +25,7 @@ uniform sampler2D groundSampler;
 uniform sampler2D skySampler;
 uniform vec2 widthBounds;
 uniform vec2 lengthBounds;
+uniform vec4 sunColor = vec4(1, 0.5f, 0, 1.f);
 //uniform float test = 0;
 
 // Random methods from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
@@ -82,7 +83,7 @@ void main() {
     // SOME OF IT WILL BE DIFFUSELY LIT, BUT THERE WILL BE SUBSURFACE SCATTERING, ESTIMATED BY THE AMBIENT TERM
 
     vec4 diffuse = vec4(red * d, green * d, blue * d, 1.0f);
-    vec4 specular = vec4(1, 1, 1, 1) * pow(spec, 10.f);
+    vec4 specular = sunColor * pow(spec, 10.f);
 //    vec4 transmissive = vec4(vec3(refrUV, 1.f - refrUV.y), 1.f);
     float waterBlurriness = 0.f;
     vec2 refrUVBlurry = (1 - beerAtt) * vec2(rand(refrUV), rand(vec4(pos, d))) * waterBlurriness + refrUV;
