@@ -148,18 +148,26 @@ GLuint skybox::loadCubeMap(std::vector<const char*> textureFiles){
 
     GLuint target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
     for (int i=0; i<6; i++){
+        std::cout << i << std::endl;
         std::string filename = std::string(textureFiles[i]);//directory + '/' + filename;
-        int width, height, nrChannels;
-        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+//        int width, height, nrChannels;
+//        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+
+        QString sky_texture_filepath = QString(filename.c_str());
+        QImage box_image = QImage(sky_texture_filepath);
+        box_image = box_image.convertToFormat(QImage::Format_RGBA8888);
+        auto data = box_image.bits();
+        int width = box_image.width();
+        int height = box_image.height();
 
         if (data){
-            stbi_set_flip_vertically_on_load(false);
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            stbi_image_free(data);
+//            stbi_set_flip_vertically_on_load(false);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//            stbi_image_free(data);
 
         }    else {
             std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
-            stbi_image_free(data);
+//            stbi_image_free(data);
         }
     }
 

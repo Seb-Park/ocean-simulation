@@ -103,6 +103,12 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/images/cupertin-lake_dn.png
         resources/images/cupertin-lake_bk.png
         resources/images/cupertin-lake_ft.png
+        resources/images/back.jpg
+        resources/images/front.jpg
+        resources/images/bottom.jpg
+        resources/images/top.jpg
+        resources/images/right.jpg
+        resources/images/left.jpg
 
 
 

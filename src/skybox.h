@@ -202,12 +202,12 @@ public:
 
 
 
-        {"/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/right.jpg",
-     "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/left.jpg",
-               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/top.jpg",
-               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/bottom.jpg",
-               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/front.jpg",
-               "/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/back.jpg",
+        {":/resources/images/right.jpg",
+     ":/resources/images/left.jpg",
+               ":/resources/images/top.jpg",
+               ":/resources/images/bottom.jpg",
+               ":/resources/images/front.jpg",
+               ":/resources/images/back.jpg",
 
    };
 

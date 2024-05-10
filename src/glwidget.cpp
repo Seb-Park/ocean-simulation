@@ -106,8 +106,8 @@ void GLWidget::initializeGL()
 //      m_skyboxShader->unbind();
 
 
-    m_halftone_tex = loadTextureFromFile("/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/halftone.png").textureID;
-    m_foam_tex = loadTextureFromFile("/Users/joelmanasseh/Desktop/cs/course/cs2240/ocean-simulation/resources/images/foam3.png").textureID;
+    m_halftone_tex = loadTextureFromFile(":/resources/images/halftone.png").textureID;
+    m_foam_tex = loadTextureFromFile(":/resources/images/foam3.png").textureID;
 
 
 
@@ -419,25 +419,32 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
 {
     std::string filename = std::string(path);
 
+    QString filepath = QString(filename.c_str());
+    QImage tex_image = QImage(filepath);
+    tex_image = tex_image.convertToFormat(QImage::Format_RGBA8888);
+    auto data = tex_image.bits();
+    int width = tex_image.width();
+    int height = tex_image.height();
+
     GLuint textureID;
     glGenTextures(1, &textureID);
 
-    int width, height, nrComponents;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    stbi_set_flip_vertically_on_load(false);
+//    int width, height, nrComponents;
+//    stbi_set_flip_vertically_on_load(true);
+//    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+//    stbi_set_flip_vertically_on_load(false);
     if (data)
     {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
+//        GLenum format;
+//        if (nrComponents == 1)
+//            format = GL_RED;
+//        else if (nrComponents == 3)
+//            format = GL_RGB;
+//        else if (nrComponents == 4)
+//            format = GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -445,13 +452,13 @@ TextureData GLWidget::loadTextureFromFile(const char *path)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        stbi_image_free(data);
+//        stbi_image_free(data);
 
     }
     else
     {
         std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
+//        stbi_image_free(data);
     }
 
     TextureData newtex;
@@ -484,9 +491,17 @@ GLuint GLWidget::loadCubeMap(std::vector<const char*> textureFiles){
 
     GLuint target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
     for (int i=0; i<6; i++){
+        std::cout << "what the yuck f" << std::endl;
         std::string filename = std::string(textureFiles[i]);//directory + '/' + filename;
-        int width, height, nrChannels;
-        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+//        int width, height, nrChannels;
+//        unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+
+        QString sky_texture_filepath = QString(filename.c_str());
+        QImage box_image = QImage(sky_texture_filepath);
+        box_image = box_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+        auto data = box_image.bits();
+        int width = box_image.width();
+        int height = box_image.height();
 
         if (data){
             stbi_set_flip_vertically_on_load(false);
@@ -495,6 +510,7 @@ GLuint GLWidget::loadCubeMap(std::vector<const char*> textureFiles){
 
         }    else {
             std::cout << "Texture failed to load at path: " << textureFiles[i] << std::endl;
+            std::cout << "love yuck f" << std::endl;
             stbi_image_free(data);
         }
     }
