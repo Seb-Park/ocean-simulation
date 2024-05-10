@@ -129,6 +129,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/images/cupertin-lake_ft.png
         resources/images/halftone.png
         resources/images/foam3.png
+        resources/images/particle.png
+
 
         resources/images/nx.png
         resources/images/ny.png
