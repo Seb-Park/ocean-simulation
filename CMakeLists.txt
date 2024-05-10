@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/meshloader.cpp
     src/graphics/shader.cpp
     src/graphics/shape.cpp
+#    src/graphics/simpleshape.cpp
 #    src/graphics/oceanshape.cpp
 
     src/mainwindow.h
@@ -47,6 +48,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/meshloader.h
     src/graphics/shader.h
     src/graphics/shape.h
+#    src/graphics/simpleshape.h
 #    src/graphics/oceanshape.h
 
     util/tiny_obj_loader.h
@@ -127,6 +129,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/images/foam3.png
 
 
+        resources/shaders/caustics.vert
+        resources/shaders/caustics.frag
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

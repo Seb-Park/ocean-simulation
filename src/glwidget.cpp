@@ -110,6 +110,7 @@ void GLWidget::initializeGL()
     m_foam_tex = loadTextureFromFile(":resources/images/foam3.png").textureID;
 
 
+    m_causticsShader = new Shader(":resources/shaders/caustics.vert",      ":resources/shaders/caustics.frag");
 
     initCaustics();
 
@@ -138,11 +139,12 @@ void GLWidget::initializeGL()
 
     m_devicePixelRatio = this->devicePixelRatio();
 
-    m_defaultFBO = 2;
+    m_defaultFBO = 3;
     m_fbo_width = size().width() * m_devicePixelRatio;
     m_fbo_height = size().height() * m_devicePixelRatio;
 
     makeFBO();
+    makeFBO1();
 
     // FBO STUFF END
 
@@ -209,7 +211,7 @@ void GLWidget::paintCaustics() {
     glClearColor(0.68f, 0.58f, 0.38f, 1);
 //    glClearColor(0., 0., 0., 1);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo1);
 //    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 
     // Clear Screen
@@ -227,6 +229,7 @@ void GLWidget::paintCaustics() {
 ////    // Draw the VAO
 //    glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
     m_colorShader->bind();
     //
     m_colorShader->setUniform("proj", m_camera.getProjection());
@@ -242,6 +245,24 @@ void GLWidget::paintCaustics() {
     glBindVertexArray(0);
 
     // Unbind the shader
+    glUseProgram(0);
+
+    m_causticsShader->bind();
+
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo_texture);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
+    glDisable( GL_DEPTH_TEST );
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture1);
+    glUniform1i(glGetUniformLocation(m_causticsShader ->id(), "normSamp"), 2);
+
+    m_arap.m_causticsShape.draw(m_causticsShader, GL_TRIANGLES);
+    glBindVertexArray(0);
     glUseProgram(0);
 }
 
@@ -345,7 +366,37 @@ void GLWidget::makeFBO() {
 
     // Task 22
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+}
 
+void GLWidget::makeFBO1() {
+    // Task 19
+    glActiveTexture(GL_TEXTURE2);
+    glGenTextures(1, &m_fbo_texture1);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_fbo_width, m_fbo_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Task 20
+    glGenRenderbuffers(1, &m_fbo_renderbuffer1);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer1);
+    glRenderbufferStorage(GL_RENDERBUFFER,
+                          GL_DEPTH24_STENCIL8,
+                          m_fbo_width,
+                          m_fbo_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Task 18
+    glGenFramebuffers(1, &m_fbo1);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo1);
+
+    // Task 21
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture1, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer1);
+
+    // Task 22
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
 
 void GLWidget::paintGL()
@@ -358,6 +409,7 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_BLEND );
+    glEnable(GL_DEPTH_TEST);
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
@@ -517,7 +569,11 @@ void GLWidget::resizeGL(int w, int h)
     glDeleteTextures(1, &m_fbo_texture);
     glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
     glDeleteFramebuffers(1, &m_fbo);
+    glDeleteTextures(1, &m_fbo_texture1);
+    glDeleteRenderbuffers(1, &m_fbo_renderbuffer1);
+    glDeleteFramebuffers(1, &m_fbo1);
     makeFBO();
+    makeFBO1();
 }
 
 // ================== Event Listeners

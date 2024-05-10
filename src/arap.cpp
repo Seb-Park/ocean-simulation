@@ -66,41 +66,7 @@ void ARAP::init
 //	minCorner = Vector3f(-1.0f, -1.0f, -1.0f);
 //	maxCorner = Vector3f(1.0f, 1.0f, 1.0f);
 
-
-//    m_shape.initGroundPlane("cornell_box_full_lighting.png")
-//    QImage ocean_floor_image;
-//    GLuint ocean_floor_texture;
-//    // Prepare filepath
-//    QString ocean_floor_filepath = QString(":/resources/images/kitten.png");
-
-//    // TASK 1: Obtain image from filepath
-//    ocean_floor_image = QImage(ocean_floor_filepath);
-
-//    // TASK 2: Format image to fit OpenGL
-//    ocean_floor_image = ocean_floor_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-
-//    // TASK 3: Generate kitten texture
-//    glGenTextures(1, &ocean_floor_texture);
-
-//    // TASK 9: Set the active texture slot to texture slot 0
-//    glActiveTexture(GL_TEXTURE0);
-
-//    // TASK 4: Bind kitten texture
-//    glBindTexture(GL_TEXTURE_2D, ocean_floor_texture);
-
-//    // TASK 5: Load image into kitten texture
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ocean_floor_image.width(), ocean_floor_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, ocean_floor_image.bits());
-
-//    // TASK 6: Set min and mag filters' interpolation mode to linear
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-//    // TASK 7: Unbind kitten texture
-//    glBindTexture(GL_TEXTURE_2D, 0);
-
-//    // TASK 10: set the texture.frag uniform for our texture
-//    glUseProgram(m_texture_shader);
-//    glUniform1i(glGetUniformLocation(m_texture_shader, "sampler"), 0);
+    initCausticsShape(10);
 }
 
 void ARAP::update(double seconds)
@@ -117,27 +83,27 @@ void ARAP::update(double seconds)
     // Note that the "seconds" parameter represents the amount of time that has passed since
     // the last update
 	m_ocean.fft_prime(m_time);
-	m_ocean.update_ocean();
-	m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
-	// m_shape.setVertices(m_ocean.get_vertices());
+    m_ocean.update_ocean();
+//    m_shape.setVertices_and_Normals(m_ocean.get_vertices(), m_ocean.getNormals());
+    m_shape.setVertices(m_ocean.get_vertices());
 
-	auto tmp = m_ocean.get_vertices();
+//	auto tmp = m_ocean.get_vertices();
 	// print the min and max of the vertices
-	Vector3f min = Vector3f::Ones() * 1000000;
-	Vector3f max = Vector3f::Ones() * -1000000;
-	for (int i = 0; i < tmp.size(); i++) {
-		min = min.cwiseMin(tmp[i]);
-		max = max.cwiseMax(tmp[i]);
-	}
-	std::cout << "min: " << min << std::endl;
-std::cout << "max: " << max << std::endl;
+//	Vector3f min = Vector3f::Ones() * 1000000;
+//	Vector3f max = Vector3f::Ones() * -1000000;
+//	for (int i = 0; i < tmp.size(); i++) {
+//		min = min.cwiseMin(tmp[i]);
+//		max = max.cwiseMax(tmp[i]);
+//	}
+//	std::cout << "min: " << min << std::endl;
+//std::cout << "max: " << max << std::endl;
 
 	FoamConstants foam = m_ocean.getFoamConstants();
 	m_foam_shape.setFoamInputs(m_shape.getVertices(), foam.wavelengths, foam.k_vectors, foam.texCoords);
 
 
      m_time += m_timestep;
-  // std::cout << m_time << std::endl;
+//   std::cout << m_time << std::endl;
 }
 
 // Move an anchored vertex, defined by its index, to targetPosition
@@ -160,5 +126,66 @@ void ARAP::move
 	//   - Left-click an anchored point to move it around
 	//
 	// - Minus and equal keys (click repeatedly) to change the size of the vertices
+}
+
+void ARAP::initCausticsShape(int res) {
+//    std::vector<Eigen::Vector3f> gridPoints;
+//    float step = 2.f / ((float) res);
+
+//    for (int i = 0; i < res; ++i) {
+//        for (int j = 0; j < res; ++j) {
+//            float x = -1.f + i * step; // calculate x coordinate
+//            float y = -1.f + j * step; // calculate y coordinate
+//            gridPoints.push_back(Eigen::Vector3f(x, y, 0.f)); // add point to grid
+//        }
+//    }
+//    std::vector<Eigen::Vector3f> verts;
+//    float step = 2.f / ((float) res);
+
+//    for (int i = 0; i < res; ++i) {
+//        for (int j = 0; j < res; ++j) {
+//            float x = -1.f + i * step; // calculate x coordinate
+//            float y = -1.f + j * step; // calculate y coordinate
+//            Eigen::Vector3f bottomLeft = Eigen::Vector3f(x, y, 0.f);
+//            Eigen::Vector3f bottomRight = Eigen::Vector3f(x + step, y, 0.f);
+//            Eigen::Vector3f topRight = Eigen::Vector3f(x + step, y + step, 0.f);
+//            Eigen::Vector3f topLeft = Eigen::Vector3f(x, y + step, 0.f);
+//            verts.push_back(topLeft);
+//            verts.push_back(bottomLeft);
+//            verts.push_back(bottomRight);
+//            verts.push_back(topLeft);
+//            verts.push_back(bottomRight);
+//            verts.push_back(topRight);
+//        }
+//    }
+//    m_causticsShape.setVertices(verts);
+    std::vector<Eigen::Vector3f> verts;
+    std::vector<Eigen::Vector3i> faces;
+    float size = 2.f;
+    float step = size / ((float) res);
+
+    for (int i = 0; i <= res; ++i) {
+        for (int j = 0; j <= res; ++j) {
+            float x = -(size / 2.f) + i * step; // calculate x coordinate
+            float y = -(size / 2.f) + j * step; // calculate y coordinate
+            Eigen::Vector3f bottomLeft = Eigen::Vector3f(x, y, 0.f);
+            verts.push_back(bottomLeft);
+        }
+    }
+
+    for (int i = 0; i < res; ++i) {
+        for (int j = 0; j < res; ++j) {
+            int bottomLeft = i * (res + 1) + j;
+            int bottomRight = i * (res + 1) + j + 1;
+            int topRight = (i + 1) * (res + 1) + j + 1;
+            int topLeft = (i + 1) * (res + 1) + j;
+            faces.push_back(Eigen::Vector3i(topLeft, bottomLeft, bottomRight));
+            faces.push_back(Eigen::Vector3i(topLeft, bottomRight, topRight));
+            faces.push_back(Eigen::Vector3i(bottomRight, bottomLeft, topLeft));
+            faces.push_back(Eigen::Vector3i(topRight, bottomRight, topLeft));
+        }
+    }
+    m_causticsShape.init(verts, faces);
+    m_causticsShape.setColor(0.27f, .803f, .96f);
 }
 

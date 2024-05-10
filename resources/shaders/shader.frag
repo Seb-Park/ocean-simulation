@@ -71,6 +71,7 @@ void main() {
     vec2 reflUV = uvFromWorldPoint(reflPos);
 
 //    float waterMurkiness = 0.002f; // TODO: Make uniform
+//    float waterMurkiness = 0.0005f; // TODO: Make uniform
     float waterMurkiness = 0.0005f; // TODO: Make uniform
     vec3 waterVolumeColor = vec3(red * 0.1f, green * 0.2f, blue * 0.2f);
     float murkDiffuse = 0.3f;
